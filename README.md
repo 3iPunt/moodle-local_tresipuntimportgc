@@ -1,29 +1,16 @@
-# README #
+# TRESIPUNT GOOGLE CLASSROOM IMPORT COURSES
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Local plugin Moodle for import courses from Google Classroom account.
 
-### What is this repository for? ###
+## Install
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+``
+/local/tresipuntimportgc/
+``
 
-### How do I get set up? ###
+## Configuration
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+``
+/admin/settings.php?section=local_tresipuntimportgc_config
+``
 
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
