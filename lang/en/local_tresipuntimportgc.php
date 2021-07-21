@@ -31,3 +31,7 @@ $string['import_page'] = 'Import Courses from Google Classroom';
 $string['not_capability'] = 'You do not have permissions to import courses from Google Classroom';
 $string['token'] = 'Access Token';
 $string['gcheading'] = 'Google Classroom API';
+$string['credentialsjson'] = 'Credentials Json';
+$string['credentialsjson_help'] = 'Add the content of the file credentials.json.<br>Credentials is a JSON file that you get when you configure the connection API in Google, in the credentials panel, at https://console.developers.google.com/';
+$string['clientid'] = 'Client ID';
+$string['clientid_help'] = 'Corresponds to "client_id" in the json file';

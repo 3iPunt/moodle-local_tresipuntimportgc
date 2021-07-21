@@ -31,3 +31,7 @@ $string['import_page'] = 'Importar Cursos de Google Classroom';
 $string['not_capability'] = 'No tiene permisos para importar cursos de Google Classroom';
 $string['token'] = 'Access Token';
 $string['gcheading'] = 'Google Classroom API';
+$string['credentialsjson'] = 'Credenciales en json';
+$string['credentialsjson_help'] = 'Añadir el contenido del archivo credentials.json.<br>Las credenciales son un archivo JSON que se obtiene al configurar la API de conexión en Google, en el panel de credenciales, en https://console.developers.google.com/';
+$string['clientid'] = 'Cliente ID';
+$string['clientid_help'] = 'Corresponde a "client_id" en el archivo json';

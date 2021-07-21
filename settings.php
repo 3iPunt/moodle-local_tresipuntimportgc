@@ -43,20 +43,33 @@ if ($hassiteconfig) {
                 '')
         );
 
-
-        $settingspage->add(new admin_setting_configtext(
+        // TODO for the moment we do not need the token
+        /*$settingspage->add(new admin_setting_configtext(
             'local_tresipuntimportgc/token',
             new lang_string('token', 'local_tresipuntimportgc'),
             '',
             ''
+        ));*/
+
+        // Credentials Json
+        $settingspage->add(new admin_setting_configtext('tool_timestats/credentialsjson',
+            new lang_string('credentialsjson', 'local_tresipuntimportgc'),
+            new lang_string('credentialsjson_help', 'local_tresipuntimportgc'),
+            '',
+            PARAM_RAW
         ));
 
+        // Client ID
+        $settingspage->add(new admin_setting_configtext('tool_timestats/clientid',
+            new lang_string('clientid', 'local_tresipuntimportgc'),
+            new lang_string('clientid_help', 'local_tresipuntimportgc'),
+            '',
+            PARAM_RAW
+        ));
     }
     $ADMIN->add('local_tresipuntimportgc_category', $settingspage);
 
-    $ADMIN->add('local_tresipuntimportgc_category', new admin_externalpage('local_tresipuntimportgc_import',
+    $ADMIN->add('courses', new admin_externalpage('local_tresipuntimportgc_import',
         new lang_string('import_page', 'local_tresipuntimportgc'),
         $CFG->wwwroot . '/local/tresipuntimportgc/import.php'));
-
-
 }
