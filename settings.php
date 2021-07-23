@@ -39,21 +39,21 @@ if ($hassiteconfig) {
                 '')
         );
         // Credentials Json
-        $settingspage->add(new admin_setting_configtext('tool_timestats/credentialsjson',
+        $settingspage->add(new admin_setting_configtext('local_tresipuntimportgc/credentialsjson',
             new lang_string('credentialsjson', 'local_tresipuntimportgc'),
             new lang_string('credentialsjson_help', 'local_tresipuntimportgc'),
             '',
             PARAM_RAW
         ));
         // Client ID
-        $settingspage->add(new admin_setting_configtext('tool_timestats/clientid',
+        $settingspage->add(new admin_setting_configtext('local_tresipuntimportgc/clientid',
             new lang_string('clientid', 'local_tresipuntimportgc'),
             new lang_string('clientid_help', 'local_tresipuntimportgc'),
             '',
             PARAM_RAW
         ));
         // Secret Key
-        $settingspage->add(new admin_setting_configtext('tool_timestats/secretkey',
+        $settingspage->add(new admin_setting_configtext('local_tresipuntimportgc/secretkey',
             new lang_string('secretkey', 'local_tresipuntimportgc'),
             new lang_string('secretkey_help', 'local_tresipuntimportgc'),
             '',

@@ -48,7 +48,7 @@ define([
      * @property {string} CREATECOURSES
      */
     let SERVICES = {
-        CREATECOURSES: 'local_tresipuntimportgc_createcourses'
+        CREATECOURSES: 'local_tresipuntimportgc_course_create'
     };
 
     /**

@@ -40,7 +40,7 @@
     </div>
     <br>
     <ul class="list-group list-group-flush" data-region="content-classroom-courses">
-        {{# coursesavailables }}
+        {{# courses }}
             <li class="list-group-item">
                 <div class="custom-control custom-checkbox">
                     <input type="checkbox" class="custom-control-input" id="{{ id }}" data-ownerId="{{ ownerId }}"
@@ -48,7 +48,6 @@
                     <label class="custom-control-label" for="{{ id }}">
                         <a href="{{ alternateLink }}" target="_blank">{{ name }}</a>
                     </label>
-
 
                     <button class="ml-auto icon-no-margin icon-size-3 btn text-reset"
                             type="button"
@@ -71,7 +70,7 @@
                     </div>
                 </div>
             </li>
-        {{/coursesavailables}}
+        {{/ courses }}
     </ul>
     <br>
     <button class="btn btn-primary" data-action="createcourses" disabled>{{#str}}createcourses, local_tresipuntimportgc{{/str}}</button>

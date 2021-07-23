@@ -14,18 +14,32 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Plugin version and other meta-data are defined here.
- *
- * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+namespace local_tresipuntimportgc\providers;
+
+use local_tresipuntimportgc\models\course;
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_tresipuntimportgc';
-$plugin->release = '1.0';
-$plugin->version = 2021072300;
-$plugin->requires = 2020061508;
-$plugin->maturity = MATURITY_STABLE;
+global $CFG;
+require_once($CFG->libdir . '/google/src/Google/autoload.php');
+require_once($CFG->libdir . '/google/lib.php');
+require_once($CFG->libdir . '/google/src/Google/Service/Drive.php');
+
+abstract class provider {
+
+    /**
+     * Get Courses.
+     *
+     * @return array
+     */
+    abstract public function get_courses(): array;
+
+    /**
+     * Get Course.
+     *
+     * @param string $id
+     * @return course
+     */
+    abstract public function get_course(string $id): course;
+
+}

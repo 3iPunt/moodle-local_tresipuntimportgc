@@ -27,6 +27,7 @@ namespace local_tresipuntimportgc\output;
 use Google_Client;
 use Google_Service_Classroom;
 use local_tresipuntimportgc\gprovider;
+use local_tresipuntimportgc\providers\provider;
 use renderable;
 use renderer_base;
 use stdClass;
@@ -46,16 +47,16 @@ require_once($CFG->libdir . '/google/src/Google/Service/Drive.php');
  */
 class import_page implements renderable, templatable {
 
-    /** @var Google_Client */
-    private $client;
-    private $courses;
+    /** @var provider Provider */
+    private $provider;
 
     /**
      * import_page constructor.
      *
+     * @param provider $provider
      */
-    public function __construct(Google_Client $client) {
-        $this->client = $client;
+    public function __construct(provider $provider) {
+        $this->provider = $provider;
     }
 
     /**
@@ -65,11 +66,9 @@ class import_page implements renderable, templatable {
      * @return stdClass
      */
     public function export_for_template(renderer_base $output): stdClass {
-        $this->courses = gprovider::get_classroom_courses($this->client);
-        //print_object($this->courses);
         // TODO empty courses.
         $data = new stdClass();
-        $data->coursesavailables = $this->courses;
+        $data->courses = $this->provider->get_courses();
         return $data;
     }
 }

@@ -15,17 +15,32 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
- *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright   3iPunt <https://www.tresipunt.com/>
  */
+
+use local_tresipuntimportgc\external\course_external;
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_tresipuntimportgc';
-$plugin->release = '1.0';
-$plugin->version = 2021072300;
-$plugin->requires = 2020061508;
-$plugin->maturity = MATURITY_STABLE;
+$functions = [
+
+    'local_tresipuntimportgc_course_create' => [
+        'classname' => course_external::class,
+        'methodname' => 'create_course',
+        'description' => 'Create Course',
+        'type' => 'read',
+        'ajax' => true,
+        'loginrequired' => true
+    ]
+
+];
+$services = [
+    'local_tresipuntimportgc' => [
+        'functions' => [
+            'local_tresipuntimportgc_course_create',
+        ],
+        'restrictedusers' => 0,
+        'enabled' => 1
+    ]
+];

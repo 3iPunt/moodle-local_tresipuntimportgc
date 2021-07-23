@@ -14,12 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_tresipuntimportgc;
+namespace local_tresipuntimportgc\providers;
 
+use dml_exception;
 use Google_Client;
 use Google_Exception;
 use Google_Service_Classroom;
 use Google_Service_Oauth2;
+use local_tresipuntimportgc\models\course;
 use moodle_exception;
 use moodle_url;
 
@@ -30,22 +32,70 @@ require_once($CFG->libdir . '/google/src/Google/autoload.php');
 require_once($CFG->libdir . '/google/lib.php');
 require_once($CFG->libdir . '/google/src/Google/Service/Drive.php');
 
-abstract class gprovider {
+/**
+ * Class gclassroom
+ *
+ * @package     local_tresipuntimportgc
+ * @copyright   2021 Tresipunt
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class gclassroom extends provider {
+
+    /** @var string Json */
+    protected $json;
+
+    /** @var string Client ID */
+    protected $clientid;
+
+    /** @var string Secret Key */
+    protected $secretkey;
+
+    /** @var Google_Client Client */
+    protected $client;
+
+    /** @var Google_Service_Classroom Service */
+    protected $service;
 
     /**
-     * @param string $json
-     * @param string $clientid
-     * @param string $secretkey
-     * @return Google_Client
+     * gclassroom constructor.
+     *
+     * @throws Google_Exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
+    public function __construct() {
+        $this->json = get_config('local_tresipuntimportgc', 'credentialsjson');
+        $this->clientid = get_config('local_tresipuntimportgc', 'clientid');
+        $this->secretkey = get_config('local_tresipuntimportgc', 'secretkey');
+
+        if ($this->json !== '' &&
+            $this->json !== false &&
+            $this->clientid !== '' &&
+            $this->clientid !== false &&
+            $this->secretkey !== '' &&
+            $this->secretkey !== false) {
+            $this->set_client();
+        } else {
+            redirect((
+                new moodle_url(
+                    '/admin/settings.php', ['section' => 'local_tresipuntimportgc'])
+                )->out(false)
+            );
+        }
+    }
+
+    /**
+     * Set Client.
+     *
      * @throws Google_Exception
      * @throws moodle_exception
      */
-    public static function get_client(string $json, string $clientid, string $secretkey): Google_Client {
+    protected function set_client() {
         $client = new Google_Client();
-        $client->setApplicationName("Tresipunt Import Google Classroom");
-        $client->setClientId($clientid);
-        $client->setClientSecret($secretkey);
-        $client->setAuthConfig($json);
+        $client->setApplicationName(get_string('pluginname', 'local_tresipuntimportgc'));
+        $client->setClientId($this->clientid );
+        $client->setClientSecret($this->secretkey);
+        $client->setAuthConfig($this->json);
         $client->setRedirectUri((new moodle_url('/local/tresipuntimportgc/import.php'))->out(false));
         $client->setAccessType('offline');
         $client->setPrompt('select_account consent');
@@ -75,19 +125,50 @@ abstract class gprovider {
             $authUrl = $client->createAuthUrl();
             echo '<script>window.open("' . $authUrl . '", "_self");</script>';
         }
-        return $client;
+        $this->client = $client;
     }
 
     /**
-     * @param Google_Client $client
+     * Set Service.
+     */
+    protected function get_service() {
+        if (empty($this->service)) {
+            $this->set_service();
+            return $this->service;
+        } else {
+            return $this->service;
+        }
+    }
+
+    /**
+     * Set Service.
+     */
+    protected function set_service() {
+        $this->service = new Google_Service_Classroom($this->client);
+    }
+
+    /**
+     * Get Courses.
+     *
      * @return array
      */
-    public static function get_classroom_courses(Google_Client $client): array {
-        $service =  new Google_Service_Classroom($client);
+    public function get_courses(): array {
         // TODO paginate logic.
         $optParams = ['pageSize' => 99];
-        $results = $service->courses->listCourses($optParams);
+        $results = $this->get_service()->courses->listCourses($optParams);
         $courses = $results->getCourses();
         return count($courses) === 0 ? [] : $courses;
+    }
+
+    /**
+     * Get Course.
+     *
+     * @param string $id
+     * @return course
+     */
+    public function get_course(string $id): course {
+        $course = $this->get_service()->courses->get($id);
+        $course3ip = new course($id);
+        return $course3ip;
     }
 }

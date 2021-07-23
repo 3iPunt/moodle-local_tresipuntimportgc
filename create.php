@@ -15,16 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Import Courses GC.
+ * Create Courses GC.
  *
  * @package    local_tresipuntimportgc
  * @subpackage tresipuntimportgc
  * @copyright  2021 Tresipunt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-use local_tresipuntimportgc\output\import_page;
-use local_tresipuntimportgc\providers\gclassroom;
 
 require_once('../../config.php');
 
@@ -34,7 +31,7 @@ require_login();
 
 $has_capability = has_capability('local/tresipuntimportgc:import',  context_system::instance());
 
-$title = get_string('import_page', 'local_tresipuntimportgc');
+$title = 'LABORATORIO DE FACTORÍA';
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/tresipuntimportgc/import.php');
@@ -46,9 +43,18 @@ $output = $PAGE->get_renderer('local_tresipuntimportgc');
 echo $OUTPUT->header();
 
 if ($has_capability) {
-    $provider = new gclassroom();
-    $page = new import_page($provider);
-    echo $output->render($page);
+
+    $providerid = '269365900855';
+    $fullname = 'Importación';
+    $shortname = 'Importación' . '_' .uniqid();
+    $category = 1;
+    $visible = true;
+
+    \local_tresipuntimportgc\external\course_external::create_course(
+        $providerid, $fullname, $shortname, $category, $visible
+    );
+
+
 } else {
     throw new moodle_exception(
         get_string('not_capability', 'local_tresipuntimportgc')
