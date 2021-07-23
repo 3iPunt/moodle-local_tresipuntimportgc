@@ -31,8 +31,39 @@
   {
     "": "" }
 }}
-<div data-region="local_tresipuntimportgc_import_page">
-    <h1>{{ test }}</h1>
+<div class="local_tresipuntimportgc_import_page" data-region="local_tresipuntimportgc_import_page">
+    <h3>{{#str}}classroom_courses, local_tresipuntimportgc{{/str}}</h3>
+    <hr>
+    <div class="custom-control custom-checkbox">
+        <input type="checkbox" class="custom-control-input" id="allchecks">
+        <label class="custom-control-label" for="allchecks">{{#str}}selectallcourses, local_tresipuntimportgc{{/str}}</label>
+    </div>
+    <br>
+    <ul class="list-group list-group-flush" data-region="content-classroom-courses">
+        {{# coursesavailables }}
+            <li class="list-group-item">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="{{ id }}" data-ownerId="{{ ownerId }}"
+                           data-coursename="{{ name }}" data-room="{{ room }}">
+                    <label class="custom-control-label" for="{{ id }}">
+                        <a href="{{ alternateLink }}" target="_blank">{{ name }}</a>
+                    </label>
+                    <div>
+                        <span class="badge badge-info">{{ room }}</span>
+                        <span class="badge badge-light">{{ courseState }}</span>
+                    </div>
+                </div>
+            </li>
+        {{/coursesavailables}}
+    </ul>
+    <br>
+    <button class="btn btn-primary" data-action="createcourses" disabled>{{#str}}createcourses, local_tresipuntimportgc{{/str}}</button>
+    <hr>
 </div>
 {{#js}}
+    require(['local_tresipuntimportgc/importpage'],
+        function(Controller) {
+            Controller.init('[data-region="local_tresipuntimportgc_import_page"]');
+        }
+    );
 {{/js}}

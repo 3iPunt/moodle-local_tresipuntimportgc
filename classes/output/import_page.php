@@ -66,9 +66,10 @@ class import_page implements renderable, templatable {
      */
     public function export_for_template(renderer_base $output): stdClass {
         $this->courses = gprovider::get_classroom_courses($this->client);
-        print_object($this->courses);
+        //print_object($this->courses);
+        // TODO empty courses.
         $data = new stdClass();
-        $data->test = 'El render funciona';
+        $data->coursesavailables = $this->courses;
         return $data;
     }
 }

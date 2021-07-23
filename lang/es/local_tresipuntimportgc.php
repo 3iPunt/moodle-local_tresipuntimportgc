@@ -38,4 +38,10 @@ $string['clientid_help'] = 'Corresponde a "client_id" en el archivo json';
 $string['secretkey'] = 'Secret Key';
 $string['secretkey_help'] = 'Este valor se obtiene al configurar la Api de Google en https://console.cloud.google.com/apis/credentials';
 
+$string['classroom_courses'] = 'Cursos disponibles de tu cuenta de Google Classroom';
+$string['selectallcourses'] = 'Seleccionar todos los cursos';
+$string['create'] = 'Crear cursos';
+$string['createcourses'] = 'Crear cursos seleccionados';
+$string['createcourses_help'] = 'Si continúa, se recargará la página y empezarán a generarse los cursos seleccionados, mostrando las información de la traza. <br>NO SE PODRÁ DETENER LA OPERACIÓN HASTA QUE TERMINE POR SÍ MISMA.<br>¿Esta seguro?';
+
 $string['error_client'] = 'Error al generar el cliente';
