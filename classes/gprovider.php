@@ -46,6 +46,7 @@ abstract class gprovider {
         $client->setClientId($clientid);
         $client->setClientSecret($secretkey);
         $client->setAuthConfig($json);
+        $client->setRedirectUri((new moodle_url('/local/tresipuntimportgc/import.php'))->out(false));
         $client->setAccessType('offline');
         $client->setPrompt('select_account consent');
         $client->setScopes([

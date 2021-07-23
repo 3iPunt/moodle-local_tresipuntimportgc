@@ -48,6 +48,23 @@
                     <label class="custom-control-label" for="{{ id }}">
                         <a href="{{ alternateLink }}" target="_blank">{{ name }}</a>
                     </label>
+
+
+                    <button class="ml-auto icon-no-margin icon-size-3 btn text-reset"
+                            type="button"
+                            data-toggle="collapse"
+                            data-target="#edit_{{ id }}"
+                            aria-expanded="false"
+                            aria-controls="edit_{{ id }}">
+                        <i class="icon fa fa-pencil"></i>
+                    </button>
+
+                    <div class="collapse" id="edit_{{ id }}">
+                        <div class="card card-body">
+                            <!--TODO controls -->
+                            Here you will have inputs and select to set the name of the course, the category where it will be created, whether it is visible or not, etc.
+                        </div>
+                    </div>
                     <div>
                         <span class="badge badge-info">{{ room }}</span>
                         <span class="badge badge-light">{{ courseState }}</span>
