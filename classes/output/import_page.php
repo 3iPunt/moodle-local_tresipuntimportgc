@@ -24,13 +24,19 @@
 
 namespace local_tresipuntimportgc\output;
 
+use Google_Client;
+use Google_Service_Classroom;
+use local_tresipuntimportgc\gprovider;
 use renderable;
 use renderer_base;
 use stdClass;
 use templatable;
 
 defined('MOODLE_INTERNAL') || die;
-
+global $CFG;
+require_once($CFG->libdir . '/google/src/Google/autoload.php');
+require_once($CFG->libdir . '/google/lib.php');
+require_once($CFG->libdir . '/google/src/Google/Service/Drive.php');
 /**
  * Class import_page
  *
@@ -40,21 +46,27 @@ defined('MOODLE_INTERNAL') || die;
  */
 class import_page implements renderable, templatable {
 
+    /** @var Google_Client */
+    private $client;
+    private $courses;
+
     /**
      * import_page constructor.
      *
      */
-    public function __construct() {
+    public function __construct(Google_Client $client) {
+        $this->client = $client;
     }
 
     /**
      * Export for template
      *
      * @param renderer_base $output
-     *
      * @return stdClass
      */
     public function export_for_template(renderer_base $output): stdClass {
+        $this->courses = gprovider::get_classroom_courses($this->client);
+        print_object($this->courses);
         $data = new stdClass();
         $data->test = 'El render funciona';
         return $data;

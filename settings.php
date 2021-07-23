@@ -26,23 +26,18 @@ defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
     global $ADMIN, $CFG;
-
     $ADMIN->add('modules', new admin_category('local_tresipuntimportgc_category',
         new lang_string('pluginname', 'local_tresipuntimportgc')));
-
     $settingspage = new admin_settingpage(
         'local_tresipuntimportgc_config',
         new lang_string('pluginconfig', 'local_tresipuntimportgc'));
-
     if ($ADMIN->fulltree) {
-
         $settingspage->add(
             new admin_setting_heading(
                 'local_tresipuntimportgc_gc',
                 new lang_string('gcheading', 'local_tresipuntimportgc'),
                 '')
         );
-
         // Credentials Json
         $settingspage->add(new admin_setting_configtext('tool_timestats/credentialsjson',
             new lang_string('credentialsjson', 'local_tresipuntimportgc'),
@@ -50,7 +45,6 @@ if ($hassiteconfig) {
             '',
             PARAM_RAW
         ));
-
         // Client ID
         $settingspage->add(new admin_setting_configtext('tool_timestats/clientid',
             new lang_string('clientid', 'local_tresipuntimportgc'),
@@ -58,7 +52,6 @@ if ($hassiteconfig) {
             '',
             PARAM_RAW
         ));
-
         // Secret Key
         $settingspage->add(new admin_setting_configtext('tool_timestats/secretkey',
             new lang_string('secretkey', 'local_tresipuntimportgc'),
@@ -68,7 +61,6 @@ if ($hassiteconfig) {
         ));
     }
     $ADMIN->add('local_tresipuntimportgc_category', $settingspage);
-
     $ADMIN->add('courses', new admin_externalpage('local_tresipuntimportgc_import',
         new lang_string('import_page', 'local_tresipuntimportgc'),
         $CFG->wwwroot . '/local/tresipuntimportgc/import.php'));

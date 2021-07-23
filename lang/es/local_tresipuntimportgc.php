@@ -35,3 +35,7 @@ $string['credentialsjson'] = 'Credenciales en json';
 $string['credentialsjson_help'] = 'Añadir el contenido del archivo credentials.json.<br>Las credenciales son un archivo JSON que se obtiene al configurar la API de conexión en Google, en el panel de credenciales, en https://console.developers.google.com/';
 $string['clientid'] = 'Cliente ID';
 $string['clientid_help'] = 'Corresponde a "client_id" en el archivo json';
+$string['secretkey'] = 'Secret Key';
+$string['secretkey_help'] = 'Este valor se obtiene al configurar la Api de Google en https://console.cloud.google.com/apis/credentials';
+
+$string['error_client'] = 'Error al generar el cliente';
