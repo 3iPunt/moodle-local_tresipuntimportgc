@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_tresipuntimportgc\external\course_external;
+
 require_once('../../config.php');
 
 global $PAGE, $OUTPUT;
@@ -50,9 +52,13 @@ if ($has_capability) {
     $category = 1;
     $visible = true;
 
-    \local_tresipuntimportgc\external\course_external::create_course(
+    echo "<pre>";
+
+    $res = course_external::create_course(
         $providerid, $fullname, $shortname, $category, $visible
     );
+
+    var_dump($res);
 
 
 } else {

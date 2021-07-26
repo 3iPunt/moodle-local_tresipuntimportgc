@@ -21,7 +21,11 @@ use Google_Client;
 use Google_Exception;
 use Google_Service_Classroom;
 use Google_Service_Oauth2;
+use local_tresipuntimportgc\api\error;
+use local_tresipuntimportgc\api\response_course;
+use local_tresipuntimportgc\api\response_file;
 use local_tresipuntimportgc\models\course;
+use local_tresipuntimportgc\models\file;
 use moodle_exception;
 use moodle_url;
 
@@ -102,7 +106,8 @@ class gclassroom extends provider {
         $client->setScopes([
                 Google_Service_Classroom::CLASSROOM_COURSES_READONLY,
                 'https://www.googleapis.com/auth/userinfo.email',
-                'https://www.googleapis.com/auth/userinfo.profile']
+                'https://www.googleapis.com/auth/userinfo.profile',
+                'https://www.googleapis.com/auth/classroom.courses',]
         );
         $oauth2 = new Google_Service_Oauth2($client);
         if (isset($_GET["code"])) {
@@ -164,11 +169,48 @@ class gclassroom extends provider {
      * Get Course.
      *
      * @param string $id
-     * @return course
+     * @return response_course
      */
-    public function get_course(string $id): course {
+    public function get_course(string $id): response_course {
+        try {
+            $course = $this->get_service()->courses->get($id);
+            $course3ip = new course($id, $course->getDescription());
+            return new response_course(true, $course3ip, null);
+        } catch (\Exception $e) {
+            return new response_course(false, null, new error('01000', $e->getMessage()));
+        }
+    }
+
+    /**
+     * Get Teacher Folder.
+     *
+     * @param string $id
+     * @return response_file
+     */
+    public function get_teacher_folder(string $id): response_file {
         $course = $this->get_service()->courses->get($id);
-        $course3ip = new course($id);
-        return $course3ip;
+        $tr = isset($course->toSimpleObject()->teacherFolder) ? $course->toSimpleObject()->teacherFolder : null;
+        if (isset($tr)) {
+            $tr = new file($tr['id'], $tr['title'], $tr['alternateLink']);
+            return new response_file(true, $tr, null);
+        } else {
+            return new response_file(false, null, new error('02000', 'Not teacher foler'));
+        }
+    }
+
+    /**
+     * Get Modules.
+     *
+     * @param string $id
+     * @return response_course
+     */
+    public function get_modules(string $id): response_course {
+        try {
+            $modules = $this->get_service()->courses->listCourses();
+            var_dump($modules);die();
+            return new response_course(true, $course3ip, null);
+        } catch (\Exception $e) {
+            return new response_course(false, null, new error('01000', $e->getMessage()));
+        }
     }
 }

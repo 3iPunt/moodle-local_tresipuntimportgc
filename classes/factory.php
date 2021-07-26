@@ -24,6 +24,7 @@
 
 namespace local_tresipuntimportgc;
 
+use local_tresipuntimportgc\api\response_course;
 use local_tresipuntimportgc\models\course;
 use local_tresipuntimportgc\providers\provider;
 use moodle_exception;
@@ -60,41 +61,53 @@ class factory  {
      * @param string $fullname
      * @param string $shortname
      * @param bool $visible
-     * @return object
+     * @return response_course
      * @throws moodle_exception
      */
     function create_course(
         string $providerid, int $categoryid, string $fullname, string $shortname, bool $visible
-    ): object {
+    ): response_course {
 
         global $DB, $USER;
 
-        $res = new stdClass();
-        $res->success = true;
-        $res->error = '';
+        $res = $this->provider->get_course($providerid);
+        if ($res->success) {
 
-        // Get Course.
-        $provider_course = $this->provider->get_course($providerid);
+            $course = $res->data;
 
-        // Create Course.
-        $course3ip = new course($providerid);
-        $newcourse = $course3ip->create_course(
-            $categoryid, $fullname, $shortname, $visible
-        );
+            // Create Course.
+            $createres = $course->create_course(
+                $categoryid, $fullname, $shortname, $visible
+            );
 
-        // Create Modules.
+            if ($createres->success) {
 
+                // Create Teacher Resource.
+                $restf = $this->provider->get_teacher_folder($providerid);
+                if ($restf->success) {
+                    $course->create_teacher_folder($restf->data->title, $restf->data->link);
+                }
 
-
-        // Enrol teacher.
-        $plugin_instance = $DB->get_record("enrol",
-            array('courseid' => $newcourse->id, 'enrol'=>'manual'));
-        $plugin = enrol_get_plugin('manual');
-        $roleid = $DB->get_field('role', 'id', array('shortname' => 'editingteacher'));
-        $plugin->enrol_user($plugin_instance, $USER->id, $roleid);
+                // Create Modules.
 
 
-        return $res;
+
+                // Enrol teacher.
+                $plugin_instance = $DB->get_record("enrol",
+                    array('courseid' => $createres->data->get_id(), 'enrol'=>'manual'));
+                $plugin = enrol_get_plugin('manual');
+                $roleid = $DB->get_field('role', 'id', array('shortname' => 'editingteacher'));
+                $plugin->enrol_user($plugin_instance, $USER->id, $roleid);
+
+                // Response.
+                return $res;
+            } else {
+                return new response_course(false, $createres->data, $createres->error);
+            }
+        } else {
+            return $res;
+        }
+
     }
 
 }

@@ -1,0 +1,66 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Class file
+ *
+ * @package     local_tresipuntimportgc
+ * @copyright   2021 Tresipunt
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace local_tresipuntimportgc\models;
+
+use local_tresipuntimportgc\api\error;
+use local_tresipuntimportgc\api\response_course;
+use moodle_exception;
+use stdClass;
+
+
+defined('MOODLE_INTERNAL') || die;
+
+/**
+ * Class file
+ *
+ * @package     local_tresipuntimportgc
+ * @copyright   2021 Tresipunt
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class file  {
+
+    /** @var string ID course Provider */
+    protected $providerid;
+
+    /** @var string Title */
+    public $title;
+
+    /** @var string Link */
+    public $link;
+
+    /**
+     * constructor.
+     *
+     * @param string $providerid
+     * @param string $title
+     * @param string $link
+     */
+    public function __construct(string $providerid, string $title, string $link) {
+        $this->providerid = $providerid;
+        $this->title = $title;
+        $this->link = $link;
+    }
+
+}

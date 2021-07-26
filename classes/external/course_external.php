@@ -88,19 +88,23 @@ class course_external extends external_api {
                 $factory = new factory($provider);
                 $res = $factory->create_course($providerid, $category->id, $fullname, $shortname, $visible);
                 $success = $res->success;
-                $error = $res->error;
+                $error = $res->to_string();
+                $id = $res->success ? $res->data->get_id() : null;
             } else {
                 $success = false;
                 $error = 'El usuario no puede crear cursos en esta categoría';
+                $id = null;
             }
         } else {
             $success = false;
             $error = 'La categoría no existe';
+            $id = null;
         }
 
         return [
             'success' => $success,
-            'error' => $error
+            'error' => $error,
+            'id' => $id
         ];
     }
 
@@ -111,7 +115,8 @@ class course_external extends external_api {
         return new external_single_structure(
             array(
                 'success' => new external_value(PARAM_BOOL, 'Was it a success?'),
-                'error' => new external_value(PARAM_TEXT, 'Error message')
+                'error' => new external_value(PARAM_TEXT, 'Error message'),
+                'id' => new external_value(PARAM_INT, 'Course ID', false)
             )
         );
     }
