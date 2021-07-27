@@ -15,66 +15,65 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class module_url
+ * Class module_quiz
  *
  * @package     local_tresipuntimportgc
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_tresipuntimportgc\models;
-
+namespace local_tresipuntimportgc\factory;
 
 use coding_exception;
 use dml_exception;
-use local_tresipuntimportgc\api\error;
-use local_tresipuntimportgc\api\response_module;
-use mod_url_generator;
+use local_tresipuntimportgc\responses\error;
+use local_tresipuntimportgc\responses\response_module;
+use mod_quiz_generator;
 
 defined('MOODLE_INTERNAL') || die;
 
 /**
- * Class module_url
+ * Class module_quiz
  *
  * @package     local_tresipuntimportgc
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class module_url extends module {
+class module_quiz extends module {
 
-    /** @var mod_url_generator Generator */
+    /** @var mod_quiz_generator Generator */
     protected $generator;
 
     /**
      * constructor.
      *
-     * @param int $course_id
-     * @throws dml_exception
+     * @param string $providersection
+     * @param string $title
+     * @param string $intro
+     * @param bool $visible
      * @throws coding_exception
      */
-    public function __construct(int $course_id) {
-        parent::__construct($course_id, 'mod_url');
+    public function __construct(string $providersection, string $title, string $intro, bool $visible) {
+        parent::__construct('mod_quiz', $providersection, $title, $intro, $visible);
     }
 
     /**
      * Create.
      *
-     * @param string $title
-     * @param string $intro
-     * @param string $link
-     * @param bool $visible
+     * @param int $course_id
      * @return response_module
+     * @throws dml_exception
      */
-    public function create(string $title, string $intro, string $link, bool $visible): response_module {
+    public function create(int $course_id): response_module {
+        $course = get_course($course_id);
         $record = [
-            'course' => $this->course,
-            'name' => $title,
-            'externalurl' => $link,
-            'intro' => $intro,
+            'course' => $course,
+            'name' => $this->title,
+            'intro' => $this->intro,
             'introformat' => FORMAT_HTML,
             'files' => file_get_unused_draft_itemid(),
         ];
-        $options = ['section' => 0, 'visible' => $visible, 'showdescription' => true];
+        $options = ['section' => $this->get_section($course_id), 'visible' => $this->visible, 'showdescription' => true];
         $res = $this->generator->create_instance($record, $options);
         if (isset($res)) {
             return new response_module(true, $this, null);

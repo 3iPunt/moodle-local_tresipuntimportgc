@@ -22,17 +22,16 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_tresipuntimportgc\models;
+namespace local_tresipuntimportgc\factory;
 
 use coding_exception;
 use dml_exception;
-use local_tresipuntimportgc\api\error;
-use local_tresipuntimportgc\api\response_course;
-use local_tresipuntimportgc\api\response_file;
-use local_tresipuntimportgc\api\response_module;
+use local_tresipuntimportgc\responses\error;
+use local_tresipuntimportgc\responses\response;
+use local_tresipuntimportgc\responses\response_course;
+use local_tresipuntimportgc\responses\response_module;
 use moodle_exception;
 use stdClass;
-
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -43,26 +42,31 @@ defined('MOODLE_INTERNAL') || die;
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class course  {
+class course {
 
     /** @var string ID course Provider */
     protected $providerid;
 
-    /** @var string Description */
-    protected $description;
+    /** @var string Provider Data */
+    public $providerdata;
 
     /** @var int Course ID Moodle */
     protected $id = null;
+
+    /** @var string Description */
+    protected $description = null;
 
     /**
      * constructor.
      *
      * @param string $providerid
-     * @param string $description
+     * @param string $desc
+     * @param object|null $providerdata
      */
-    public function __construct(string $providerid, string $description) {
+    public function __construct(string $providerid, string $desc, object $providerdata = null) {
         $this->providerid = $providerid;
-        $this->description = $description;
+        $this->providerdata = $providerdata;
+        $this->description = $desc;
     }
 
     /**
@@ -92,7 +96,8 @@ class course  {
      * @param bool $visible
      * @return response_course
      */
-    public function create_course(int $categoryid, string $fullname, string $shortname, bool $visible): response_course {
+    public function create_course(
+        int $categoryid, string $fullname, string $shortname, bool $visible): response_course {
         $data = new stdClass();
         $data->category = $categoryid;
         $data->idnumber = $this->providerid . '_' .uniqid();
@@ -115,12 +120,40 @@ class course  {
      * @param string $title
      * @param string $link
      * @return response_module
-     * @throws coding_exception
-     * @throws dml_exception
+     * @throws coding_exception|dml_exception
      */
     public function create_teacher_folder(string $title, string $link): response_module {
-        $modurl = new module_url($this->get_id());
-        return $modurl->create($title, 'Teacher Folder', $link, false);
+        if (!is_null($this->get_id())) {
+            $modurl = new module_url('', $title, 'Teacher Folder', false, $link);
+            return $modurl->create($this->get_id());
+        } else {
+            return new response_module(false, null, new error('10001', 'COURSE NOT CREATED'));
+        }
+
+    }
+
+    /**
+     * Enrol Current User as Teacher.
+     *
+     * @return response
+     */
+    public function enrol_user_as_teacher(): response {
+        global $USER, $DB;
+        if (!is_null($this->get_id())) {
+            try {
+                $plugin_instance = $DB->get_record("enrol",
+                    array('courseid' => $this->get_id(), 'enrol'=>'manual'));
+                $plugin = enrol_get_plugin('manual');
+                $roleid = $DB->get_field('role', 'id', array('shortname' => 'editingteacher'));
+                $plugin->enrol_user($plugin_instance, $USER->id, $roleid);
+                return new response(true, '');
+            } catch (moodle_exception $e) {
+                return new response(false, '', new error('10002', $e->getMessage()));
+            }
+        } else {
+            return new response(false, null, new error('10001', 'COURSE NOT CREATED'));
+        }
+
     }
 
 }

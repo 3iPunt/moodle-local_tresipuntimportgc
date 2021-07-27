@@ -15,50 +15,41 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Error Response
+ * response_courses
  *
  * @package     local_tresipuntimportgc
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_tresipuntimportgc\api;
+namespace local_tresipuntimportgc\responses;
+
+use local_tresipuntimportgc\factory\course;
 
 defined('MOODLE_INTERNAL') || die();
 
-
 /**
- * Error Response
+ * response_courses
  *
  * @package     local_tresipuntimportgc
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class error {
+class response_courses extends response {
 
-    /** @var int Error Code */
-    public $code;
-
-    /** @var string Error Message */
-    public $message;
+    /** @var course[] Data */
+    public $data;
 
     /**
-     * Error constructor.
-     * @param string $code
-     * @param string $message
-     */
-    public function __construct(string $code, string $message) {
-        $this->code = $code;
-        $this->message = $message;
-    }
-
-    /**
-     * To String.
+     * response_templates constructor.
      *
-     * @return string
+     * @param bool $success
+     * @param course[] $data
+     * @param error|null $error
      */
-    public function to_string(): string {
-        return $this->code . ': ' . $this->message;
+    public function __construct(bool $success, array $data = [], error $error = null) {
+        parent::__construct($success, '', $error);
+        $this->data = $data;
     }
 
 }

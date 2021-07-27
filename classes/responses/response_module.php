@@ -15,40 +15,40 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * response_file
+ * response_module
  *
  * @package     local_tresipuntimportgc
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_tresipuntimportgc\api;
+namespace local_tresipuntimportgc\responses;
 
-use local_tresipuntimportgc\models\file;
+use local_tresipuntimportgc\factory\module;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * response_file
+ * response_module
  *
  * @package     local_tresipuntimportgc
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class response_file extends response {
+class response_module extends response {
 
-    /** @var file Data */
+    /** @var module Data */
     public $data;
 
     /**
      * response_templates constructor.
      *
      * @param bool $success
-     * @param file|null $data
+     * @param module|null $data
      * @param error|null $error
      */
-    public function __construct(bool $success, file $data = null, error $error = null) {
-        parent::__construct($success, $error);
+    public function __construct(bool $success, module $data = null, error $error = null) {
+        parent::__construct($success, '', $error);
         $this->data = $data;
     }
 

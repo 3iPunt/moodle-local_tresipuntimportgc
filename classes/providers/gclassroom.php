@@ -16,16 +16,19 @@
 
 namespace local_tresipuntimportgc\providers;
 
+use curl;
 use dml_exception;
 use Google_Client;
 use Google_Exception;
 use Google_Service_Classroom;
 use Google_Service_Oauth2;
-use local_tresipuntimportgc\api\error;
-use local_tresipuntimportgc\api\response_course;
-use local_tresipuntimportgc\api\response_file;
-use local_tresipuntimportgc\models\course;
-use local_tresipuntimportgc\models\file;
+use local_tresipuntimportgc\maps\gclassroom_map;
+use local_tresipuntimportgc\responses\error;
+use local_tresipuntimportgc\responses\response_course;
+use local_tresipuntimportgc\responses\response_courses;
+use local_tresipuntimportgc\responses\response_folder;
+use local_tresipuntimportgc\responses\response_modules;
+use local_tresipuntimportgc\responses\response_sections;
 use moodle_exception;
 use moodle_url;
 
@@ -44,6 +47,9 @@ require_once($CFG->libdir . '/google/src/Google/Service/Drive.php');
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class gclassroom extends provider {
+
+    public const TIMEOUT = 30;
+    public const GOOGLE_CLASSROOM_URL = 'https://classroom.googleapis.com/v1/courses/';
 
     /** @var string Json */
     protected $json;
@@ -89,6 +95,17 @@ class gclassroom extends provider {
     }
 
     /**
+     * Get Token.
+     *
+     * @return mixed
+     */
+    protected function get_token() {
+        $accesstokenjson = $this->client->getAccessToken();
+        $accesstoken = json_decode($accesstokenjson);
+        return $accesstoken->access_token;
+    }
+
+    /**
      * Set Client.
      *
      * @throws Google_Exception
@@ -107,7 +124,12 @@ class gclassroom extends provider {
                 Google_Service_Classroom::CLASSROOM_COURSES_READONLY,
                 'https://www.googleapis.com/auth/userinfo.email',
                 'https://www.googleapis.com/auth/userinfo.profile',
-                'https://www.googleapis.com/auth/classroom.courses',]
+                'https://www.googleapis.com/auth/classroom.courses',
+                'https://www.googleapis.com/auth/classroom.coursework.me.readonly',
+                'https://www.googleapis.com/auth/classroom.coursework.students.readonly ',
+                'https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly',
+                'https://www.googleapis.com/auth/classroom.announcements.readonly',
+                'https://www.googleapis.com/auth/classroom.topics.readonly' ]
         );
         $oauth2 = new Google_Service_Oauth2($client);
         if (isset($_GET["code"])) {
@@ -136,7 +158,7 @@ class gclassroom extends provider {
     /**
      * Set Service.
      */
-    protected function get_service() {
+    protected function get_service(): Google_Service_Classroom {
         if (empty($this->service)) {
             $this->set_service();
             return $this->service;
@@ -157,12 +179,17 @@ class gclassroom extends provider {
      *
      * @return array
      */
-    public function get_courses(): array {
+    public function get_courses(): response_courses {
         // TODO paginate logic.
-        $optParams = ['pageSize' => 99];
-        $results = $this->get_service()->courses->listCourses($optParams);
-        $courses = $results->getCourses();
-        return count($courses) === 0 ? [] : $courses;
+        try {
+            $optParams = ['pageSize' => 99];
+            $results = $this->get_service()->courses->listCourses($optParams);
+            $courses = $results->getCourses();
+            $data = gclassroom_map::courses($courses);
+            return new response_courses(true, $data, null);
+        } catch (\Exception $e) {
+            return new response_courses(false, [], new error('01000', $e->getMessage()));
+        }
     }
 
     /**
@@ -174,10 +201,10 @@ class gclassroom extends provider {
     public function get_course(string $id): response_course {
         try {
             $course = $this->get_service()->courses->get($id);
-            $course3ip = new course($id, $course->getDescription());
-            return new response_course(true, $course3ip, null);
+            $data = gclassroom_map::course($course);
+            return new response_course(true, $data, null);
         } catch (\Exception $e) {
-            return new response_course(false, null, new error('01000', $e->getMessage()));
+            return new response_course(false, null, new error('01100', $e->getMessage()));
         }
     }
 
@@ -185,32 +212,212 @@ class gclassroom extends provider {
      * Get Teacher Folder.
      *
      * @param string $id
-     * @return response_file
+     * @return response_folder
      */
-    public function get_teacher_folder(string $id): response_file {
+    public function get_teacher_folder(string $id): response_folder {
         $course = $this->get_service()->courses->get($id);
         $tr = isset($course->toSimpleObject()->teacherFolder) ? $course->toSimpleObject()->teacherFolder : null;
         if (isset($tr)) {
-            $tr = new file($tr['id'], $tr['title'], $tr['alternateLink']);
-            return new response_file(true, $tr, null);
+            $data = gclassroom_map::teacher_folder($tr);
+            return new response_folder(true, $data, null);
         } else {
-            return new response_file(false, null, new error('02000', 'Not teacher foler'));
+            return new response_folder(false, null, new error('01200', 'Not teacher foler'));
         }
+    }
+
+    /**
+     * Get Sections.
+     *
+     * @param string $id
+     * @return response_sections
+     */
+    public function get_sections(string $id): response_sections {
+        $curl = new curl();
+        $url = self::GOOGLE_CLASSROOM_URL . $id .  '/topics';
+        $curl->setHeader($this->get_headers());
+        $params = [];
+        try {
+            $req = $curl->get($url, $params, $this->get_options_curl('GET'));
+            $res = $curl->getResponse();
+            $data = json_decode($req, true);
+            if (isset($res['HTTP/1.0'])) {
+                if ($res['HTTP/1.0'] === '200 OK') {
+                    $data = gclassroom_map::sections($data['topic']);
+                    $response = new response_sections(true, $data);
+                } else {
+                    $msg = $this->get_msg_curl($data, $res);
+                    $response = new response_sections(false, [], new error('01302', $msg));
+                }
+            } else {
+                $response = new response_sections(false, [], new error('01301', json_encode($res)));
+            }
+        } catch (\Exception $e) {
+            $response = new response_sections(false, [], new error('01300', $e->getMessage()));
+        }
+        return $response;
+
     }
 
     /**
      * Get Modules.
      *
      * @param string $id
-     * @return response_course
+     * @return response_modules
      */
-    public function get_modules(string $id): response_course {
-        try {
-            $modules = $this->get_service()->courses->listCourses();
-            var_dump($modules);die();
-            return new response_course(true, $course3ip, null);
-        } catch (\Exception $e) {
-            return new response_course(false, null, new error('01000', $e->getMessage()));
+    public function get_modules(string $id): response_modules {
+        $resworks = $this->get_course_works($id);
+        if ($resworks->success) {
+            $resmats = $this->get_course_work_materials($id);
+            if ($resmats->success) {
+                $resanoun =$this->get_course_announcements($id);
+                if ($resanoun->success) {
+                    $mods = array_merge($resworks->data, $resmats->data, $resanoun->data);
+                    return new response_modules(true, $mods, null);
+                } else {
+                    $mods = array_merge($resworks->data, $resmats->data);
+                    return new response_modules(true, $mods, null);
+                }
+            }
         }
+        return $resworks;
+    }
+
+    /**
+     * Get Course Works.
+     *
+     * @param string $id
+     * @return response_modules
+     */
+    public function get_course_works(string $id): response_modules {
+        $curl = new curl();
+        $url = self::GOOGLE_CLASSROOM_URL . $id .  '/courseWork';
+        $curl->setHeader($this->get_headers());
+        $params = [];
+        try {
+            $req = $curl->get($url, $params, $this->get_options_curl('GET'));
+            $res = $curl->getResponse();
+            $data = json_decode($req, true);
+            if (isset($res['HTTP/1.0'])) {
+                if ($res['HTTP/1.0'] === '200 OK') {
+                    $mods = gclassroom_map::modules($data['courseWork'], 'courseWork');
+                    $response = new response_modules(true, $mods);
+                } else {
+                    $msg = $this->get_msg_curl($data, $res);
+                    $response = new response_modules(false, [], new error('01402', $msg));
+                }
+            } else {
+                $response = new response_modules(false, [], new error('01401', json_encode($res)));
+            }
+        } catch (\Exception $e) {
+            $response = new response_modules(false, [], new error('01400', $e->getMessage()));
+        }
+        return $response;
+    }
+
+    /**
+     * Get Course Work Materials.
+     *
+     * @param string $id
+     * @return response_modules
+     */
+    public function get_course_work_materials(string $id): response_modules {
+        $curl = new curl();
+        $url = self::GOOGLE_CLASSROOM_URL . $id . '/courseWorkMaterials';
+        $curl->setHeader($this->get_headers());
+        $params = [];
+        try {
+            $req = $curl->get($url, $params, $this->get_options_curl('GET'));
+            $res = $curl->getResponse();
+            $data = json_decode($req, true);
+            if (isset($res['HTTP/1.0'])) {
+                if ($res['HTTP/1.0'] === '200 OK') {
+                    $mods = gclassroom_map::modules($data['courseWorkMaterial'], 'courseWorkMaterials');
+                    $response = new response_modules(true, $mods);
+                } else {
+                    $msg = $this->get_msg_curl($data, $res);
+                    $response = new response_modules(false, [], new error('01502', $msg));
+                }
+            } else {
+                $response = new response_modules(false, [], new error('01501', json_encode($res)));
+            }
+        } catch (\Exception $e) {
+            $response = new response_modules(false, [], new error('01500', $e->getMessage()));
+        }
+        return $response;
+    }
+
+    /**
+     * Get Course Announcements.
+     *
+     * @param string $id
+     * @return response_modules
+     */
+    public function get_course_announcements(string $id): response_modules {
+        $curl = new curl();
+        $url = self::GOOGLE_CLASSROOM_URL . $id . '/announcements';
+        $curl->setHeader($this->get_headers());
+        $params = [];
+        try {
+            $req = $curl->get($url, $params, $this->get_options_curl('GET'));
+            $res = $curl->getResponse();
+            $data = json_decode($req, true);
+            if (isset($res['HTTP/1.0'])) {
+                if ($res['HTTP/1.0'] === '200 OK') {
+                    $mods = gclassroom_map::modules($data['announcements'], 'announcements');
+                    $response = new response_modules(true, $mods);
+                } else {
+                    $msg = $this->get_msg_curl($data, $res);
+                    $response = new response_modules(false, [], new error('01602', $msg));
+                }
+            } else {
+                $response = new response_modules(false, [], new error('01601', json_encode($res)));
+            }
+        } catch (\Exception $e) {
+            $response = new response_modules(false, [], new error('01600', $e->getMessage()));
+        }
+        return $response;
+    }
+
+    /**
+     * Get Headers.
+     *
+     * @return array
+     */
+    private function get_headers(): array {
+        return [
+            "Content-type: application/json",
+            "Authorization: Bearer " . $this->get_token()
+        ];
+    }
+
+    /**
+     * Get Message Curl.
+     *
+     * @param $data
+     * @param $res
+     * @return string
+     */
+    private function get_msg_curl($data, $res): string {
+        $code = $data['error']['code'] ?? '';
+        $msg = $data['error']['message'] ?? '';
+        $status = $data['error']['status'] ?? '';
+        return $res['HTTP/1.0'] . ' - ' . $code . ': ' .  $msg . ' - ' . $status;
+    }
+
+    /**
+     * Get Options CURL.
+     *
+     * @param string $method
+     * @return array
+     */
+    private function get_options_curl(string $method): array {
+        return [
+            'CURLOPT_RETURNTRANSFER' => true,
+            'CURLOPT_TIMEOUT' => self::TIMEOUT,
+            'CURLOPT_HTTP_VERSION' => CURL_HTTP_VERSION_1_0,
+            'CURLOPT_CUSTOMREQUEST' => $method,
+            'CURLOPT_SSL_VERIFYHOST' => 0,
+            'CURLOPT_SSLVERSION' => CURL_SSLVERSION_TLSv1_2,
+        ];
     }
 }

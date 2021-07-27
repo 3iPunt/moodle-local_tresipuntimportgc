@@ -16,9 +16,12 @@
 
 namespace local_tresipuntimportgc\providers;
 
-use local_tresipuntimportgc\api\response_course;
-use local_tresipuntimportgc\api\response_file;
-use local_tresipuntimportgc\models\course;
+use local_tresipuntimportgc\responses\response_course;
+use local_tresipuntimportgc\responses\response_courses;
+use local_tresipuntimportgc\responses\response_file;
+use local_tresipuntimportgc\responses\response_folder;
+use local_tresipuntimportgc\responses\response_modules;
+use local_tresipuntimportgc\responses\response_sections;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -32,9 +35,9 @@ abstract class provider {
     /**
      * Get Courses.
      *
-     * @return array
+     * @return response_courses
      */
-    abstract public function get_courses(): array;
+    abstract public function get_courses(): response_courses;
 
     /**
      * Get Course.
@@ -48,16 +51,24 @@ abstract class provider {
      * Get Teacher Folder.
      *
      * @param string $id
-     * @return response_file
+     * @return response_folder
      */
-    abstract public function get_teacher_folder(string $id): response_file;
+    abstract public function get_teacher_folder(string $id): response_folder;
+
+    /**
+     * Get Sections.
+     *
+     * @param string $id
+     * @return response_sections
+     */
+    abstract public function get_sections(string $id): response_sections;
 
     /**
      * Get Modules.
      *
      * @param string $id
-     * @return response_course
+     * @return response_modules
      */
-    abstract public function get_modules(string $id): response_course;
+    abstract public function get_modules(string $id): response_modules;
 
 }

@@ -15,31 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class file
+ * Class folder
  *
  * @package     local_tresipuntimportgc
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_tresipuntimportgc\models;
-
-use local_tresipuntimportgc\api\error;
-use local_tresipuntimportgc\api\response_course;
-use moodle_exception;
-use stdClass;
-
+namespace local_tresipuntimportgc\factory;
 
 defined('MOODLE_INTERNAL') || die;
 
 /**
- * Class file
+ * Class folder
  *
  * @package     local_tresipuntimportgc
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class file  {
+class folder  {
 
     /** @var string ID course Provider */
     protected $providerid;

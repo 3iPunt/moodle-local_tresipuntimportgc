@@ -66,9 +66,22 @@ class import_page implements renderable, templatable {
      * @return stdClass
      */
     public function export_for_template(renderer_base $output): stdClass {
-        // TODO empty courses.
         $data = new stdClass();
-        $data->courses = $this->provider->get_courses();
+        $data->courses = [];
+        $data->has_error = false;
+        $data->error_msg = '';
+        $rescourses = $this->provider->get_courses();
+        if ($rescourses->success) {
+            $gcourses = [];
+            foreach ($rescourses->data as $c) {
+                $gcourse = $c->providerdata;
+                $gcourses[] = $gcourse;
+            }
+            $data->courses = $gcourses;
+        } else {
+            $data->has_error = true;
+            $data->error_msg = $rescourses->error->to_string();
+        }
         return $data;
     }
 }

@@ -28,7 +28,7 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
-use local_tresipuntimportgc\factory;
+use local_tresipuntimportgc\factory\factory;
 use local_tresipuntimportgc\providers\gclassroom;
 use moodle_exception;
 

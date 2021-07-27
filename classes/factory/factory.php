@@ -22,13 +22,11 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_tresipuntimportgc;
+namespace local_tresipuntimportgc\factory;
 
-use local_tresipuntimportgc\api\response_course;
-use local_tresipuntimportgc\models\course;
 use local_tresipuntimportgc\providers\provider;
+use local_tresipuntimportgc\responses\response_course;
 use moodle_exception;
-use stdClass;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -67,47 +65,46 @@ class factory  {
     function create_course(
         string $providerid, int $categoryid, string $fullname, string $shortname, bool $visible
     ): response_course {
-
-        global $DB, $USER;
-
         $res = $this->provider->get_course($providerid);
         if ($res->success) {
-
             $course = $res->data;
-
             // Create Course.
             $createres = $course->create_course(
                 $categoryid, $fullname, $shortname, $visible
             );
-
             if ($createres->success) {
-
+                $courseid = $createres->data->get_id();
                 // Create Teacher Resource.
                 $restf = $this->provider->get_teacher_folder($providerid);
                 if ($restf->success) {
                     $course->create_teacher_folder($restf->data->title, $restf->data->link);
                 }
-
-                // Create Modules.
-
-
-
-                // Enrol teacher.
-                $plugin_instance = $DB->get_record("enrol",
-                    array('courseid' => $createres->data->get_id(), 'enrol'=>'manual'));
-                $plugin = enrol_get_plugin('manual');
-                $roleid = $DB->get_field('role', 'id', array('shortname' => 'editingteacher'));
-                $plugin->enrol_user($plugin_instance, $USER->id, $roleid);
-
-                // Response.
-                return $res;
+                // Create Sections.
+                $ressections = $this->provider->get_sections($providerid);
+                if ($ressections->success) {
+                    foreach ($ressections->data as $section) {
+                        $section->create($courseid);
+                    }
+                    // Create Modules.
+                    $resmods = $this->provider->get_modules($providerid);
+                    if ($resmods->success) {
+                        foreach ($resmods->data as $mod) {
+                            $mod->create($courseid);
+                        }
+                    }
+                    // Enrol teacher.
+                    $course->enrol_user_as_teacher();
+                    // Response.
+                    return $res;
+                } else {
+                    return new response_course(false, $createres->data, $ressections->error);
+                }
             } else {
                 return new response_course(false, $createres->data, $createres->error);
             }
         } else {
             return $res;
         }
-
     }
 
 }

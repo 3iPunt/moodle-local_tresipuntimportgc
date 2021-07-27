@@ -33,6 +33,8 @@ require_login();
 
 $has_capability = has_capability('local/tresipuntimportgc:import',  context_system::instance());
 
+$providerid = required_param('id', PARAM_INT);
+
 $title = 'LABORATORIO DE FACTORÍA';
 
 $PAGE->set_context(context_system::instance());
@@ -46,7 +48,6 @@ echo $OUTPUT->header();
 
 if ($has_capability) {
 
-    $providerid = '269365900855';
     $fullname = 'Importación';
     $shortname = 'Importación' . '_' .uniqid();
     $category = 1;

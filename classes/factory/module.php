@@ -22,13 +22,12 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_tresipuntimportgc\models;
+namespace local_tresipuntimportgc\factory;
 
 use coding_exception;
 use dml_exception;
-use local_tresipuntimportgc\api\response_module;
+use local_tresipuntimportgc\responses\response_module;
 use phpunit_util;
-use stdClass;
 use testing_data_generator;
 
 global $CFG;
@@ -46,25 +45,61 @@ defined('MOODLE_INTERNAL') || die;
  */
 abstract class module  {
 
-    /** @var stdClass Course */
-    protected $course;
-
     /** @var testing_data_generator Generator */
     protected $generator;
+
+    /** @var string Provider Section */
+    protected $provider_section;
+
+    /** @var string Title */
+    protected $title;
+
+    /** @var string Intro */
+    protected $intro;
+
+    /** @var bool Visible */
+    protected $visible;
 
     /**
      * constructor.
      *
-     * @param int $course_id
      * @param string $component
+     * @param string $providersection
+     * @param string $title
+     * @param string $intro
+     * @param bool $visible
      * @throws coding_exception
-     * @throws dml_exception
      */
-    public function __construct(int $course_id, string $component) {
-        $this->course = get_course($course_id);
+    public function __construct(string $component, string $providersection, string $title, string $intro, bool $visible) {
         $generator = phpunit_util::get_data_generator();
         $this->generator = $generator->get_plugin_generator($component);
+        $this->title = $title;
+        $this->intro = $intro;
+        $this->visible = $visible;
+        $this->provider_section = $providersection;
     }
 
+    /**
+     * Get Section.
+     *
+     * @param int $course_id
+     * @return int
+     * @throws dml_exception
+     */
+    public function get_section(int $course_id): int {
+        if ($this->provider_section === '') {
+            return 0;
+        } else {
+            return section::get_section($course_id, $this->provider_section);
+        }
+    }
+
+    /**
+     * Create.
+     *
+     * @param int $course_id
+     * @return response_module
+     */
+    abstract public function create(int $course_id): response_module;
 
 }
