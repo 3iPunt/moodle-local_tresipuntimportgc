@@ -115,17 +115,23 @@ class gc_map extends map {
     static public function module(array $module, string $type = ''): ?module {
         $item = null;
         if ($module['assigneeMode'] === 'ALL_STUDENTS') {
-            $modtypes = gc_mod_map::GC_MODS[$type];
-            $class = is_array($modtypes) ? $modtypes[$module['workType']] : $modtypes;
-            if (!empty($class)) {
-                try {
-                    $modmap = new $class;
-                    return $modmap->get_mod($module);
-                } catch (\Exception $e) {
-                    error_log($e->getMessage());
-                    return null;
+            if (isset(gc_mod_map::GC_MODS[$type])) {
+                $modtypes = gc_mod_map::GC_MODS[$type];
+                $class = is_array($modtypes) ? $modtypes[$module['workType']] : $modtypes;
+                if (!empty($class)) {
+                    try {
+                        $modmap = new $class;
+                        return $modmap->get_mod($module);
+                    } catch (\Exception $e) {
+                        error_log($e->getMessage());
+                        mtrace('    -- ERROR: GET_MODULE: ' . $module['id'] . ' - ' . $e->getMessage());
+                        return null;
+                    }
                 }
+            } else {
+                mtrace('    -- ERROR: GET_MODULE_TYPE: ' . $module['id'] . ' - ' . $type);
             }
+
         }
         return null;
     }

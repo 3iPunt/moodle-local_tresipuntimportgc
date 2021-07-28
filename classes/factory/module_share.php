@@ -43,7 +43,8 @@ defined('MOODLE_INTERNAL') || die;
  */
 class module_share extends module {
 
-    const MOD_SHARE = 'tresipuntshare';
+    /** @var string Mod Name */
+    protected $modname = 'tresipuntshare';
 
     /** @var mod_url_generator Generator */
     protected $generator;
@@ -74,7 +75,7 @@ class module_share extends module {
     public function create(int $course_id): response_module {
         global $USER;
         $plugins = core_component::get_plugin_list('mod');
-        if (array_key_exists(self::MOD_SHARE, $plugins)) {
+        if (array_key_exists($this->get_modname(), $plugins)) {
 
             $comment_name = preg_replace("/[\r\n|\n|\r]+/", " ", $this->title);
             $name = fullname($USER) . ': ' . substr(trim($comment_name), 0, 200);
@@ -85,7 +86,7 @@ class module_share extends module {
             }
 
             $moduleinfo = new stdClass();
-            $moduleinfo->modulename = self::MOD_SHARE;
+            $moduleinfo->modulename = $this->get_modname();
             $moduleinfo->section = 0;
             $moduleinfo->showdescription = true;
             $moduleinfo->course = $course_id;

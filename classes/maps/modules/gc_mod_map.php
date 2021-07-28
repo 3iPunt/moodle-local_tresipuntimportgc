@@ -59,7 +59,11 @@ abstract class gc_mod_map {
                     /** @var gc_mat_map $item */
                     $item = new $class;
                     $html .= $item->get_render($mat[$key]);
+                } else {
+                    mtrace('    -- ERROR: GET_MATERIAL_CLASS: ' . json_encode($mat));
                 }
+            } else {
+                mtrace('    -- ERROR: GET_MATERIAL_KEY: ' . json_encode($mat));
             }
         }
         return $html;

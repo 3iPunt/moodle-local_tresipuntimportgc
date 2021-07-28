@@ -41,6 +41,9 @@ defined('MOODLE_INTERNAL') || die;
  */
 class module_quiz extends module {
 
+    /** @var string Mod Name */
+    protected $modname = 'quiz';
+
     /** @var mod_quiz_generator Generator */
     protected $generator;
 

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Error Response
+ * Errors Response
  *
  * @package     local_tresipuntimportgc
  * @copyright   2021 Tresipunt
@@ -28,28 +28,26 @@ defined('MOODLE_INTERNAL') || die();
 
 
 /**
- * Error Response
+ * Errors Response
  *
  * @package     local_tresipuntimportgc
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class error {
+class errors extends error {
 
-    /** @var int Error Code */
-    public $code;
-
-    /** @var string Error Message */
-    public $message;
+    /** @var error[] Errors */
+    public $errors;
 
     /**
      * Error constructor.
      * @param string $code
      * @param string $message
+     * @param error[] $errors
      */
-    public function __construct(string $code, string $message) {
-        $this->code = $code;
-        $this->message = $message;
+    public function __construct(string $code, string $message, array $errors) {
+        parent::__construct($code, $message);
+        $this->errors = $errors;
     }
 
     /**
@@ -61,6 +59,10 @@ class error {
         $res = '';
         if ($this->code !== '0') {
             $res = $this->code . ': ' . $this->message;
+            foreach ($this->errors as $error) {
+                $res .=  PHP_EOL;
+                $res .= $error->to_string();
+            }
         }
         return $res;
     }

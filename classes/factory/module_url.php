@@ -41,6 +41,9 @@ defined('MOODLE_INTERNAL') || die;
  */
 class module_url extends module {
 
+    /** @var string Mod Name */
+    protected $modname = 'url';
+
     /** @var mod_url_generator Generator */
     protected $generator;
 

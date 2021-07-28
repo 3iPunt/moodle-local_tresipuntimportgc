@@ -46,11 +46,11 @@ class course_external extends external_api {
     public static function create_course_parameters(): external_function_parameters {
         return new external_function_parameters(
             array(
-                'providerid' => new external_value(PARAM_TEXT, 'Course ID Provider', true),
-                'fullname' => new external_value(PARAM_TEXT, 'Course Fullname', true),
-                'shortname' => new external_value(PARAM_TEXT, 'Course Shortname', true),
-                'category' => new external_value(PARAM_INT, 'Category ID', true),
-                'visible' => new external_value(PARAM_BOOL, 'Visibility', true)
+                'providerid' => new external_value(PARAM_TEXT, 'Course ID Provider', VALUE_REQUIRED),
+                'fullname' => new external_value(PARAM_TEXT, 'Course Fullname', VALUE_REQUIRED),
+                'shortname' => new external_value(PARAM_TEXT, 'Course Shortname', VALUE_REQUIRED),
+                'category' => new external_value(PARAM_INT, 'Category ID', VALUE_REQUIRED),
+                'visible' => new external_value(PARAM_BOOL, 'Visibility', VALUE_REQUIRED)
             )
         );
     }
@@ -88,22 +88,22 @@ class course_external extends external_api {
                 $factory = new factory($provider);
                 $res = $factory->create_course($providerid, $category->id, $fullname, $shortname, $visible);
                 $success = $res->success;
-                $error = $res->to_string();
-                $id = $res->success ? $res->data->get_id() : null;
+                $errors = $res->error->to_string();
+                $id = $res->success ? $res->data : null;
             } else {
                 $success = false;
-                $error = 'El usuario no puede crear cursos en esta categoría';
+                $errors = 'USER_CAN_NOT_VIEW_CATEGORY';
                 $id = null;
             }
         } else {
             $success = false;
-            $error = 'La categoría no existe';
+            $errors = 'CATEGORY_NO_EXIST';
             $id = null;
         }
 
         return [
             'success' => $success,
-            'error' => $error,
+            'errors' => $errors,
             'id' => $id
         ];
     }
@@ -115,7 +115,7 @@ class course_external extends external_api {
         return new external_single_structure(
             array(
                 'success' => new external_value(PARAM_BOOL, 'Was it a success?'),
-                'error' => new external_value(PARAM_TEXT, 'Error message'),
+                'errors' => new external_value(PARAM_TEXT, 'Error message'),
                 'id' => new external_value(PARAM_INT, 'Course ID', false)
             )
         );

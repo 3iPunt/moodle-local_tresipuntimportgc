@@ -63,6 +63,13 @@ class section  {
     }
 
     /**
+     * Get Name.
+     */
+    public function get_name(): string {
+        return $this->name;
+    }
+
+    /**
      * Get Section.
      *
      * @param int $courseid
@@ -77,6 +84,9 @@ class section  {
                 WHERE cs.course = ? 
                 AND cs.summary = ?";
         $record = $DB->get_records_sql($sql, [$courseid, $DB->sql_compare_text($providerid)]);
+        if (!$record) {
+            mtrace('    -- ERROR: SECTION_NOT_FOUND: ' . $providerid);
+        }
         return $record ? current($record)->section : 0;
     }
 

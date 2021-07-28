@@ -41,6 +41,9 @@ defined('MOODLE_INTERNAL') || die;
  */
 class module_assign extends module {
 
+    /** @var string Mod Name */
+    protected $modname = 'assign';
+
     /** @var mod_assign_generator Generator */
     protected $generator;
 

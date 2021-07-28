@@ -45,9 +45,22 @@ class renderer extends plugin_renderer_base {
      * @return string html for the page
      * @throws moodle_exception
      */
-    public function render_charge_page(import_page $page): string {
+    public function render_import_page(import_page $page): string {
         $data = $page->export_for_template($this);
         return parent::render_from_template('local_tresipuntimportgc/import_page', $data);
+    }
+
+    /**
+     * Defer to template.
+     *
+     * @param create_page $page
+     *
+     * @return string html for the page
+     * @throws moodle_exception
+     */
+    public function render_create_page(create_page $page): string {
+        $data = $page->export_for_template($this);
+        return parent::render_from_template('local_tresipuntimportgc/create_page', $data);
     }
 
     /**

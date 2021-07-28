@@ -269,6 +269,7 @@ class gclassroom extends provider {
         $resworks = $this->get_course_works($id);
         if ($resworks->success) {
             $resmats = $this->get_course_work_materials($id);
+            $mods = $resworks->data;
             if ($resmats->success) {
                 $resanoun =$this->get_course_announcements($id);
                 if ($resanoun->success) {
@@ -276,11 +277,16 @@ class gclassroom extends provider {
                     return new response_modules(true, $mods, null);
                 } else {
                     $mods = array_merge($resworks->data, $resmats->data);
-                    return new response_modules(true, $mods, null);
+                    mtrace('  -- ERROR: GET_ANNOUNCEMENTS: ' . $resanoun->error->to_string());
+                    return new response_modules(true, $mods, $resanoun->error);
                 }
+            } else {
+                mtrace('  -- ERROR: GET_WORK_MATERIALS: ' . $resmats->error->to_string());
+                return new response_modules(true, $mods, $resmats->error);
             }
+        } else {
+            return $resworks;
         }
-        return $resworks;
     }
 
     /**
@@ -402,7 +408,11 @@ class gclassroom extends provider {
         $code = $data['error']['code'] ?? '';
         $msg = $data['error']['message'] ?? '';
         $status = $data['error']['status'] ?? '';
-        return $res['HTTP/1.0'] . ' - ' . $code . ': ' .  $msg . ' - ' . $status;
+        $message = $res['HTTP/1.0'];
+        if (!empty($msg)) {
+            $message .= ' - ' . $code . ': ' .  $msg . ' - ' . $status;
+        }
+        return $message;
     }
 
     /**

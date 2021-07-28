@@ -45,6 +45,9 @@ defined('MOODLE_INTERNAL') || die;
  */
 abstract class module  {
 
+    /** @var string Mod Name */
+    protected $modname = '';
+
     /** @var testing_data_generator Generator */
     protected $generator;
 
@@ -77,6 +80,24 @@ abstract class module  {
         $this->intro = $intro;
         $this->visible = $visible;
         $this->provider_section = $providersection;
+    }
+
+    /**
+     * Get Title.
+     *
+     * @return string
+     */
+    public function get_title(): string {
+        return $this->title;
+    }
+
+    /**
+     * Get Modname.
+     *
+     * @return string
+     */
+    public function get_modname(): string {
+        return $this->modname;
     }
 
     /**

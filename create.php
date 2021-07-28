@@ -24,6 +24,7 @@
  */
 
 use local_tresipuntimportgc\external\course_external;
+use local_tresipuntimportgc\output\create_page;
 
 require_once('../../config.php');
 
@@ -59,8 +60,10 @@ if ($has_capability) {
         $providerid, $fullname, $shortname, $category, $visible
     );
 
-    var_dump($res);
+    echo "</pre>";
 
+    $page = new create_page($res);
+    echo $output->render($page);
 
 } else {
     throw new moodle_exception(
