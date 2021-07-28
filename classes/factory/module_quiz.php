@@ -78,7 +78,7 @@ class module_quiz extends module {
         if (isset($res)) {
             return new response_module(true, $this, null);
         } else {
-            return new response_module(false, null, new error('10001', 'MODULE_NOT_CREATED'));
+            return new response_module(false, null, new error('13000', 'MODULE_NOT_CREATED'));
         }
     }
 

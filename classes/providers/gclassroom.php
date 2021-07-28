@@ -22,7 +22,7 @@ use Google_Client;
 use Google_Exception;
 use Google_Service_Classroom;
 use Google_Service_Oauth2;
-use local_tresipuntimportgc\maps\gclassroom_map;
+use local_tresipuntimportgc\maps\gc_map;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response_course;
 use local_tresipuntimportgc\responses\response_courses;
@@ -142,7 +142,8 @@ class gclassroom extends provider {
         if (isset($_REQUEST['error'])) {
             // TODO get error.
             echo "<script type='text/javascript'>alert('error')</script>";
-            redirect((new moodle_url('/admin/settings.php', ['section' => 'local_tresipuntimportgc']))->out(false));
+            redirect((new moodle_url('/admin/settings.php',
+                ['section' => 'local_tresipuntimportgc']))->out(false));
         }
         if ($client->getAccessToken()) {
             $user = $oauth2->userinfo->get();
@@ -185,7 +186,7 @@ class gclassroom extends provider {
             $optParams = ['pageSize' => 99];
             $results = $this->get_service()->courses->listCourses($optParams);
             $courses = $results->getCourses();
-            $data = gclassroom_map::courses($courses);
+            $data = gc_map::courses($courses);
             return new response_courses(true, $data, null);
         } catch (\Exception $e) {
             return new response_courses(false, [], new error('01000', $e->getMessage()));
@@ -201,10 +202,10 @@ class gclassroom extends provider {
     public function get_course(string $id): response_course {
         try {
             $course = $this->get_service()->courses->get($id);
-            $data = gclassroom_map::course($course);
+            $data = gc_map::course($course);
             return new response_course(true, $data, null);
         } catch (\Exception $e) {
-            return new response_course(false, null, new error('01100', $e->getMessage()));
+            return new response_course(false, null, new error('01010', $e->getMessage()));
         }
     }
 
@@ -218,10 +219,10 @@ class gclassroom extends provider {
         $course = $this->get_service()->courses->get($id);
         $tr = isset($course->toSimpleObject()->teacherFolder) ? $course->toSimpleObject()->teacherFolder : null;
         if (isset($tr)) {
-            $data = gclassroom_map::teacher_folder($tr);
+            $data = gc_map::teacher_folder($tr);
             return new response_folder(true, $data, null);
         } else {
-            return new response_folder(false, null, new error('01200', 'Not teacher foler'));
+            return new response_folder(false, null, new error('01020', 'Not teacher foler'));
         }
     }
 
@@ -242,17 +243,17 @@ class gclassroom extends provider {
             $data = json_decode($req, true);
             if (isset($res['HTTP/1.0'])) {
                 if ($res['HTTP/1.0'] === '200 OK') {
-                    $data = gclassroom_map::sections($data['topic']);
+                    $data = gc_map::sections($data['topic']);
                     $response = new response_sections(true, $data);
                 } else {
                     $msg = $this->get_msg_curl($data, $res);
-                    $response = new response_sections(false, [], new error('01302', $msg));
+                    $response = new response_sections(false, [], new error('01032', $msg));
                 }
             } else {
-                $response = new response_sections(false, [], new error('01301', json_encode($res)));
+                $response = new response_sections(false, [], new error('01031', json_encode($res)));
             }
         } catch (\Exception $e) {
-            $response = new response_sections(false, [], new error('01300', $e->getMessage()));
+            $response = new response_sections(false, [], new error('01030', $e->getMessage()));
         }
         return $response;
 
@@ -299,17 +300,17 @@ class gclassroom extends provider {
             $data = json_decode($req, true);
             if (isset($res['HTTP/1.0'])) {
                 if ($res['HTTP/1.0'] === '200 OK') {
-                    $mods = gclassroom_map::modules($data['courseWork'], 'courseWork');
+                    $mods = gc_map::modules($data['courseWork'], 'courseWork');
                     $response = new response_modules(true, $mods);
                 } else {
                     $msg = $this->get_msg_curl($data, $res);
-                    $response = new response_modules(false, [], new error('01402', $msg));
+                    $response = new response_modules(false, [], new error('01042', $msg));
                 }
             } else {
-                $response = new response_modules(false, [], new error('01401', json_encode($res)));
+                $response = new response_modules(false, [], new error('01041', json_encode($res)));
             }
         } catch (\Exception $e) {
-            $response = new response_modules(false, [], new error('01400', $e->getMessage()));
+            $response = new response_modules(false, [], new error('01040', $e->getMessage()));
         }
         return $response;
     }
@@ -331,17 +332,17 @@ class gclassroom extends provider {
             $data = json_decode($req, true);
             if (isset($res['HTTP/1.0'])) {
                 if ($res['HTTP/1.0'] === '200 OK') {
-                    $mods = gclassroom_map::modules($data['courseWorkMaterial'], 'courseWorkMaterials');
+                    $mods = gc_map::modules($data['courseWorkMaterial'], 'courseWorkMaterials');
                     $response = new response_modules(true, $mods);
                 } else {
                     $msg = $this->get_msg_curl($data, $res);
-                    $response = new response_modules(false, [], new error('01502', $msg));
+                    $response = new response_modules(false, [], new error('01052', $msg));
                 }
             } else {
-                $response = new response_modules(false, [], new error('01501', json_encode($res)));
+                $response = new response_modules(false, [], new error('01051', json_encode($res)));
             }
         } catch (\Exception $e) {
-            $response = new response_modules(false, [], new error('01500', $e->getMessage()));
+            $response = new response_modules(false, [], new error('01050', $e->getMessage()));
         }
         return $response;
     }
@@ -363,17 +364,17 @@ class gclassroom extends provider {
             $data = json_decode($req, true);
             if (isset($res['HTTP/1.0'])) {
                 if ($res['HTTP/1.0'] === '200 OK') {
-                    $mods = gclassroom_map::modules($data['announcements'], 'announcements');
+                    $mods = gc_map::modules($data['announcements'], 'announcements');
                     $response = new response_modules(true, $mods);
                 } else {
                     $msg = $this->get_msg_curl($data, $res);
-                    $response = new response_modules(false, [], new error('01602', $msg));
+                    $response = new response_modules(false, [], new error('01062', $msg));
                 }
             } else {
-                $response = new response_modules(false, [], new error('01601', json_encode($res)));
+                $response = new response_modules(false, [], new error('01061', json_encode($res)));
             }
         } catch (\Exception $e) {
-            $response = new response_modules(false, [], new error('01600', $e->getMessage()));
+            $response = new response_modules(false, [], new error('01060', $e->getMessage()));
         }
         return $response;
     }

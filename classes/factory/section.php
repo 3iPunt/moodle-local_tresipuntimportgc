@@ -92,7 +92,7 @@ class section  {
             course_update_section($course_id, $newsection, array('name' => $this->name, 'summary' => $this->providerid));
             return new response_section(true, $this, null);
         } catch (moodle_exception $e) {
-            return new response_section(false, null, new error('10001', $e->getMessage()));
+            return new response_section(false, null, new error('16000', $e->getMessage()));
         }
     }
 

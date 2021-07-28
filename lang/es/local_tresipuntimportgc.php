@@ -45,3 +45,8 @@ $string['createcourses'] = 'Crear cursos seleccionados';
 $string['createcourses_help'] = 'Si continúa, se recargará la página y empezarán a generarse los cursos seleccionados, mostrando las información de la traza. <br>NO SE PODRÁ DETENER LA OPERACIÓN HASTA QUE TERMINE POR SÍ MISMA.<br>¿Esta seguro?';
 
 $string['error_client'] = 'Error al generar el cliente';
+$string['view_more'] = 'Ver más';
+$string['drivefile'] = 'Archivo GoogleDrive';
+$string['form'] = 'Formulario GoogleDrive';
+$string['link'] = 'Enlace externo';
+$string['teacher_folder'] = 'Carpeta del Profesor';

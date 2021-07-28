@@ -50,5 +50,57 @@ class renderer extends plugin_renderer_base {
         return parent::render_from_template('local_tresipuntimportgc/import_page', $data);
     }
 
+    /**
+     * Defer to template.
+     *
+     * @param gc_desc_youtube_component $component
+     *
+     * @return string html for the page
+     * @throws moodle_exception
+     */
+    public function render_gc_desc_youtube_component(gc_desc_youtube_component $component): string {
+        $data = $component->export_for_template($this);
+        return parent::render_from_template('local_tresipuntimportgc/gc/desc_youtube_component', $data);
+    }
+
+    /**
+     * Defer to template.
+     *
+     * @param gc_desc_link_component $component
+     *
+     * @return string html for the page
+     * @throws moodle_exception
+     */
+    public function render_gc_desc_link_component(gc_desc_link_component $component): string {
+        $data = $component->export_for_template($this);
+        return parent::render_from_template('local_tresipuntimportgc/gc/desc_link_component', $data);
+    }
+
+    /**
+     * Defer to template.
+     *
+     * @param gc_desc_drivefile_component $component
+     *
+     * @return string html for the page
+     * @throws moodle_exception
+     */
+    public function render_gc_desc_drivefile_component(gc_desc_drivefile_component $component): string {
+        $data = $component->export_for_template($this);
+        return parent::render_from_template('local_tresipuntimportgc/gc/desc_drivefile_component', $data);
+    }
+
+    /**
+     * Defer to template.
+     *
+     * @param gc_desc_form_component $component
+     *
+     * @return string html for the page
+     * @throws moodle_exception
+     */
+    public function render_gc_desc_form_component(gc_desc_form_component $component): string {
+        $data = $component->export_for_template($this);
+        return parent::render_from_template('local_tresipuntimportgc/gc/desc_form_component', $data);
+    }
+
 
 }

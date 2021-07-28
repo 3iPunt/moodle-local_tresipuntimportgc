@@ -25,6 +25,7 @@
 namespace local_tresipuntimportgc\factory;
 
 use coding_exception;
+use course_modinfo;
 use dml_exception;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response;
@@ -34,6 +35,9 @@ use moodle_exception;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die;
+
+global $CFG;
+require_once($CFG->dirroot . '/lib/modinfolib.php');
 
 /**
  * Class course
@@ -110,7 +114,7 @@ class course {
             $this->set_id($new->id);
             return new response_course(true, $this, null);
         } catch (moodle_exception $e) {
-            return new response_course(false, null, new error('10001', $e->getMessage()));
+            return new response_course(false, null, new error('11000', $e->getMessage()));
         }
     }
 
@@ -124,10 +128,15 @@ class course {
      */
     public function create_teacher_folder(string $title, string $link): response_module {
         if (!is_null($this->get_id())) {
-            $modurl = new module_url('', $title, 'Teacher Folder', false, $link);
+            $modurl = new module_url(
+                '',
+                $title . ': ' . get_string('teacher_folder', 'local_tresipuntimportgc'),
+                '',
+                false,
+                $link);
             return $modurl->create($this->get_id());
         } else {
-            return new response_module(false, null, new error('10001', 'COURSE NOT CREATED'));
+            return new response_module(false, null, new error('11010', 'COURSE NOT CREATED'));
         }
 
     }
@@ -148,10 +157,37 @@ class course {
                 $plugin->enrol_user($plugin_instance, $USER->id, $roleid);
                 return new response(true, '');
             } catch (moodle_exception $e) {
-                return new response(false, '', new error('10002', $e->getMessage()));
+                return new response(false, '', new error('11021', $e->getMessage()));
             }
         } else {
-            return new response(false, null, new error('10001', 'COURSE NOT CREATED'));
+            return new response(false, null, new error('11020', 'COURSE NOT CREATED'));
+        }
+    }
+
+    /**
+     * Clean sections intro.
+     *
+     * @return response
+     * @throws moodle_exception
+     */
+    public function clean_sections_intro(): response {
+        global $DB;
+        if (!is_null($this->get_id())) {
+            $course = get_course($this->get_id());
+            /** @var course_modinfo $modinfo */
+            $modinfo = get_fast_modinfo($course->id);
+            $sections = $modinfo->get_section_info_all();
+            foreach ($sections as $section) {
+                $updatesection = new stdClass();
+                $updatesection->id = $section->id;
+                $updatesection->summary = '';
+                $DB->update_record('course_sections', $updatesection);
+                course_modinfo::clear_instance_cache($course);
+                rebuild_course_cache($course->id);
+            }
+            return new response(true, '');
+        } else {
+            return new response(false, null, new error('11030', 'COURSE NOT CREATED'));
         }
 
     }

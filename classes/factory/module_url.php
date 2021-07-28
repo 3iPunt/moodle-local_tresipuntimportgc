@@ -63,40 +63,6 @@ class module_url extends module {
     }
 
     /**
-     * Get Description Rich.
-     *
-     * @param string $desc
-     * @param array $materials
-     * @return string
-     */
-    static public function get_desc_rich(string $desc, array $materials): string {
-        $html = '';
-        $html .= $desc;
-        foreach ($materials as $mat) {
-            if (isset($mat['youtubeVideo'])) {
-                $item = $mat['youtubeVideo'];
-                $html .= '<hr>';
-                $html .= '<iframe width="560" height="315" src="https://www.youtube.com/embed/' . $item['id'] . '" title="' . $item['title'] . '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-            }
-            if (isset($mat['link'])) {
-                $item = $mat['link'];
-                $html .= '<hr>';
-                $html .= '<a href="' . $item['url'] . '" target="_blank>';
-                $html .= '<img border="0" alt="' . $item['title'] . '" src="' . $item['thumbnailUrl'] . '" width="100" height="100">';
-                $html .= '</a>';
-            }
-            if (isset($mat['driveFile'])) {
-                $item = $mat['driveFile']['driveFile'];
-                $html .= '<hr>';
-                $html .= '<a href="' . $item['alternateLink'] . '" target="_blank>';
-                $html .= '<img border="0" alt="' . $item['title'] . '" src="' . $item['thumbnailUrl'] . '" width="100" height="100">';
-                $html .= '</a>';
-            }
-        }
-        return $html;
-    }
-
-    /**
      * Create.
      *
      * @param int $course_id
@@ -118,7 +84,7 @@ class module_url extends module {
         if (isset($res)) {
             return new response_module(true, $this, null);
         } else {
-            return new response_module(false, null, new error('10001', 'MODULE_NOT_CREATED'));
+            return new response_module(false, null, new error('15000', 'MODULE_NOT_CREATED'));
         }
     }
 

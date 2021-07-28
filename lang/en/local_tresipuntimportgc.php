@@ -45,3 +45,8 @@ $string['createcourses'] = 'Create selected courses';
 $string['createcourses_help'] = 'If you continue, the page will reload and the selected courses will start to be generated, showing the trace information. <br>THE OPERATION CANNOT BE STOPPED UNTIL IT HAS ENDED BY ITSELF.';
 
 $string['error_client'] = 'Error when generating the client';
+$string['view_more'] = 'View more';
+$string['drivefile'] = 'GoogleDrive File';
+$string['form'] = 'GoogleDrive Form';
+$string['link'] = 'External Link';
+$string['teacher_folder'] = 'Teacher Folder';

@@ -21,15 +21,8 @@ use local_tresipuntimportgc\factory\course;
 use local_tresipuntimportgc\factory\folder;
 use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\factory\section;
-use local_tresipuntimportgc\responses\response_courses;
-use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->libdir . '/google/src/Google/autoload.php');
-require_once($CFG->libdir . '/google/lib.php');
-require_once($CFG->libdir . '/google/src/Google/Service/Drive.php');
 
 /**
  * Class gclassroom_map

@@ -16,33 +16,23 @@
 
 namespace local_tresipuntimportgc\maps;
 
-
-use coding_exception;
 use Google_Service_Classroom_Course;
 use local_tresipuntimportgc\factory\course;
 use local_tresipuntimportgc\factory\folder;
 use local_tresipuntimportgc\factory\module;
-use local_tresipuntimportgc\factory\module_assign;
-use local_tresipuntimportgc\factory\module_quiz;
-use local_tresipuntimportgc\factory\module_share;
-use local_tresipuntimportgc\factory\module_url;
 use local_tresipuntimportgc\factory\section;
+use local_tresipuntimportgc\maps\modules\gc_mod_map;
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-require_once($CFG->libdir . '/google/src/Google/autoload.php');
-require_once($CFG->libdir . '/google/lib.php');
-require_once($CFG->libdir . '/google/src/Google/Service/Drive.php');
-
 /**
- * Class gclassroom_map
+ * Class Google Classroom Map.
  *
  * @package     local_tresipuntimportgc
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class gclassroom_map extends map {
+class gc_map extends map {
 
     /**
      * Courses.
@@ -121,50 +111,23 @@ class gclassroom_map extends map {
      * @param string[] $module
      * @param string $type
      * @return module
-     * @throws coding_exception
      */
     static public function module(array $module, string $type = ''): ?module {
         $item = null;
         if ($module['assigneeMode'] === 'ALL_STUDENTS') {
-            switch ($type) {
-                case 'courseWork':
-                    switch ($module['workType']) {
-                        case 'ASSIGNMENT':
-                            $visible = $module['state'] === 'PUBLISHED';
-                            $section = isset($module['topicId']) ? $module['topicId'] : '';
-                            $item = new module_assign(
-                                $section, $module['title'], $module['description'], $visible
-                            );
-                            break;
-                        case 'SHORT_ANSWER_QUESTION':
-                        case 'MULTIPLE_CHOICE_QUESTION':
-                            $visible = $module['state'] === 'PUBLISHED';
-                            $section = isset($module['topicId']) ? $module['topicId'] : '';
-                            $item = new module_quiz(
-                                $section, $module['title'], $module['description'], $visible
-                            );
-                            break;
-                    }
-                    return $item;
-                case 'courseWorkMaterials':
-                    $visible = $module['state'] === 'PUBLISHED';
-                    $section = isset($module['topicId']) ? $module['topicId'] : '';
-                    /** @var string[] $materials */
-                    $materials = $module['materials'];
-                    $desc = module_url::get_desc_rich($module['description'], $materials);
-                    $item = new module_url(
-                        $section, $module['title'], $desc, $visible, $module['alternateLink']
-                    );
-                    return $item;
-                case 'announcements':
-                    $visible = $module['state'] === 'PUBLISHED';
-                    $item = new module_share(
-                        $module['text'], $visible
-                    );
-                    return $item;
+            $modtypes = gc_mod_map::GC_MODS[$type];
+            $class = is_array($modtypes) ? $modtypes[$module['workType']] : $modtypes;
+            if (!empty($class)) {
+                try {
+                    $modmap = new $class;
+                    return $modmap->get_mod($module);
+                } catch (\Exception $e) {
+                    error_log($e->getMessage());
+                    return null;
+                }
             }
         }
-        return $item;
+        return null;
     }
 
     /**
@@ -173,7 +136,6 @@ class gclassroom_map extends map {
      * @param array $modules
      * @param string $type
      * @return module[]
-     * @throws coding_exception
      */
     static public function modules(array $modules, string $type = ''): array {
         $data = [];

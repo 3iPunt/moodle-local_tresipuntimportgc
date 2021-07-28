@@ -94,6 +94,8 @@ class factory  {
                     }
                     // Enrol teacher.
                     $course->enrol_user_as_teacher();
+                    // Clean intro sections.
+                    $course->clean_sections_intro();
                     // Response.
                     return $res;
                 } else {

@@ -25,6 +25,7 @@
 namespace local_tresipuntimportgc\factory;
 
 use coding_exception;
+use core_component;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response_module;
 use mod_url_generator;
@@ -42,18 +43,25 @@ defined('MOODLE_INTERNAL') || die;
  */
 class module_share extends module {
 
+    const MOD_SHARE = 'tresipuntshare';
+
     /** @var mod_url_generator Generator */
     protected $generator;
+
+    /** @var string Description */
+    protected $desc;
 
     /**
      * constructor.
      *
      * @param string $text
+     * @param string $desc
      * @param bool $visible
      * @throws coding_exception
      */
-    public function __construct(string $text, bool $visible) {
+    public function __construct(string $text, string $desc, bool $visible) {
         parent::__construct('mod_url', '', $text, $text, $visible);
+        $this->desc = $desc;
     }
 
     /**
@@ -65,24 +73,34 @@ class module_share extends module {
      */
     public function create(int $course_id): response_module {
         global $USER;
-        $comment_name = preg_replace("/[\r\n|\n|\r]+/", " ", $this->title);
-        $name = fullname($USER) . ': ' . substr(trim($comment_name), 0, 200);
-        $draftid_editor = file_get_submitted_draft_itemid('introeditor');
+        $plugins = core_component::get_plugin_list('mod');
+        if (array_key_exists(self::MOD_SHARE, $plugins)) {
 
-        $moduleinfo = new stdClass();
-        $moduleinfo->modulename = 'tresipuntshare';
-        $moduleinfo->section = 0;
-        $moduleinfo->course = $course_id;
-        $moduleinfo->teacher = $USER->id;
-        $moduleinfo->name = $name;
-        $moduleinfo->intro = $this->title;
-        $moduleinfo->introeditor = array('text'=> $this->title, 'format'=> FORMAT_HTML, 'itemid'=>$draftid_editor);;
-        $moduleinfo->visible = true;
-        $cm = create_module($moduleinfo);
-        if (isset($cm)) {
-            return new response_module(true, $this, null);
+            $comment_name = preg_replace("/[\r\n|\n|\r]+/", " ", $this->title);
+            $name = fullname($USER) . ': ' . substr(trim($comment_name), 0, 200);
+            $draftid_editor = file_get_submitted_draft_itemid('introeditor');
+
+            if (!empty($this->desc)) {
+                $comment_name .= $this->desc;
+            }
+
+            $moduleinfo = new stdClass();
+            $moduleinfo->modulename = self::MOD_SHARE;
+            $moduleinfo->section = 0;
+            $moduleinfo->showdescription = true;
+            $moduleinfo->course = $course_id;
+            $moduleinfo->teacher = $USER->id;
+            $moduleinfo->name = $name;
+            $moduleinfo->introeditor = array('text'=> $comment_name, 'format'=> FORMAT_HTML, 'itemid'=>$draftid_editor);;
+            $moduleinfo->visible = true;
+            $cm = create_module($moduleinfo);
+            if (isset($cm)) {
+                return new response_module(true, $this, null);
+            } else {
+                return new response_module(false, null, new error('14001', 'MODULE_NOT_CREATED'));
+            }
         } else {
-            return new response_module(false, null, new error('10001', 'MODULE_NOT_CREATED'));
+            return new response_module(false, null, new error('14000', 'PLUGIN_NOT_EXIST'));
         }
     }
 
