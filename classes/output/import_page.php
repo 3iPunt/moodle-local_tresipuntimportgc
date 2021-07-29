@@ -24,6 +24,7 @@
 
 namespace local_tresipuntimportgc\output;
 
+use core_course_category;
 use Google_Client;
 use Google_Service_Classroom;
 use local_tresipuntimportgc\gprovider;
@@ -68,6 +69,7 @@ class import_page implements renderable, templatable {
     public function export_for_template(renderer_base $output): stdClass {
         $data = new stdClass();
         $data->courses = [];
+        $data->categories = $this->get_categories();
         $data->has_error = false;
         $data->error_msg = '';
         $rescourses = $this->provider->get_courses();
@@ -83,5 +85,27 @@ class import_page implements renderable, templatable {
             $data->error_msg = $rescourses->error->to_string();
         }
         return $data;
+    }
+
+    /**
+     * Get Categories for current user.
+     *
+     * @return array
+     */
+    protected function get_categories(): array {
+        $options = [];
+        $options['returnhidden'] = false;
+        $categories = core_course_category::get_all($options);
+        $cats = [];
+        foreach ($categories as $category) {
+            if (core_course_category::can_view_category($category)) {
+                $cat = [];
+                $cat['id'] = $category->id;
+                $cat['name'] = $category->name;
+                $cats[] = $cat;
+            }
+        }
+        return $cats;
+
     }
 }

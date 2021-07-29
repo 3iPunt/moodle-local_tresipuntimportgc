@@ -29,6 +29,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 abstract class gc_mat_map {
 
+    const GC_LOGICAL = '';
+
     const GC_MATS = [
         'youtubeVideo' => gc_mat_youtube_map::class,
         'link' => gc_mat_link_map::class,

@@ -50,3 +50,9 @@ $string['drivefile'] = 'GoogleDrive File';
 $string['form'] = 'GoogleDrive Form';
 $string['link'] = 'External Link';
 $string['teacher_folder'] = 'Teacher Folder';
+$string['uniquename_course'] = 'Unique name';
+$string['select_category'] = 'Select category';
+$string['course_visible'] = 'Visible to students';
+$string['uniquename_course_help'] = "This name will be used for both the full name and the short name. (Must be unique)";
+$string['select_category_help'] = "Select the category where the imported course will be created";
+

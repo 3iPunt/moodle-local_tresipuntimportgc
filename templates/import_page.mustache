@@ -44,11 +44,11 @@
         {{ error_msg }}
     </div>
     {{/ has_error }}
-    <ul class="list-group list-group-flush" data-region="content-classroom-courses">
+    <ul class="list-group list-group-flush" data-region="content-classroom-courses" data-region="content-courses">
         {{# courses }}
             <li class="list-group-item">
                 <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="{{ id }}" data-ownerId="{{ ownerId }}"
+                    <input type="checkbox" class="custom-control-input" id="{{ id }}" data-id="{{ id }}" data-ownerId="{{ ownerId }}"
                            data-coursename="{{ name }}" data-room="{{ room }}">
                     <label class="custom-control-label" for="{{ id }}">
                         <a href="{{ alternateLink }}" target="_blank">{{ name }}</a>
@@ -62,16 +62,46 @@
                             aria-controls="edit_{{ id }}">
                         <i class="icon fa fa-pencil"></i>
                     </button>
-
-                    <div class="collapse" id="edit_{{ id }}">
-                        <div class="card card-body">
-                            <!--TODO controls -->
-                            Here you will have inputs and select to set the name of the course, the category where it will be created, whether it is visible or not, etc.
-                        </div>
-                    </div>
                     <div>
                         <span class="badge badge-info">{{ room }}</span>
                         <span class="badge badge-light">{{ courseState }}</span>
+                    </div>
+
+
+                    <div class="collapse" id="edit_{{ id }}">
+                        <div class="card card-body">
+                            <form data-form="{{ id }}">
+                                <div class="form-row">
+                                    <div class="col-md-5 mb-3">
+                                        <label for="name-{{ id }}">
+                                            {{#str}}uniquename_course, local_tresipuntimportgc{{/str}}
+                                            <button type="button" class="btn helplabel" data-container="body" data-toggle="popover" data-placement="bottom" data-content="{{# str }} uniquename_course_help, local_tresipuntimportgc {{/ str }}">
+                                                <i class="fa fa-question-circle text-info" aria-hidden="true"></i>
+                                            </button>
+                                        </label>
+                                        <input type="text" class="form-control" id="name-{{ id }}" value="{{ name }}">
+
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="category-{{ id }}">
+                                            {{#str}}select_category, local_tresipuntimportgc{{/str}}
+                                            <button type="button" class="btn helplabel" data-container="body" data-toggle="popover" data-placement="bottom" data-content="{{# str }} select_category_help, local_tresipuntimportgc {{/ str }}">
+                                                <i class="fa fa-question-circle text-info" aria-hidden="true"></i>
+                                            </button>
+                                        </label>
+                                        <select id="category-{{ id }}" class="form-control">
+                                            {{# categories }}
+                                                <option value="{{ id }}">{{ name }}</option>
+                                            {{/ categories }}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2 d-flex align-items-center justify-content-center">
+                                        <input type="checkbox" class="custom-control-input" id="visible-{{ id }}" checked>
+                                        <label class="custom-control-label" for="visible-{{ id }}">{{#str}}course_visible, local_tresipuntimportgc{{/str}}</label>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </li>
