@@ -242,7 +242,7 @@ class gclassroom extends provider {
             $res = $curl->getResponse();
             $data = json_decode($req, true);
             if (isset($res['HTTP/1.0'])) {
-                if ($res['HTTP/1.0'] === '200 OK') {
+                if ($res['HTTP/1.0'] === '200 OK' && !empty($data)) {
                     $data = gc_map::sections($data['topic']);
                     $response = new response_sections(true, $data);
                 } else {

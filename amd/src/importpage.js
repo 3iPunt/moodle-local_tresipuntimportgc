@@ -59,7 +59,7 @@ define([
      * @property {string} ALLCHEKS
      */
     let REGION = {
-        CONTENT_LIST: '[data-region="content-courses"]',
+        CONTENT_LIST: '[data-region="content-classroom-courses"]',
         CHECKS: 'input[type="checkbox"]:not(#allchecks)',
         ALLCHEKS: '#allchecks'
     };
@@ -138,6 +138,7 @@ define([
             {key: 'createcourses_help', component: 'local_tresipuntimportgc'},
             {key: 'create', component: 'local_tresipuntimportgc'},
         ];
+        let that = this;
         Str.get_strings(stringkeys).then(function(langStrings) {
             let title = langStrings[0];
             let confirmMessage = langStrings[1];
@@ -151,12 +152,24 @@ define([
                 modal.getRoot().on(ModalEvents.save, function() {
                     let courses = [];
                     identifier.find(REGION.CHECKS).each(function() {
-                        if ($(this).is(':checked')) {
-                            courses.push($(this).attr('data-id'));
+                        if ($(this).is(':checked') && $(this).attr('data-id') !== undefined) {
+                            let courseContent = $(this).parent();
+                            let id = $(this).attr('data-id');
+                            let courseconfig = {
+                                'providerid': id,
+                                'fullname': courseContent.find('#fullname-' + id).text(),
+                                'shortname': courseContent.find('#name-' + id).val(),
+                                'categoryid': courseContent.find('#category-' + id).val(),
+                                'visible': courseContent.find('#visible-' + id).val()
+                            };
+                            courses.push(courseconfig);
                         }
                     });
-                    let param = courses.join('__');
-                    let url = window.location.href + '?courses=' + btoa(param);
+                    if (that.checkCookie('coursesConfig')) {
+                        that.deletekCookie('coursesConfig');
+                    }
+                    that.setCookie('coursesConfig', JSON.stringify(courses), 5);
+                    let url = window.location.href + '?courses=true';
                     let tasktab = window.open(url, '_self');
                     tasktab.focus();
                 });
@@ -168,6 +181,38 @@ define([
         }).done(function(modal) {
             modal.show();
         }).fail(Notification.exception);
+    };
+
+    Controller.prototype.setCookie = function(cname, cvalue, exminutes) {
+        const d = new Date();
+        d.setMinutes(d.getMinutes() + exminutes);
+        let expires = 'expires=' + d.toUTCString();
+        document.cookie = cname + '=' + cvalue + ';' + expires + ';path=/';
+    };
+
+    Controller.prototype.getCookie = function(cname) {
+        let name = cname + '=';
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) === 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return '';
+    };
+
+    Controller.prototype.checkCookie = function(cname) {
+        let cookie = this.getCookie(cname);
+        return cookie !== '';
+    };
+
+    Controller.prototype.deletekCookie = function(cname) {
+        document.cookie = cname + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;';
     };
 
     return {

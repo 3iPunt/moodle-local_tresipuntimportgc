@@ -49,10 +49,11 @@ abstract class gc_mod_map {
      * @return string
      */
     static public function get_desc_rich(string $desc, array $materials = []): string {
-        $html = '';
-        $html .= $desc;
+        $html = $desc;
         foreach ($materials as $mat) {
-            $key = array_key_first($mat);
+            // array_key_first() Not working for version < 7.3 https://www.php.net/manual/es/function.array-key-first.php
+            //$key = array_key_first($mat);
+            $key = reset($mat);
             if (isset(gc_mat_map::GC_MATS[$key])) {
                 $class = gc_mat_map::GC_MATS[$key];
                 if (!empty($class)) {

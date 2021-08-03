@@ -50,9 +50,9 @@ $string['drivefile'] = 'Arxiu GoogleDrive';
 $string['form'] = 'Formulario GoogleDrive';
 $string['link'] = 'Enllaç extern';
 $string['teacher_folder'] = "Carpeta de l'Professor";
-$string['uniquename_course'] = 'Nom únic';
+$string['uniquename_course'] = 'Nom curt';
 $string['select_category'] = 'Seleccionar categoria';
 $string['course_visible'] = 'Visible per als alumnes';
-$string['uniquename_course_help'] = "S'utilitzarà aquest nom, tant per al nom complet com per al nom curt. (Ha de ser únic)";
+$string['uniquename_course_help'] = "Aquest valor s’utilitzarà per al nom curt del curs. (Ha de ser únic, sense majúscules, caràcters especials ni accents. Si no es compleix, el valor es normalitzarà automàticament. Si es deixa buit, el nom del curs es normalitzarà).";
 $string['select_category_help'] = "Seleccioneu la categoria on es crearà el curs importat";
 
