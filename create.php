@@ -34,7 +34,7 @@ require_login();
 
 $has_capability = has_capability('local/tresipuntimportgc:import',  context_system::instance());
 
-$title = get_string('generatingcourses', 'local_tresipuntimportgc');
+$title = get_string('create_page', 'local_tresipuntimportgc');
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/tresipuntimportgc/import.php');
@@ -45,17 +45,17 @@ $output = $PAGE->get_renderer('local_tresipuntimportgc');
 
 echo $OUTPUT->header();
 
+// TODO delete, ONLY FOR DEV delete all courses first
+/*$oldcourses = get_courses();
+foreach($oldcourses as $oldcourse) {
+    if ((int)$oldcourse->id !== 1) {
+        delete_course($oldcourse);
+    }
+}*/
+/*******************************************/
 if ($has_capability) {
     if (!empty($_COOKIE)) {
         $courses = json_decode($_COOKIE['coursesIds']);
-        // TODO ONLY FOR DEV delete all courses first
-            $oldcourses = get_courses();
-            foreach($oldcourses as $oldcourse) {
-                if ((int)$oldcourse->id !== 1) {
-                    delete_course($oldcourse);
-                }
-            }
-        /*******************************************/
         $page = new create_page($courses);
         echo $output->render($page);
     } else {

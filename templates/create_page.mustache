@@ -32,6 +32,31 @@
     "": "" }
 }}
 <div class="local_tresipuntimportgc_create_page" data-region="local_tresipuntimportgc_create_page">
-
-
+    <hr>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-4">
+                <div class="card" style="width: 18rem;">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">{{#str}}countcourses, local_tresipuntimportgc{{/str}}: <b>{{countcourses}}</b></li>
+                        <li class="list-group-item">{{#str}}timespent, local_tresipuntimportgc{{/str}}: <b>{{timespent}}</b></li>
+                        <li class="list-group-item">{{#str}}memoryusage, local_tresipuntimportgc{{/str}}: <b>{{memoryusage}}</b></li>
+                        <li class="list-group-item">{{#str}}initdate, local_tresipuntimportgc{{/str}}: <b>{{initdate}}</b></li>
+                        <li class="list-group-item">{{#str}}enddate, local_tresipuntimportgc{{/str}}: <b>{{enddate}}</b></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-8">
+                <div class="list-group">
+                    {{#courselinks}}
+                        <a href="{{courselink}}" target="_blank" class="list-group-item list-group-item-action">
+                            {{coursetitle}}
+                        </a>
+                    {{/courselinks}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <a class="btn btn-primary" href="{{ returnulr }}">{{#str}}returntoimport, local_tresipuntimportgc{{/str}}</a>
 </div>

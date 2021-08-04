@@ -71,8 +71,13 @@ class create_page implements renderable, templatable {
      * @throws moodle_exception
      */
     public function export_for_template(renderer_base $output): stdClass {
+        global $DB;
+        $time = microtime(true);
+        $initdate = date('H:i:s');
+        $countcourses = 0;
+        $coursesids = [];
+        $coursestitle = [];
         if (count($this->courses) > 0) {
-            $time = microtime(true);
             $service = new course_external();
             @ini_set('zlib.output_compression',0);
             @ini_set('implicit_flush',1);
@@ -80,27 +85,34 @@ class create_page implements renderable, templatable {
             set_time_limit(0);
             ob_start();
             flush();
-            print_trace('generatingcourses', 'info', null, $time);
             print_trace('generatingcourses_help', 'info', null, $time);
             echo '<div id="content_traces">';
-            foreach($this->courses as $course) {
+            foreach($this->courses as $key => $course) {
                 $coursedata = json_decode($_COOKIE[$course]);
                 $shortname = $coursedata->shortname;
                 if ($shortname === '') {
                     $shortname = str_replace(' ', '_', normalize_str($coursedata->fullname));
                 }
-                echo '<div class="card">';
-                echo '<div class="card-header" id="heading_' . $coursedata->providerid . '">';
-                echo '<h5 class="mb-0">';
-                echo '<button class="btn btn-link" data-toggle="collapse" data-target="#gcid_' . $coursedata->providerid . '" aria-expanded="true" aria-controls="' . $coursedata->providerid . '">';
-                echo '<h3>' . $coursedata->fullname . '</h3>';
-                echo '</button>';
-                echo '</h5>';
-                echo '</div>';
-                echo '<div id="gcid_' . $coursedata->providerid . '" class="collapse show" aria-labelledby="heading_' . $coursedata->providerid . '" data-parent="#content_traces">';
-                $service::create_course($coursedata->providerid, $coursedata->fullname, $shortname, (int)$coursedata->categoryid, $coursedata->visible === 'on');
-                echo '</div>';
-                echo '</div>';
+                if ($DB->get_record('course', ['shortname' => $shortname]) === false) {
+                    // TODO refactor with html_writer
+                    echo '<div class="card">';
+                    echo '<div class="card-header" id="heading_' . $coursedata->providerid . '">';
+                    echo '<h5 class="mb-0">';
+                    echo '<button class="btn btn-link" data-toggle="collapse" data-target="#gcid_' . $coursedata->providerid . '" aria-expanded="true" aria-controls="' . $coursedata->providerid . '">';
+                    echo '<h4>' . $coursedata->fullname . '</h4>';
+                    echo '</button>';
+                    echo '</h5>';
+                    echo '</div>';
+                    echo '<div id="gcid_' . $coursedata->providerid . '" class="collapse show" aria-labelledby="heading_' . $coursedata->providerid . '" data-parent="#content_traces">';
+                    $courseresponse = $service::create_course($coursedata->providerid, $coursedata->fullname, $shortname, (int)$coursedata->categoryid, $coursedata->visible === 'on');
+                    echo '</div>';
+                    echo '</div>';
+                    $coursesids[$key] = $courseresponse['id'];
+                    $coursestitle[$key] = $coursedata->fullname;
+                    $countcourses++;
+                } else {
+                    print_trace('shortnamealreadyexist', 'danger', $shortname, $time);
+                }
             }
             echo '</div>';
             print_trace('generatingcoursesfinish', 'info', $time);
@@ -109,6 +121,19 @@ class create_page implements renderable, templatable {
             // TODO add notification for error, and charge de course list again
             echo 'Ningún curso seleccionado';
         }
-        return new stdClass();
+        $data = new stdClass();
+        $data->returnulr = (new moodle_url('/local/tresipuntimportgc/import.php'))->out();
+        $data->timespent = round(microtime(true) - $time, 2) . 's';
+        $data->memoryusage = display_size(memory_get_usage());
+        $data->initdate = $initdate;
+        $data->countcourses = $countcourses;
+        $data->enddate = date('H:i:s');
+        $data->courselinks = [];
+        foreach($coursesids as $key => $coursesid) {
+            $data->courselinks[$key]['courselink'] = (new moodle_url('/course/view.php', ['id' => $coursesid]))->out();
+            $data->courselinks[$key]['coursetitle'] = $coursestitle[$key];
+        }
+        $data->courselinks = array_values($data->courselinks);
+        return $data;
     }
 }

@@ -84,7 +84,7 @@ class factory  {
             // Create Course.
             $createres = $course->create_course($categoryid, $fullname, $shortname, $visible);
             if ($createres->success) {
-                $courseid = $createres->data->get_id();
+                $courseid = (int)$createres->data->get_id();
                 print_trace('coursebasecreated', 'success', $courseid, self::$time);
                 //mtrace('CREACIÓN DEL CURSO: OK');
                 // Create Teacher Resource.
@@ -173,7 +173,7 @@ class factory  {
                 //mtrace('RECUPERACIÓN DE LAS SECCIONES: ERROR - ' . $ressections->error->to_string());
                 print_trace('creationcoursecompletederror', 'danger', null, self::$time);
                 //mtrace(PHP_EOL . '*** FIN CON ERRORES ***');
-                return new response(false,'', new errors('00003', 'WARNING_GET_SECTIONS', $errors));
+                return new response(false, $courseid, new errors('00003', 'WARNING_GET_SECTIONS', $errors));
             }
             $errors[] = $createres->error;
             print_trace('coursebasecreatederror', 'warning', $createres->error->to_string(), self::$time);

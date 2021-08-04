@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'Tresipunt Importar Google Classroom';
 $string['pluginconfig'] = 'Configuració Tresipunt Importació Google Classroom';
 $string['import_page'] = 'Importa Cursos de Google Classroom';
+$string['create_page'] = 'Importing Google Classroom Courses';
 $string['not_capability'] = 'No tens autorització per importar cursos de Google Classroom';
 $string['token'] = 'Access Token';
 $string['gcheading'] = 'Google Classroom API';
@@ -60,6 +61,13 @@ $string['select_category_help'] = "Seleccioneu la categoria on es crearà el cur
 $string['generatingcourses'] = '<h4 class="alert-heading">GENERATING COURSES</h4>';
 $string['generatingcoursesfinish'] = '<h4 class="alert-heading">GENERATION OF CURRICULA COMPLETED</h4>';
 $string['generatingcourses_help'] = '<p>The creation of courses has begun.<br>Even if you close this tab, courses will still be created.<br>You can see the information generated both from here and from the log.txt file of the plugin.</p><hr>';
+$string['shortnamealreadyexist'] = 'The short name <b>{$a}</b> is already in use. Choose another short name for this course and try again';
+$string['returntoimport'] = 'Back to course selection page';
+$string['timespent'] = 'Time spent';
+$string['memoryusage'] = 'Memory used';
+$string['initdate'] = 'Start time';
+$string['enddate'] = 'End time';
+$string['countcourses'] = 'Number of courses created';
 
 // Traces Course
 $string['startingcourse'] = 'Beginning course creation <b>{$a}</b>';

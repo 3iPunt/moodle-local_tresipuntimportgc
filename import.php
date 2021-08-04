@@ -46,7 +46,14 @@ $PAGE->set_heading($title);
 $output = $PAGE->get_renderer('local_tresipuntimportgc');
 
 echo $OUTPUT->header();
-
+// TODO delete, ONLY FOR DEV delete all courses first
+/*$oldcourses = get_courses();
+foreach($oldcourses as $oldcourse) {
+    if ((int)$oldcourse->id !== 1) {
+        delete_course($oldcourse);
+    }
+}*/
+/*******************************************/
 if ($has_capability) {
     $provider = new gclassroom();
     $page = new import_page($provider);
