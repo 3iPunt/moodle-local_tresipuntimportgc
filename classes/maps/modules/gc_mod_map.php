@@ -22,6 +22,9 @@ use local_tresipuntimportgc\maps\materials\gc_mat_map;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once($CFG->dirroot . '/local/tresipuntimportgc/classes/maps/materials/gc_mat_map.php');
+
 /**
  * Class gc_mod_map
  *
@@ -53,7 +56,7 @@ abstract class gc_mod_map {
         foreach ($materials as $mat) {
             // array_key_first() Not working for version < 7.3 https://www.php.net/manual/es/function.array-key-first.php
             //$key = array_key_first($mat);
-            $key = reset($mat);
+            $key = array_key_first_compatible($mat);
             if (isset(gc_mat_map::GC_MATS[$key])) {
                 $class = gc_mat_map::GC_MATS[$key];
                 if (!empty($class)) {
@@ -61,6 +64,7 @@ abstract class gc_mod_map {
                     $item = new $class;
                     $html .= $item->get_render($mat[$key]);
                 } else {
+                    // TODO change mtrace() to print_trace()
                     mtrace('    -- ERROR: GET_MATERIAL_CLASS: ' . json_encode($mat));
                 }
             } else {

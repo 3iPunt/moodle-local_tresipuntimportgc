@@ -32,27 +32,6 @@
     "": "" }
 }}
 <div class="local_tresipuntimportgc_create_page" data-region="local_tresipuntimportgc_create_page">
-    <div class="alert {{^ has_errors }}alert-success{{/ has_errors }} {{# has_errors }}alert-{{ error_level }}{{/ has_errors }}" role="alert">
-        <h4 class="alert-heading">
-            {{^ has_errors }}
-                Well done!
-            {{/ has_errors }}
-            {{# has_errors }}
-                Oops!, Errors found.
-            {{/ has_errors }}
-        </h4>
-        {{^ has_errors }}
-        <p>El curso se ha creado correctamente.</p>
-        {{/ has_errors }}
-        <hr>
-        {{# has_errors }}
-            {{# errors }}
-            <p>{{{ . }}}</p>
-            {{/ errors }}
-        {{/ has_errors }}
-        {{# success }}
-            <a class="btn btn-primary" href="{{ view_url }}" target="_blank">Ver el curso</a>
-        {{/ success }}
-    </div>
+
 
 </div>

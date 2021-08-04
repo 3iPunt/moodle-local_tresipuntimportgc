@@ -28,10 +28,12 @@ use local_tresipuntimportgc\providers\provider;
 use local_tresipuntimportgc\responses\error_errors;
 use local_tresipuntimportgc\responses\errors;
 use local_tresipuntimportgc\responses\response;
-use local_tresipuntimportgc\responses\response_course;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die;
+
+global $CFG;
+require_once($CFG->dirroot . '/local/tresipuntimportgc/lib.php');
 
 /**
  * Class factory
@@ -44,6 +46,8 @@ class factory  {
 
     /** @var provider Provider */
     protected $provider;
+    /** @var int|null time */
+    private static $time;
 
     /**
      * constructor.
@@ -51,6 +55,7 @@ class factory  {
      * @param provider $provider
      */
     public function __construct(provider $provider) {
+        self::$time = microtime(true);
         $this->provider = $provider;
     }
 
@@ -68,101 +73,121 @@ class factory  {
     function create_course(
         string $providerid, int $categoryid, string $fullname, string $shortname, bool $visible
     ): response {
-        mtrace('*** INICIO IMPORTACIÓN DEL CURSO ***' . PHP_EOL);
+        print_trace('startingcourse', 'light', $fullname, self::$time);
+        //mtrace('*** INICIO IMPORTACIÓN DEL CURSO ***' . PHP_EOL);
         $errors = [];
         $res = $this->provider->get_course($providerid);
         if ($res->success) {
-            mtrace('RECUPERACIÓN DEL CURSO: OK');
+            print_trace('recoverycourse', 'success', null, self::$time);
+            //mtrace('RECUPERACIÓN DEL CURSO: OK');
             $course = $res->data;
             // Create Course.
             $createres = $course->create_course($categoryid, $fullname, $shortname, $visible);
             if ($createres->success) {
-                mtrace('CREACIÓN DEL CURSO: OK');
                 $courseid = $createres->data->get_id();
+                print_trace('coursebasecreated', 'success', $courseid, self::$time);
+                //mtrace('CREACIÓN DEL CURSO: OK');
                 // Create Teacher Resource.
                 $restf = $this->provider->get_teacher_folder($providerid);
                 if ($restf->success) {
+                    // TODO import files in course folder, add in config of each course
                     $course->create_teacher_folder($restf->data->title, $restf->data->link);
-                    mtrace('  CREACIÓN DE LA CARPETA DEL PROFESOR: OK');
+                    print_trace('teacherfoldercreated', 'success', null, self::$time);
+                    //mtrace('  CREACIÓN DE LA CARPETA DEL PROFESOR: OK');
                 } else {
                     $errors[] = $restf->error;
-                    mtrace('  CREACIÓN DE LA CARPETA DEL PROFESOR: ERROR - ' . $restf->error->to_string());
+                    print_trace('teacherfoldererrorcreated', 'warning', null, self::$time);
+                    //mtrace('  CREACIÓN DE LA CARPETA DEL PROFESOR: ERROR - ' . $restf->error->to_string());
                 }
                 // Create Sections.
                 $ressections = $this->provider->get_sections($providerid);
                 if ($ressections->success) {
-                    mtrace('  RECUPERACIÓN DE LAS SECCIONES: OK - (' . count($ressections->data) . ')');
+                    print_trace('recoverysections', 'success', count($ressections->data), self::$time);
+                    //mtrace('  RECUPERACIÓN DE LAS SECCIONES: OK - (' . count($ressections->data) . ')');
                     foreach ($ressections->data as $section) {
                         if (!is_null($section)) {
                             $ressect = $section->create($courseid);
                             if ($ressect->success) {
-                                mtrace('    CREACIÓN DE SECCIÓN: OK - ' . $ressect->data->get_name());
+                                print_trace('sectioncreated', 'success', $ressect->data->get_name(), self::$time);
+                                //mtrace('    CREACIÓN DE SECCIÓN: OK - ' . $ressect->data->get_name());
                             } else {
                                 $errors[] = $ressect->error;
-                                mtrace('    CREACIÓN DE SECCIÓN: ERROR - ' . $ressect->error->to_string());
+                                print_trace('sectionerrorcreated', 'warning', $ressect->data->get_name(), self::$time);
+                                //mtrace('    CREACIÓN DE SECCIÓN: ERROR - ' . $ressect->error->to_string());
                             }
                         }
                     }
                     // Create Modules.
                     $resmods = $this->provider->get_modules($providerid);
                     if ($resmods->success) {
-                        mtrace('  RECUPERACIÓN DE LOS MÓDULOS: OK - (' . count($resmods->data) . ')');
+                        print_trace('recoverymodules', 'success', count($resmods->data), self::$time);
+                        //mtrace('  RECUPERACIÓN DE LOS MÓDULOS: OK - (' . count($resmods->data) . ')');
                         foreach ($resmods->data as $mod) {
                             if (!is_null($mod)) {
                                 $resmod = $mod->create($courseid);
                                 if ($resmod->success) {
-                                    mtrace('    CREACIÓN DE MÓDULO: OK - (' . $resmod->data->get_modname() . ') ' . $resmod->data->get_title());
+                                    print_trace('modulecreated', 'success', ['type' => $resmod->data->get_modname(), 'title' => $resmod->data->get_title()], self::$time);
+                                    //mtrace('    CREACIÓN DE MÓDULO: OK - (' . $resmod->data->get_modname() . ') ' . $resmod->data->get_title());
                                 } else {
                                     $errors[] = $resmod->error;
-                                    mtrace('    CREACIÓN DE MÓDULO: ERROR - (' . $mod->get_modname() . ') - ' . $resmod->error->to_string());
+                                    print_trace('moduleerrorcreated', 'warning', ['type' => $mod->get_modname(), 'title' => $mod->get_title()], self::$time);
+                                    //mtrace('    CREACIÓN DE MÓDULO: ERROR - (' . $mod->get_modname() . ') - ' . $resmod->error->to_string());
                                 }
                             }
                         }
                     } else {
                         $errors[] = $resmods->error;
-                        mtrace('  RECUPERACIÓN DE LOS MÓDULOS: ERROR - ' . $resmods->error->to_string());
+                        print_trace('recoverymoduleserror', 'warning', $resmods->error->to_string(), self::$time);
+                        //mtrace('  RECUPERACIÓN DE LOS MÓDULOS: ERROR - ' . $resmods->error->to_string());
                     }
                     // Enrol teacher.
                     $resenrol = $course->enrol_user_as_teacher();
                     if ($resenrol->success) {
-                        mtrace('  MATRICULACIÓN PROFESOR: OK');
+                        print_trace('enrolteacher', 'success', null, self::$time);
+                        //mtrace('  MATRICULACIÓN PROFESOR: OK');
                     } else {
                         $errors[] = $resenrol->error;
-                        mtrace('  MATRICULACIÓN PROFESOR: ERROR - ' . $resenrol->error->to_string());
+                        print_trace('enrolteachererror', 'warning', $resenrol->error->to_string(), self::$time);
+                        //mtrace('  MATRICULACIÓN PROFESOR: ERROR - ' . $resenrol->error->to_string());
                     }
                     // Clean intro sections.
                     $resclean = $course->clean_sections_intro();
                     if ($resclean->success) {
-                        mtrace('  LIMPIEZA CURSO: OK');
+                        print_trace('cleancourse', 'success', null, self::$time);
+                        //mtrace('  LIMPIEZA CURSO: OK');
                     } else {
                         $errors[] = $resclean->error;
-                        mtrace('  LIMPIEZA CURSO: ERROR - ' . $resclean->error->to_string());
+                        print_trace('cleancourseerror', 'warning', $resclean->error->to_string(), self::$time);
+                        //mtrace('  LIMPIEZA CURSO: ERROR - ' . $resclean->error->to_string());
                     }
-                    mtrace(PHP_EOL . '*** FIN COMPLETADO ***');
+                    print_trace('creationcoursecompleted', 'primaty', null, self::$time);
+                    //mtrace(PHP_EOL . '*** FIN COMPLETADO ***');
                     // Response.
                     return new response(
                         true,
                         $res->data->get_id(),
                         count($errors) > 0 ? new errors('00004', 'NOTICE_WITH_ERRORS', $errors) : null);
-
-                } else {
-                    $errors[] = $ressections->error;
-                    mtrace('RECUPERACIÓN DE LAS SECCIONES: ERROR - ' . $ressections->error->to_string());
-                    mtrace(PHP_EOL . '*** FIN CON ERRORES ***');
-                    return new response(false,'', new errors('00003', 'WARNING_GET_SECTIONS', $errors));
                 }
-            } else {
-                $errors[] = $createres->error;
-                mtrace('CREACIÓN DEL CURSO: ERROR - ' . $createres->error->to_string());
-                mtrace(PHP_EOL . '*** FIN CON ERRORES ***');
-                return new response(false,'', new errors('00002', 'ERROR_CREATE', $errors));
+                $errors[] = $ressections->error;
+                print_trace('recoverysectionserror', 'warning', $ressections->error->to_string(), self::$time);
+                //mtrace('RECUPERACIÓN DE LAS SECCIONES: ERROR - ' . $ressections->error->to_string());
+                print_trace('creationcoursecompletederror', 'danger', null, self::$time);
+                //mtrace(PHP_EOL . '*** FIN CON ERRORES ***');
+                return new response(false,'', new errors('00003', 'WARNING_GET_SECTIONS', $errors));
             }
-        } else {
-            $errors[] = $res->error;
-            mtrace('RECUPERACIÓN DEL CURSO: ERROR - ' . $res->error->to_string());
-            mtrace(PHP_EOL . '*** FIN CON ERRORES ***');
-            return new response(false,'', new errors('00001', 'ERROR_GET', $errors));
+            $errors[] = $createres->error;
+            print_trace('coursebasecreatederror', 'warning', $createres->error->to_string(), self::$time);
+            //mtrace('CREACIÓN DEL CURSO: ERROR - ' . $createres->error->to_string());
+            print_trace('creationcoursecompletederror', 'danger', null, self::$time);
+            //mtrace(PHP_EOL . '*** FIN CON ERRORES ***');
+            return new response(false,'', new errors('00002', 'ERROR_CREATE', $errors));
         }
+        $errors[] = $res->error;
+        print_trace('recoverycourseerror', 'warning', $res->error->to_string(), self::$time);
+        //mtrace('RECUPERACIÓN DEL CURSO: ERROR - ' . $res->error->to_string());
+        print_trace('creationcoursecompletederror', 'danger', null, self::$time);
+        mtrace(PHP_EOL . '*** FIN CON ERRORES ***');
+        return new response(false,'', new errors('00001', 'ERROR_GET', $errors));
     }
 
 }

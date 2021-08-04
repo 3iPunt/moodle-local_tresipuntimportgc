@@ -162,14 +162,15 @@ define([
                                 'categoryid': courseContent.find('#category-' + id).val(),
                                 'visible': courseContent.find('#visible-' + id).val()
                             };
-                            courses.push(courseconfig);
+                            courses.push(id);
+                            that.setCookie(id, JSON.stringify(courseconfig), 5);
                         }
                     });
                     if (that.checkCookie('coursesConfig')) {
                         that.deletekCookie('coursesConfig');
                     }
-                    that.setCookie('coursesConfig', JSON.stringify(courses), 5);
-                    let url = window.location.href + '?courses=true';
+                    that.setCookie('coursesIds', JSON.stringify(courses), 5);
+                    let url = window.location.href.replace('import.php', 'create.php');
                     let tasktab = window.open(url, '_self');
                     tasktab.focus();
                 });

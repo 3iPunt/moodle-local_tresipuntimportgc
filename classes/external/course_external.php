@@ -37,6 +37,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir . '/externallib.php');
 require_once($CFG->dirroot . '/webservice/lib.php');
+require_once($CFG->dirroot . '/local/tresipuntimportgc/lib.php');
 
 class course_external extends external_api {
 
@@ -80,23 +81,27 @@ class course_external extends external_api {
             ]
         );
 
-        $category = core_course_category::get($category);
-        if ($category) {
-            if (core_course_category::can_view_category($category)) {
+        // New value type (bool) is not matching the resolved parameter type and might introduce types-related false-positives.
+        //$category = core_course_category::get($category);
+        $moodlecategory = core_course_category::get($category);
+        if ($moodlecategory) {
+            if (core_course_category::can_view_category($moodlecategory)) {
                 // Factory.
                 $provider = new gclassroom();
                 $factory = new factory($provider);
-                $res = $factory->create_course($providerid, $category->id, $fullname, $shortname, $visible);
+                $res = $factory->create_course($providerid, $moodlecategory->id, $fullname, $shortname, $visible);
                 $success = $res->success;
                 $errors = $res->error->to_string();
                 $id = $res->success ? $res->data : null;
             } else {
                 $success = false;
+                print_trace('user_can_not_view_category', 'danger', ['category' => $moodlecategory->name, 'course' => $fullname]);
                 $errors = 'USER_CAN_NOT_VIEW_CATEGORY';
                 $id = null;
             }
         } else {
             $success = false;
+            print_trace('category_no_exist', 'danger', ['categoryid' => $category, 'course' => $fullname]);
             $errors = 'CATEGORY_NO_EXIST';
             $id = null;
         }
@@ -120,6 +125,4 @@ class course_external extends external_api {
             )
         );
     }
-
-
 }

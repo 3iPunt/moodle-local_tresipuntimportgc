@@ -26,6 +26,7 @@ namespace local_tresipuntimportgc\output;
 
 use Google_Client;
 use Google_Service_Classroom;
+use local_tresipuntimportgc\external\course_external;
 use local_tresipuntimportgc\gprovider;
 use local_tresipuntimportgc\providers\provider;
 use local_tresipuntimportgc\responses\response;
@@ -50,28 +51,16 @@ require_once($CFG->libdir . '/google/src/Google/Service/Drive.php');
  */
 class create_page implements renderable, templatable {
 
-    /** @var int|null Response */
-    private $courseid;
-
-    /** @var bool Success */
-    private $success;
-
-    /** @var string[] Response */
-    private $errors;
+    /** @var string[]|null Courses */
+    private $courses;
 
     /**
      * import_page constructor.
      *
-     * @param string[] $response
+     * @param string[] $courses
      */
-    public function __construct(array $response) {
-        $this->courseid = isset($response['id']) ? (int)$response['id'] : null;
-        if (isset($response['errors']) && $response['errors'] !== '') {
-            $this->errors = explode( PHP_EOL, $response['errors']);
-        } else {
-            $this->errors = [];
-        }
-        $this->success = $response['success'];
+    public function __construct(array $courses) {
+        $this->courses = $courses;
     }
 
     /**
@@ -82,22 +71,44 @@ class create_page implements renderable, templatable {
      * @throws moodle_exception
      */
     public function export_for_template(renderer_base $output): stdClass {
-        $has_errors = false;
-        $view_url = '';
-        $level = 'danger';
-        if ($this->success) {
-            $level = 'warning';
-            $view_url = new moodle_url('/course/view.php', ['id' => $this->courseid]);
-            if (count($this->errors) > 0) {
-                $has_errors = true;
+        if (count($this->courses) > 0) {
+            $time = microtime(true);
+            $service = new course_external();
+            @ini_set('zlib.output_compression',0);
+            @ini_set('implicit_flush',1);
+            @ob_end_clean();
+            set_time_limit(0);
+            ob_start();
+            flush();
+            print_trace('generatingcourses', 'info', null, $time);
+            print_trace('generatingcourses_help', 'info', null, $time);
+            echo '<div id="content_traces">';
+            foreach($this->courses as $course) {
+                $coursedata = json_decode($_COOKIE[$course]);
+                $shortname = $coursedata->shortname;
+                if ($shortname === '') {
+                    $shortname = str_replace(' ', '_', normalize_str($coursedata->fullname));
+                }
+                echo '<div class="card">';
+                echo '<div class="card-header" id="heading_' . $coursedata->providerid . '">';
+                echo '<h5 class="mb-0">';
+                echo '<button class="btn btn-link" data-toggle="collapse" data-target="#gcid_' . $coursedata->providerid . '" aria-expanded="true" aria-controls="' . $coursedata->providerid . '">';
+                echo '<h3>' . $coursedata->fullname . '</h3>';
+                echo '</button>';
+                echo '</h5>';
+                echo '</div>';
+                echo '<div id="gcid_' . $coursedata->providerid . '" class="collapse show" aria-labelledby="heading_' . $coursedata->providerid . '" data-parent="#content_traces">';
+                $service::create_course($coursedata->providerid, $coursedata->fullname, $shortname, (int)$coursedata->categoryid, $coursedata->visible === 'on');
+                echo '</div>';
+                echo '</div>';
             }
+            echo '</div>';
+            print_trace('generatingcoursesfinish', 'info', $time);
+            ob_end_clean();
+        } else {
+            // TODO add notification for error, and charge de course list again
+            echo 'Ningún curso seleccionado';
         }
-        $data = new stdClass();
-        $data->view_url = $view_url;
-        $data->errors = $this->errors;
-        $data->has_errors = $has_errors;
-        $data->error_level = $level;
-        $data->success = $this->success;
-        return $data;
+        return new stdClass();
     }
 }

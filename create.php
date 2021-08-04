@@ -34,9 +34,7 @@ require_login();
 
 $has_capability = has_capability('local/tresipuntimportgc:import',  context_system::instance());
 
-$providerid = required_param('id', PARAM_INT);
-
-$title = 'LABORATORIO DE FACTORÍA';
+$title = get_string('generatingcourses', 'local_tresipuntimportgc');
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/tresipuntimportgc/import.php');
@@ -48,23 +46,24 @@ $output = $PAGE->get_renderer('local_tresipuntimportgc');
 echo $OUTPUT->header();
 
 if ($has_capability) {
-
-    $fullname = 'Importación';
-    $shortname = 'Importación' . '_' .uniqid();
-    $category = 1;
-    $visible = true;
-
-    echo "<pre>";
-
-    $res = course_external::create_course(
-        $providerid, $fullname, $shortname, $category, $visible
-    );
-
-    echo "</pre>";
-
-    $page = new create_page($res);
-    echo $output->render($page);
-
+    if (!empty($_COOKIE)) {
+        $courses = json_decode($_COOKIE['coursesIds']);
+        // TODO ONLY FOR DEV delete all courses first
+            $oldcourses = get_courses();
+            foreach($oldcourses as $oldcourse) {
+                if ((int)$oldcourse->id !== 1) {
+                    delete_course($oldcourse);
+                }
+            }
+        /*******************************************/
+        $page = new create_page($courses);
+        echo $output->render($page);
+    } else {
+        // TODO error browser cookies or js
+        throw new moodle_exception(
+            'error browser cookies or js'
+        );
+    }
 } else {
     throw new moodle_exception(
         get_string('not_capability', 'local_tresipuntimportgc')

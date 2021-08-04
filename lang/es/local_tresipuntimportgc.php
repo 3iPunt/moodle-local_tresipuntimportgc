@@ -55,3 +55,35 @@ $string['select_category'] = 'Seleccionar categoría';
 $string['course_visible'] = 'Visible para los alumnos';
 $string['uniquename_course_help'] = "Se utilizará este valor para el nombre corto del curso. (Debe ser único, sin mayúsculas ni carácteres especiales, ni acentos. Si esto no se cumple, se normalizará el valor automáticamente. Si se deja vacío, se normalizará el nombre del curso).";
 $string['select_category_help'] = "Seleccione la categoría donde se creará el curso importado";
+
+// Traces
+$string['generatingcourses'] = '<h4 class="alert-heading">GENERANDO CURSOS</h4>';
+$string['generatingcoursesfinish'] = '<h4 class="alert-heading">GENERACIÖN DE CURRSOS FINALIZADA</h4>';
+$string['generatingcourses_help'] = '<p>Se ha comenzado la creación de cursos.<br>Aunque cierre esta pestaña, seguirán creándose cursos.<br>Podrá ver la información generada tanto desde aquí, como desde el fichero log.txt del plugin.</p><hr>';
+
+// Traces Course
+$string['startingcourse'] = 'Comenzando creación del curso <b>{$a}</b>';
+$string['recoverycourse'] = 'Curso recuperado de Classroom correctamente';
+$string['recoverycourseerror'] = 'ERROR al recuperar el curso de Classroom: <b>{$a}</b>';
+$string['coursebasecreated'] = 'Curso Base creado con id: {$a}';
+$string['coursebasecreatederror'] = 'ERROR al crear el curso: <b>{$a}</b>';
+$string['teacherfoldercreated'] = 'Carpeta del profesor creada correctamente';
+$string['teacherfoldererrorcreated'] = 'ERROR al crear la carpeta del profesor';
+$string['recoverysections'] = 'Se han recuperado correctamente <b>{$a}</b> secciones del curso';
+$string['sectioncreated'] = 'Se ha creado correctamente la sección {$a}';
+$string['sectionerrorcreated'] = 'ERROR al crear la sección {$a}';
+$string['recoverysectionserror'] = 'ERROR al recuperar las secciones del curso: <b>{$a}</b>';
+$string['recoverymodules'] = 'Se han recuperado correctamente <b>{$a}</b> módulos del curso';
+$string['modulecreated'] = 'Se ha creado correctamente el módulo del tipo {$a->type} con el título <b>{$a->title}</b>';
+$string['moduleerrorcreated'] = 'ERROR al crear el módulo del tipo {$a->type} con el título <b>{$a->title}</b>';
+$string['recoverymoduleserror'] = 'ERROR al recuperar los módulos del curso: <b>{$a}</b>';
+$string['enrolteacher'] = 'El usuario ha sido matriculado en el curso como profesor';
+$string['enrolteachererror'] = 'ERROR al matricular al usuario en el curso como profesor: <b>{$a}</b>';
+$string['cleancourse'] = 'Sección inicial del curso normalizada';
+$string['cleancourseerror'] = 'ERROR al normalizar la sección inicial del curso: <b>{$a}</b>';
+$string['creationcoursecompleted'] = 'Proceso de creación del curso finalizado';
+$string['creationcoursecompletederror'] = 'Proceso de creación del curso finalizado CON ERRORES';
+
+// Traces errors
+$string['user_can_not_view_category'] = 'No tienes acceso a la categoría "{$a->category}", el curso "{$a->course}" no se creará.';
+$string['category_no_exist'] = 'La categoría con id {$a->categoryid} no existe, el curso "{$a->course}" no se creará.';
