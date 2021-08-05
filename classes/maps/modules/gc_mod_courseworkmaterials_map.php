@@ -42,7 +42,7 @@ class gc_mod_courseworkmaterials_map extends gc_mod_map  {
         $visible = $module['state'] === 'PUBLISHED';
         $section = isset($module['topicId']) ? $module['topicId'] : '';
         $mats = isset($module['materials']) ? $module['materials'] : [];
-        $desc = self::get_desc_rich($module['description'], $mats);
+        $desc = isset($module['description']) ? self::get_desc_rich($module['description'], $mats) : self::get_desc_rich('', $mats);
         return new module_url(
             $section, $module['title'], $desc, $visible, $module['alternateLink']
         );

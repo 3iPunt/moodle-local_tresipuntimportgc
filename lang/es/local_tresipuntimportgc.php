@@ -56,6 +56,8 @@ $string['select_category'] = 'Seleccionar categoría';
 $string['course_visible'] = 'Visible para los alumnos';
 $string['uniquename_course_help'] = "Se utilizará este valor para el nombre corto del curso. (Debe ser único, sin mayúsculas ni carácteres especiales, ni acentos. Si esto no se cumple, se normalizará el valor automáticamente. Si se deja vacío, se normalizará el nombre del curso).";
 $string['select_category_help'] = "Seleccione la categoría donde se creará el curso importado";
+$string['performancedata'] = 'Datos de ejecución';
+$string['courselinks'] = 'Enlaces a los cursos';
 
 // Traces
 $string['generatingcourses'] = '<h4 class="alert-heading">GENERANDO CURSOS</h4>';

@@ -86,6 +86,14 @@ class create_page implements renderable, templatable {
             ob_start();
             flush();
             print_trace('generatingcourses_help', 'info', null, $time);
+            // TODO review script, not work
+            echo "<script>
+let body = document.getElementById('page-local-tresipuntimportgc-import');
+const resize_ob = new ResizeObserver(function() {
+	body.scrollTop = document.getElementById('page-local-tresipuntimportgc-import').scrollHeight;
+});
+resize_ob.observe(document.querySelector('#region-main'));
+</script>";
             echo '<div id="content_traces">';
             foreach($this->courses as $key => $course) {
                 $coursedata = json_decode($_COOKIE[$course]);
@@ -94,7 +102,7 @@ class create_page implements renderable, templatable {
                     $shortname = str_replace(' ', '_', normalize_str($coursedata->fullname));
                 }
                 if ($DB->get_record('course', ['shortname' => $shortname]) === false) {
-                    // TODO refactor with html_writer
+                    // TODO refactor with html_writer?? (the content is not known at any time)
                     echo '<div class="card">';
                     echo '<div class="card-header" id="heading_' . $coursedata->providerid . '">';
                     echo '<h5 class="mb-0">';

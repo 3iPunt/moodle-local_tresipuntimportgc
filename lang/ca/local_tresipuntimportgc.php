@@ -56,6 +56,8 @@ $string['select_category'] = 'Seleccionar categoria';
 $string['course_visible'] = 'Visible per als alumnes';
 $string['uniquename_course_help'] = "Aquest valor s’utilitzarà per al nom curt del curs. (Ha de ser únic, sense majúscules, caràcters especials ni accents. Si no es compleix, el valor es normalitzarà automàticament. Si es deixa buit, el nom del curs es normalitzarà).";
 $string['select_category_help'] = "Seleccioneu la categoria on es crearà el curs importat";
+$string['performancedata'] = 'Implementation data';
+$string['courselinks'] = 'Links to the courses';
 
 // Traces
 $string['generatingcourses'] = '<h4 class="alert-heading">GENERATING COURSES</h4>';

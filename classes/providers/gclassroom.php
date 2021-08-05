@@ -247,7 +247,7 @@ class gclassroom extends provider {
                     $response = new response_sections(true, $data);
                 } else {
                     $msg = $this->get_msg_curl($data, $res);
-                    $response = new response_sections(false, [], new error('01032', $msg));
+                    $response = new response_sections(true, [], new error('01032', $msg));
                 }
             } else {
                 $response = new response_sections(false, [], new error('01031', json_encode($res)));
@@ -306,7 +306,7 @@ class gclassroom extends provider {
             $data = json_decode($req, true);
             if (isset($res['HTTP/1.0'])) {
                 if ($res['HTTP/1.0'] === '200 OK') {
-                    $mods = gc_map::modules($data['courseWork'], 'courseWork');
+                    $mods = isset($data['courseWork']) ? gc_map::modules($data['courseWork'], 'courseWork') : gc_map::modules([], 'courseWork');
                     $response = new response_modules(true, $mods);
                 } else {
                     $msg = $this->get_msg_curl($data, $res);
@@ -370,7 +370,7 @@ class gclassroom extends provider {
             $data = json_decode($req, true);
             if (isset($res['HTTP/1.0'])) {
                 if ($res['HTTP/1.0'] === '200 OK') {
-                    $mods = gc_map::modules($data['announcements'], 'announcements');
+                    $mods = isset($data['announcements']) ? gc_map::modules($data['announcements'], 'announcements') : gc_map::modules([], 'announcements');
                     $response = new response_modules(true, $mods);
                 } else {
                     $msg = $this->get_msg_curl($data, $res);

@@ -42,7 +42,10 @@ class gc_mod_coursework_assignment_map extends gc_mod_map {
         $visible = $module['state'] === 'PUBLISHED';
         $section = isset($module['topicId']) ? $module['topicId'] : '';
         $mats = isset($module['materials']) ? $module['materials'] : [];
-        $desc = self::get_desc_rich($module['description'], $mats);
+        $desc = '';
+        if (isset($module['description']) && $module['description'] !== null) {
+            $desc = self::get_desc_rich($module['description'], $mats);
+        }
         return new module_assign(
             $section, $module['title'], $desc, $visible
         );

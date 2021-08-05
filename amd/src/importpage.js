@@ -171,6 +171,9 @@ define([
                     }
                     that.setCookie('coursesIds', JSON.stringify(courses), 5);
                     let url = window.location.href.replace('import.php', 'create.php');
+                    if (url.indexOf('?') !== -1) {
+                        url = url.substring(0, url.indexOf('?'));
+                    }
                     let tasktab = window.open(url, '_self');
                     tasktab.focus();
                 });
