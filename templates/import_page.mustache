@@ -117,7 +117,8 @@
                                                 {{/importfiles}}
                                             </select>
                                         </div>
-                                        <div class="col-md-4 mb-3">
+                                        <!--TODO the teacher's folder does not exist in classroom, it would be the user's private drive.-->
+                                        <!--<div class="col-md-4 mb-3">
                                             <label for="teacherfolderimportfiles-{{ id }}">
                                                 {{#str}}teacherfolderimportfiles, local_tresipuntimportgc{{/str}}
                                                 <button type="button" class="btn helplabel" data-container="body" data-toggle="popover" data-placement="bottom" data-content="{{# str }} teacherfolderimportfiles_help, local_tresipuntimportgc {{/ str }}">
@@ -129,7 +130,7 @@
                                                     <option value="{{value}}" {{selected}}>{{text}}</option>
                                                 {{/teacherfolderimportfiles}}
                                             </select>
-                                        </div>
+                                        </div>-->
                                         <div class="col-md-4 mb-3">
                                             <label for="calendarimport-{{ id }}">
                                                 {{#str}}googlecalendarimport, local_tresipuntimportgc{{/str}}
@@ -137,7 +138,7 @@
                                                     <i class="fa fa-question-circle text-info" aria-hidden="true"></i>
                                                 </button>
                                             </label>
-                                            <select class="form-control" id="teacherfolderimportfiles-{{ id }}">
+                                            <select class="form-control" id="calendarimport-{{ id }}">
                                                 {{#calendarimport}}
                                                     <option value="{{value}}" {{selected}}>{{text}}</option>
                                                 {{/calendarimport}}
@@ -159,7 +160,7 @@
 {{#js}}
     require(['local_tresipuntimportgc/importpage'],
         function(Controller) {
-            Controller.init('[data-region="local_tresipuntimportgc_import_page"]');
+            Controller.init('[data-region="local_tresipuntimportgc_import_page"]', {{#allowconfig}}true{{/allowconfig}}{{^allowconfig}}false{{/allowconfig}});
         }
     );
 {{/js}}

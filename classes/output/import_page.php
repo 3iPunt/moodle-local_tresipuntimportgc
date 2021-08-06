@@ -90,18 +90,18 @@ class import_page implements renderable, templatable {
         }
         $data->allowconfig = get_config('local_tresipuntimportgc', 'allowconfig');
         $importfiles = (int)get_config('local_tresipuntimportgc', 'importfiles');
-        $teacherfolderimportfiles = (int)get_config('local_tresipuntimportgc', 'teacherfolderimportfiles');
+        //$teacherfolderimportfiles = (int)get_config('local_tresipuntimportgc', 'teacherfolderimportfiles');
         $calendarimport = (int)get_config('local_tresipuntimportgc', 'calendarimport');
         $data->importfiles = [
             ['value' => 0, 'text' => get_string('generategdlink', 'local_tresipuntimportgc'), 'selected' => $importfiles === 0 ? 'selected' : ''],
             ['value' => 1, 'text' => get_string('importtocontentbank', 'local_tresipuntimportgc'), 'selected' => $importfiles === 1 ? 'selected' : ''],
             ['value' => 2, 'text' => get_string('importtonextcloud', 'local_tresipuntimportgc'), 'selected' => $importfiles === 2 ? 'selected' : '']
         ];
-        $data->teacherfolderimportfiles = [
+        /*$data->teacherfolderimportfiles = [
             ['value' => 0, 'text' => get_string('teacherfoldergenerategdlink', 'local_tresipuntimportgc'), 'selected' => $teacherfolderimportfiles === 0 ? 'selected' : ''],
             ['value' => 1, 'text' => get_string('teacherfolderimporttoprivatefiles', 'local_tresipuntimportgc'), 'selected' => $teacherfolderimportfiles === 1 ? 'selected' : ''],
             ['value' => 2, 'text' => get_string('teacherfolderimporttonextcloud', 'local_tresipuntimportgc'), 'selected' => $teacherfolderimportfiles === 2 ? 'selected' : '']
-        ];
+        ];*/
         $data->calendarimport = [
             ['value' => 0, 'text' => get_string('calendargenerategdlink', 'local_tresipuntimportgc'), 'selected' => $calendarimport === 0 ? 'selected' : ''],
             ['value' => 1, 'text' => get_string('calendarimport', 'local_tresipuntimportgc'), 'selected' => $calendarimport === 1 ? 'selected' : '']

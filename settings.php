@@ -91,7 +91,8 @@ if ($hassiteconfig) {
                 new lang_string('importfiles_help','local_tresipuntimportgc'), 0, $options));
 
         // Teacher folder
-        $options = [
+        // TODO the teacher's folder does not exist in classroom, it would be the user's private drive.
+        /*$options = [
             0 => get_string('teacherfoldergenerategdlink', 'local_tresipuntimportgc'),
             1 => get_string('teacherfolderimporttoprivatefiles', 'local_tresipuntimportgc'),
             2 => get_string('teacherfolderimporttonextcloud', 'local_tresipuntimportgc'),
@@ -100,7 +101,7 @@ if ($hassiteconfig) {
             new admin_setting_configselect(
                 'local_tresipuntimportgc/teacherfolderimportfiles',
                 new lang_string('teacherfolderimportfiles','local_tresipuntimportgc'),
-                new lang_string('teacherfolderimportfiles_help','local_tresipuntimportgc'), 0, $options));
+                new lang_string('teacherfolderimportfiles_help','local_tresipuntimportgc'), 0, $options));*/
 
         // Google Calendar
         $options = [

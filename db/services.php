@@ -20,11 +20,11 @@
  */
 
 use local_tresipuntimportgc\external\course_external;
+use local_tresipuntimportgc\external\importfiles_external;
 
 defined('MOODLE_INTERNAL') || die();
 
 $functions = [
-
     'local_tresipuntimportgc_course_create' => [
         'classname' => course_external::class,
         'methodname' => 'create_course',
@@ -32,13 +32,21 @@ $functions = [
         'type' => 'read',
         'ajax' => true,
         'loginrequired' => true
-    ]
-
+    ],
+    'local_tresipuntimportgc_importfiles' => [
+        'classname' => importfiles_external::class,
+        'methodname' => 'create_course',
+        'description' => 'Create Course',
+        'type' => 'read',
+        'ajax' => true,
+        'loginrequired' => true
+    ],
 ];
 $services = [
     'local_tresipuntimportgc' => [
         'functions' => [
             'local_tresipuntimportgc_course_create',
+            'local_tresipuntimportgc_importfiles'
         ],
         'restrictedusers' => 0,
         'enabled' => 1

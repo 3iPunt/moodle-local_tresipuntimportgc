@@ -47,10 +47,9 @@ require_once($CFG->libdir . '/google/src/Google/Service/Drive.php');
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class gclassroom extends provider {
+class gdrive extends provider {
 
     public const TIMEOUT = 30;
-    public const GOOGLE_CLASSROOM_URL = 'https://classroom.googleapis.com/v1/courses/';
 
     /** @var string Json */
     protected $json;
@@ -78,7 +77,6 @@ class gclassroom extends provider {
         $this->json = get_config('local_tresipuntimportgc', 'credentialsjson');
         $this->clientid = get_config('local_tresipuntimportgc', 'clientid');
         $this->secretkey = get_config('local_tresipuntimportgc', 'secretkey');
-
         if ($this->json !== '' &&
             $this->json !== false &&
             $this->clientid !== '' &&
@@ -96,27 +94,16 @@ class gclassroom extends provider {
     }
 
     /**
-     * @return Google_Client
-     * @throws Google_Exception
-     * @throws moodle_exception
-     */
-    public function get_client(): Google_Client {
-        if (!isset($this->client)) {
-            $this->set_client();
-        }
-        return $this->client;
-    }
-
-    /**
      * Get Token.
      *
      * @return mixed
      */
     protected function get_token() {
         $accesstokenjson = $this->client->getAccessToken();
-        $accesstoken = json_decode($accesstokenjson);
-        return $accesstoken->access_token;
+        return json_decode($accesstokenjson, true)->access_token;
     }
+
+
 
     /**
      * Set Client.
@@ -130,22 +117,9 @@ class gclassroom extends provider {
         $client->setClientId($this->clientid );
         $client->setClientSecret($this->secretkey);
         $client->setAuthConfig($this->json);
-        $client->setRedirectUri((new moodle_url('/local/tresipuntimportgc/import.php'))->out(false));
         $client->setAccessType('offline');
         $client->setPrompt('select_account consent');
-        $client->setScopes([
-                Google_Service_Classroom::CLASSROOM_COURSES_READONLY,
-                'https://www.googleapis.com/auth/userinfo.email',
-                'https://www.googleapis.com/auth/userinfo.profile',
-                'https://www.googleapis.com/auth/classroom.courses',
-                'https://www.googleapis.com/auth/classroom.coursework.me.readonly',
-                'https://www.googleapis.com/auth/classroom.coursework.students.readonly ',
-                'https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly',
-                'https://www.googleapis.com/auth/classroom.announcements.readonly',
-                'https://www.googleapis.com/auth/classroom.topics.readonly',
-                // DRIVE_READONLY ??
-                Google_Service_Drive::DRIVE]
-        );
+        $client->setScopes([Google_Service_Drive::DRIVE]);
         $oauth2 = new Google_Service_Oauth2($client);
         if (isset($_GET["code"])) {
             $client->authenticate($_GET['code']);

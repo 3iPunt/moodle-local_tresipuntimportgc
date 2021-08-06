@@ -94,3 +94,16 @@ function print_trace(string $traceid, string $type, $param = null, $time = null)
     );*/
     // TODO save the trace or create log for revision
 }
+
+/**
+ * @param $obj
+ * @param $prop
+ * @return mixed
+ * @throws ReflectionException
+ */
+function accessProtected($obj, $prop) {
+    $reflection = new ReflectionClass($obj);
+    $property = $reflection->getProperty($prop);
+    $property->setAccessible(true);
+    return $property->getValue($obj);
+}

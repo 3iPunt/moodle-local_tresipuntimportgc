@@ -27,6 +27,7 @@ namespace local_tresipuntimportgc\output;
 use Google_Client;
 use Google_Service_Classroom;
 use local_tresipuntimportgc\external\course_external;
+use local_tresipuntimportgc\external\importfiles_external;
 use local_tresipuntimportgc\gprovider;
 use local_tresipuntimportgc\providers\provider;
 use local_tresipuntimportgc\responses\response;
@@ -78,7 +79,8 @@ class create_page implements renderable, templatable {
         $coursesids = [];
         $coursestitle = [];
         if (count($this->courses) > 0) {
-            $service = new course_external();
+            $courseservice = new course_external();
+            $importfilesservice = new importfiles_external();
             @ini_set('zlib.output_compression',0);
             @ini_set('implicit_flush',1);
             @ob_end_clean();
@@ -101,6 +103,9 @@ resize_ob.observe(document.querySelector('#region-main'));
                 if ($shortname === '') {
                     $shortname = str_replace(' ', '_', normalize_str($coursedata->fullname));
                 }
+                $coursedata->importfiles = $coursedata->importfiles ?? (int)get_config('local_tresipuntimportgc', 'importfiles');
+                /*$coursedata->teacherfolderimportfiles = $coursedata->teacherfolderimportfiles ?? (int)get_config('local_tresipuntimportgc', 'teacherfolderimportfiles');*/
+                $coursedata->calendarimport = $coursedata->calendarimport ?? (int)get_config('local_tresipuntimportgc', 'calendarimport');
                 if ($DB->get_record('course', ['shortname' => $shortname]) === false) {
                     // TODO refactor with html_writer?? (the content is not known at any time)
                     echo '<div class="card">';
@@ -112,7 +117,14 @@ resize_ob.observe(document.querySelector('#region-main'));
                     echo '</h5>';
                     echo '</div>';
                     echo '<div id="gcid_' . $coursedata->providerid . '" class="collapse show" aria-labelledby="heading_' . $coursedata->providerid . '" data-parent="#content_traces">';
-                    $courseresponse = $service::create_course($coursedata->providerid, $coursedata->fullname, $shortname, (int)$coursedata->categoryid, $coursedata->visible === 'on');
+                    $courseresponse = $courseservice::create_course($coursedata->providerid, $coursedata->fullname, $shortname, (int)$coursedata->categoryid, $coursedata->visible === 'on');
+                    /* TODO IMPORTANT This should be done right at the time of course creation, because if this option is checked,
+                       it is necessary to associate the course files to the content bank, and users can delete them from Google Drive.
+                       Right now, if users delete the files or the course from Classroom, all course files are lost in moodle course.
+                       TODO There is still a strong dependency on the GoogleClassroom course if files are not imported into Moodle !!!!!!!!!!!!!!! */
+                    if ((int)$coursedata->importfiles === 1) {
+                        $importfilesresponse = $importfilesservice::importfiles($coursedata->providerid, (int)$courseresponse['id']);
+                    }
                     echo '</div>';
                     echo '</div>';
                     $coursesids[$key] = $courseresponse['id'];

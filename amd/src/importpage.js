@@ -76,9 +76,11 @@ define([
     /**
      * @constructor
      * @param {String} selector
+     * @param {boolean} allowconfig
      */
-    function Controller(selector) {
+    function Controller(selector, allowconfig) {
         this.node = $(selector);
+        this.allowconfig = allowconfig;
         this.initControl();
         this.initCreatecourses();
     }
@@ -155,13 +157,27 @@ define([
                         if ($(this).is(':checked') && $(this).attr('data-id') !== undefined) {
                             let courseContent = $(this).parent();
                             let id = $(this).attr('data-id');
-                            let courseconfig = {
-                                'providerid': id,
-                                'fullname': courseContent.find('#fullname-' + id).text(),
-                                'shortname': courseContent.find('#name-' + id).val(),
-                                'categoryid': courseContent.find('#category-' + id).val(),
-                                'visible': courseContent.find('#visible-' + id).val()
-                            };
+                            let courseconfig;
+                            if (that.allowconfig) {
+                                courseconfig = {
+                                    'providerid': id,
+                                    'fullname': courseContent.find('#fullname-' + id).text(),
+                                    'shortname': courseContent.find('#name-' + id).val(),
+                                    'categoryid': courseContent.find('#category-' + id).val(),
+                                    'visible': courseContent.find('#visible-' + id).val(),
+                                    'importfiles': courseContent.find('#importfiles-' + id).val(),
+                                    /* 'teacherfolderimportfiles': courseContent.find('#teacherfolderimportfiles-' + id).val(),*/
+                                    'calendarimport': courseContent.find('#calendarimport-' + id).val()
+                                };
+                            } else {
+                                courseconfig = {
+                                    'providerid': id,
+                                    'fullname': courseContent.find('#fullname-' + id).text(),
+                                    'shortname': courseContent.find('#name-' + id).val(),
+                                    'categoryid': courseContent.find('#category-' + id).val(),
+                                    'visible': courseContent.find('#visible-' + id).val()
+                                };
+                            }
                             courses.push(id);
                             that.setCookie(id, JSON.stringify(courseconfig), 5);
                         }
@@ -222,10 +238,11 @@ define([
     return {
         /**
          * @param {String} selector The selector for the page region containing the page.
+         * @param {boolean} allowconfig Indicates if advanced configuration is allowed to be added.
          * @return {Controller}
          */
-        init: function(selector) {
-            return new Controller(selector);
+        init: function(selector, allowconfig) {
+            return new Controller(selector, allowconfig);
         }
     };
 });
