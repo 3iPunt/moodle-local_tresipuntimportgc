@@ -64,13 +64,16 @@
                     <div>
                         <span class="badge badge-info">{{ room }}</span>
                         <span class="badge badge-light">{{ courseState }}</span>
+                        <!--TODO convert creationTime and creationTime strings to user-friendly format-->
+                        <!--<span class="badge badge-secondary">{{ creationTime }}</span>
+                        <span class="badge badge-primary">{{ updateTime }}</span>-->
                     </div>
                     <br>
                     <div class="collapse" id="edit_{{ id }}">
                         <div class="card card-body">
                             <form data-form="{{ id }}">
                                 <div class="form-row">
-                                    <div class="col-md-5 mb-3">
+                                    <div class="col-md-3 mb-3">
                                         <label for="name-{{ id }}">
                                             {{#str}}uniquename_course, local_tresipuntimportgc{{/str}}
                                             <button type="button" class="btn helplabel" data-container="body" data-toggle="popover" data-placement="bottom" data-content="{{# str }} uniquename_course_help, local_tresipuntimportgc {{/ str }}">
@@ -79,7 +82,7 @@
                                         </label>
                                         <input type="text" class="form-control" id="name-{{ id }}" value="">
                                     </div>
-                                    <div class="col-md-4 mb-3">
+                                    <div class="col-md-7 mb-3">
                                         <label for="category-{{ id }}">
                                             {{#str}}select_category, local_tresipuntimportgc{{/str}}
                                             <button type="button" class="btn helplabel" data-container="body" data-toggle="popover" data-placement="bottom" data-content="{{# str }} select_category_help, local_tresipuntimportgc {{/ str }}">
@@ -97,6 +100,51 @@
                                         <label class="custom-control-label" for="visible-{{ id }}">{{#str}}course_visible, local_tresipuntimportgc{{/str}}</label>
                                     </div>
                                 </div>
+                                {{#allowconfig}}
+                                    <hr>
+                                    <h5>{{#str}}advanced{{/str}}</h5>
+                                    <div class="form-row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="importfiles-{{ id }}">
+                                                {{#str}}importfiles, local_tresipuntimportgc{{/str}}
+                                                <button type="button" class="btn helplabel" data-container="body" data-toggle="popover" data-placement="bottom" data-content="{{# str }} importfiles_help, local_tresipuntimportgc {{/ str }}">
+                                                    <i class="fa fa-question-circle text-info" aria-hidden="true"></i>
+                                                </button>
+                                            </label>
+                                            <select class="form-control" id="importfiles-{{ id }}">
+                                                {{#importfiles}}
+                                                    <option value="{{value}}" {{selected}}>{{text}}</option>
+                                                {{/importfiles}}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="teacherfolderimportfiles-{{ id }}">
+                                                {{#str}}teacherfolderimportfiles, local_tresipuntimportgc{{/str}}
+                                                <button type="button" class="btn helplabel" data-container="body" data-toggle="popover" data-placement="bottom" data-content="{{# str }} teacherfolderimportfiles_help, local_tresipuntimportgc {{/ str }}">
+                                                    <i class="fa fa-question-circle text-info" aria-hidden="true"></i>
+                                                </button>
+                                            </label>
+                                            <select class="form-control" id="teacherfolderimportfiles-{{ id }}">
+                                                {{#teacherfolderimportfiles}}
+                                                    <option value="{{value}}" {{selected}}>{{text}}</option>
+                                                {{/teacherfolderimportfiles}}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="calendarimport-{{ id }}">
+                                                {{#str}}googlecalendarimport, local_tresipuntimportgc{{/str}}
+                                                <button type="button" class="btn helplabel" data-container="body" data-toggle="popover" data-placement="bottom" data-content="{{# str }} googlecalendarimport_help, local_tresipuntimportgc {{/ str }}">
+                                                    <i class="fa fa-question-circle text-info" aria-hidden="true"></i>
+                                                </button>
+                                            </label>
+                                            <select class="form-control" id="teacherfolderimportfiles-{{ id }}">
+                                                {{#calendarimport}}
+                                                    <option value="{{value}}" {{selected}}>{{text}}</option>
+                                                {{/calendarimport}}
+                                            </select>
+                                        </div>
+                                    </div>
+                                {{/allowconfig}}
                             </form>
                         </div>
                     </div>

@@ -32,6 +32,7 @@ if ($hassiteconfig) {
         'local_tresipuntimportgc_config',
         new lang_string('pluginconfig', 'local_tresipuntimportgc'));
     if ($ADMIN->fulltree) {
+        /* GOOGLE API */
         $settingspage->add(
             new admin_setting_heading(
                 'local_tresipuntimportgc_gc',
@@ -59,6 +60,58 @@ if ($hassiteconfig) {
             '',
             PARAM_RAW
         ));
+
+        // TODO link or button for check connection to Google API.
+
+        /* GENERAL CONFIG */
+        $settingspage->add(
+            new admin_setting_heading(
+                'local_tresipuntimportgc_config_import',
+                new lang_string('configimportheading', 'local_tresipuntimportgc'),
+                '')
+        );
+
+        // Allow users to configure courses
+        $settingspage->add(
+            new admin_setting_configcheckbox(
+                'local_tresipuntimportgc/allowconfig',
+                new lang_string('allowconfig','local_tresipuntimportgc'),
+                new lang_string('allowconfig_help','local_tresipuntimportgc'), 0));
+
+        // Google Drive Files
+        $options = [
+            0 => get_string('generategdlink', 'local_tresipuntimportgc'),
+            1 => get_string('importtocontentbank', 'local_tresipuntimportgc'),
+            2 => get_string('importtonextcloud', 'local_tresipuntimportgc'),
+        ];
+        $settingspage->add(
+            new admin_setting_configselect(
+                'local_tresipuntimportgc/importfiles',
+                new lang_string('importfiles','local_tresipuntimportgc'),
+                new lang_string('importfiles_help','local_tresipuntimportgc'), 0, $options));
+
+        // Teacher folder
+        $options = [
+            0 => get_string('teacherfoldergenerategdlink', 'local_tresipuntimportgc'),
+            1 => get_string('teacherfolderimporttoprivatefiles', 'local_tresipuntimportgc'),
+            2 => get_string('teacherfolderimporttonextcloud', 'local_tresipuntimportgc'),
+        ];
+        $settingspage->add(
+            new admin_setting_configselect(
+                'local_tresipuntimportgc/teacherfolderimportfiles',
+                new lang_string('teacherfolderimportfiles','local_tresipuntimportgc'),
+                new lang_string('teacherfolderimportfiles_help','local_tresipuntimportgc'), 0, $options));
+
+        // Google Calendar
+        $options = [
+            0 => get_string('calendargenerategdlink', 'local_tresipuntimportgc'),
+            1 => get_string('calendarimport', 'local_tresipuntimportgc'),
+        ];
+        $settingspage->add(
+            new admin_setting_configselect(
+                'local_tresipuntimportgc/calendarimport',
+                new lang_string('googlecalendarimport','local_tresipuntimportgc'),
+                new lang_string('googlecalendarimport_help','local_tresipuntimportgc'), 0, $options));
     }
     $ADMIN->add('local_tresipuntimportgc_category', $settingspage);
     $ADMIN->add('courses', new admin_externalpage('local_tresipuntimportgc_import',

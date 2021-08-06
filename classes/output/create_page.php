@@ -142,6 +142,7 @@ resize_ob.observe(document.querySelector('#region-main'));
             $data->courselinks[$key]['coursetitle'] = $coursestitle[$key];
         }
         $data->courselinks = array_values($data->courselinks);
+        // TODO exporter
         return $data;
     }
 }
