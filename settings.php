@@ -81,8 +81,9 @@ if ($hassiteconfig) {
         // Google Drive Files
         $options = [
             0 => get_string('generategdlink', 'local_tresipuntimportgc'),
-            1 => get_string('importtocontentbank', 'local_tresipuntimportgc'),
+            1 => get_string('importtoprivatearea', 'local_tresipuntimportgc'),
             2 => get_string('importtonextcloud', 'local_tresipuntimportgc'),
+            3 => get_string('notimport', 'local_tresipuntimportgc'),
         ];
         $settingspage->add(
             new admin_setting_configselect(

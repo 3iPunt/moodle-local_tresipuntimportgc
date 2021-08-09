@@ -147,20 +147,20 @@ class gdrive extends provider {
 
     /**
      * Set Service.
+     * @return Google_Service_Classroom
      */
     protected function get_service(): Google_Service_Classroom {
         if (empty($this->service)) {
             $this->set_service();
             return $this->service;
-        } else {
-            return $this->service;
         }
+        return $this->service;
     }
 
     /**
      * Set Service.
      */
-    protected function set_service() {
+    protected function set_service(): void {
         $this->service = new Google_Service_Classroom($this->client);
     }
 

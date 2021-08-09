@@ -45,9 +45,10 @@ $string['allowconfig'] = 'Allow user configuration for each course';
 $string['allowconfig_help'] = 'If allowed, users will be able to choose the type of settings for each course from the course import panel. If not allowed, all courses will be imported with the general settings.';
 $string['importfiles'] = 'Importing files from Google Drive';
 $string['importfiles_help'] = 'Select how files will be imported from the GoogleDrive folder for each course';
-$string['generategdlink'] = 'Generate a direct link to the GoogleDrive folder in the first section of the course.';
-$string['importtocontentbank'] = 'Import all the files into the content bank of each course.';
-$string['importtonextcloud'] = 'Import all files to NextCloud assigned to each course (coming soon)';
+$string['generategdlink'] = 'Generate a direct link to the GoogleDrive folder in the first section of the course (hidden for students).';
+$string['importtoprivatearea'] = 'Import all files from GoogleDrive to the user\'s "Private Files" area in Moodle';
+$string['importtonextcloud'] = 'Import all files to NextCloud associated to each course (coming soon)';
+$string['notimport'] = 'Do not import files';
 $string['teacherfolderimportfiles'] = 'Importing teacher files';
 $string['teacherfolderimportfiles_help'] = 'Select how the files will be imported from the teacher\'s folder';
 $string['teacherfoldergenerategdlink'] = 'Generate a direct link (hidden for students) to the GoogleDrive folder in the first section of the course';
@@ -112,6 +113,15 @@ $string['cleancourse'] = 'Standardised initial course section';
 $string['cleancourseerror'] = 'ERROR when normalising the initial section of the course: <b>{$a}</b>';
 $string['creationcoursecompleted'] = 'Course creation process completed';
 $string['creationcoursecompletederror'] = 'Course creation process completed WITH ERRORS';
+
+// Traces importfiles
+$string['importingfiles'] = 'Importing files from Google Drive to the user\'s Private Area';
+$string['filesfound'] = '{$a} files have been found';
+$string['importfilesuccess'] = 'The file <b>{$a}</b> has been successfully imported';
+$string['importfilealreadyexist'] = 'A file with the name <b>{$a}</b> is already in this user\'s private area';
+$string['importfileerror'] = 'The file <b>{$a->name}</b> could not be imported: {$a->error}';
+$string['importfileerrorcontent'] = 'File <b>{$a}</b> has no content stored in Drive';
+$string['convertdocumentto'] = 'Converting the file <b>{$a->title}</b> to format <b>{$a->format}</b>';
 
 // Traces errors
 $string['user_can_not_view_category'] = 'You do not have access to the category "{$a->category}", the course "{$a->course}" shall not be created.';

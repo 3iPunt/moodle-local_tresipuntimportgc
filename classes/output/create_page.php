@@ -123,7 +123,8 @@ resize_ob.observe(document.querySelector('#region-main'));
                        Right now, if users delete the files or the course from Classroom, all course files are lost in moodle course.
                        TODO There is still a strong dependency on the GoogleClassroom course if files are not imported into Moodle !!!!!!!!!!!!!!! */
                     if ((int)$coursedata->importfiles === 1) {
-                        $importfilesresponse = $importfilesservice::importfiles($coursedata->providerid, (int)$courseresponse['id']);
+                        print_trace('importingfiles', 'info');
+                        $importfilesservice::importfiles($coursedata->providerid, (int)$courseresponse['id'], $shortname);
                     }
                     echo '</div>';
                     echo '</div>';

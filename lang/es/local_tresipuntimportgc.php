@@ -45,9 +45,10 @@ $string['allowconfig'] = 'Permitir configuración a los usuarios para cada curso
 $string['allowconfig_help'] = 'Si se permite, lo usuarios podrán escoger el tipo de configuración para cada curso desde el panel de importación de cursos. Si no se permite, todos los cursos se importarán con la configuración general.';
 $string['importfiles'] = 'Importación de archivos de Google Drive';
 $string['importfiles_help'] = 'Seleccione cómo se importarán los archivos de la carpeta GoogleDrive de cada curso';
-$string['generategdlink'] = 'Generar un enlace directo a la carpeta GoogleDrive en la primera sección del curso';
-$string['importtocontentbank'] = 'Importar todos los archivos al banco de contenidos de cada curso';
+$string['generategdlink'] = 'Generar un enlace directo a la carpeta GoogleDrive en la primera sección del curso (oculta para los estudiantes)';
+$string['importtoprivatearea'] = 'Importar todos los archivos de GoogleDrive al área "Archivos Privados" del usuario en Moodle';
 $string['importtonextcloud'] = 'Importar todos los archivos a NextCloud asociados a cada curso (proximamente)';
+$string['notimport'] = 'No importar archivos';
 $string['teacherfolderimportfiles'] = 'Importación de archivos del profesor';
 $string['teacherfolderimportfiles_help'] = 'Seleccione cómo se importarán los archivos de la carpeta del profesor';
 $string['teacherfoldergenerategdlink'] = 'Generar un enlace (oculto para los estudiantes) directo a la carpeta GoogleDrive en la primera sección del curso';
@@ -112,6 +113,15 @@ $string['cleancourse'] = 'Sección inicial del curso normalizada';
 $string['cleancourseerror'] = 'ERROR al normalizar la sección inicial del curso: <b>{$a}</b>';
 $string['creationcoursecompleted'] = 'Proceso de creación del curso finalizado';
 $string['creationcoursecompletederror'] = 'Proceso de creación del curso finalizado CON ERRORES';
+
+// Traces importfiles
+$string['importingfiles'] = 'Importando archivos de Google Drive al Área Privada del usuario';
+$string['filesfound'] = 'Se han encontrado {$a} archivos';
+$string['importfilesuccess'] = 'El archivo <b>{$a}</b> se ha importado correctamente';
+$string['importfilealreadyexist'] = 'Ya se encuentra un archivo con el nombre <b>{$a}</b> en el área privada de este usuario';
+$string['importfileerror'] = 'El archivo <b>{$a->name}</b> no se ha podido importar: {$a->error}';
+$string['importfileerrorcontent'] = 'El archivo <b>{$a}</b> no tiene ningún contenido almacenado en Drive';
+$string['convertdocumentto'] = 'Convirtiendo el archivo <b>{$a->title}</b> a formato <b>{$a->format}</b>';
 
 // Traces errors
 $string['user_can_not_view_category'] = 'No tienes acceso a la categoría "{$a->category}", el curso "{$a->course}" no se creará.';

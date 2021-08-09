@@ -22,17 +22,27 @@
 
 namespace local_tresipuntimportgc\external;
 
+use coding_exception;
+use context_course;
+use context_user;
+use core_contentbank\contentbank;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use file_exception;
+use file_storage;
 use Google_Exception;
+use Google_Http_Request;
 use Google_Service_Drive;
+use Google_Service_Drive_DriveFile;
+use Google_Service_Drive_FileList;
 use invalid_parameter_exception;
 use local_tresipuntimportgc\providers\gclassroom;
 use local_tresipuntimportgc\providers\gdrive;
 use moodle_exception;
 use ReflectionException;
+use stored_file_creation_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -50,7 +60,8 @@ class importfiles_external extends external_api {
         return new external_function_parameters(
             array(
                 'providerid' => new external_value(PARAM_TEXT, 'Course ID Provider', VALUE_REQUIRED),
-                'courseid' => new external_value(PARAM_INT, 'Course id for import files', VALUE_REQUIRED)
+                'courseid' => new external_value(PARAM_INT, 'Course id for import files', VALUE_REQUIRED),
+                'shortname' => new external_value(PARAM_RAW, 'Short name of course', VALUE_REQUIRED),
             )
         );
     }
@@ -58,50 +69,142 @@ class importfiles_external extends external_api {
     /**
      * @param string $providerid
      * @param int $courseid
+     * @param string $shortname
      * @return array
      * @throws Google_Exception
+     * @throws ReflectionException
+     * @throws coding_exception
+     * @throws file_exception
+     * @throws stored_file_creation_exception
      * @throws invalid_parameter_exception
      * @throws moodle_exception
-     * @throws ReflectionException
      */
-    public static function importfiles(string $providerid, int $courseid): array {
-        global $CFG;
+    public static function importfiles(string $providerid, int $courseid, string $shortname): array {
+        global $CFG, $USER;
         require_once($CFG->dirroot . '/course/lib.php');
         require_once($CFG->dirroot . '/user/externallib.php');
         self::validate_parameters(
             self::importfiles_parameters(), [
                 'providerid' => $providerid,
-                'courseid' => $courseid
+                'courseid' => $courseid,
+                'shortname' => $shortname
             ]
         );
         $provider = new gclassroom();
         $courseclassroom = $provider->get_course($providerid);
-        $coursemodel = $courseclassroom->data->providerdata;
         $folderid = accessProtected($courseclassroom->data->providerdata, 'modelData')['teacherFolder']['id'];
         // Needs the same client as for the first login, if a new client or provider with other scopes is created, it skips it because it is already logged in.
         $gdrvieclient = $provider->get_client();
+        $tokenjson = json_decode($gdrvieclient->getAccessToken(), true);
         $service = new Google_Service_Drive($gdrvieclient);
         $optParams =['q' => "'". $folderid ."' in parents"];
-        $files = $service->files->listFiles($optParams);
-        // TODO get all files and zip, or zif folder directly
-        print_object($files);die();
-        if (count($folders->getItems()) === 0) {
-            print_trace('emptydirectory', 'warning');
-        } else {
-            echo count($folders->getItems()) . ' cosas encontradas en drive';
-            foreach ($folders->getItems() as $folder) {
-                if ($folderid === $folder->getId()) {
-                    echo 'eureka!!!!';
-                }
+        /** @var Google_Service_Drive_FileList $files */
+        $filelist = $service->files->listFiles($optParams);
+        /** @var Google_Service_Drive_DriveFile[] $files */
+        $files = $filelist->getItems();
+        $context = context_user::instance($USER->id);
+        $fs = get_file_storage();
+        $errors = [];
+        print_trace('filesfound', 'info', count($files));
+        if (count($files) > 0) {
+            $fs->create_directory($context->id, 'user', 'private', 0, '/' . $shortname . '/');
+            foreach ($files as $file) {
+                self::import_file($fs, $file, $service, $shortname, $context->id, (int)$USER->id, $tokenjson['access_token']);
             }
         }
-        print_object($courseclassroom);
-        print_object($folders);die();
+        // TODO response
         return [
             'success' => true,
-            'errors' => '',
-            'id' => 1
+            'errors' => $errors,
+            'id' => $courseid
         ];
+    }
+
+    /**
+     * @param file_storage $fs
+     * @param Google_Service_Drive_DriveFile $file
+     * @param Google_Service_Drive $service
+     * @param string $shortname
+     * @param int $contextid
+     * @param int $userid
+     * @param string $token
+     * @throws coding_exception
+     * @throws file_exception
+     * @throws stored_file_creation_exception
+     */
+    private static function import_file(file_storage $fs, Google_Service_Drive_DriveFile $file, Google_Service_Drive $service, string $shortname, int $contextid, int $userid, string $token): void {
+        $downloadUrl = $file->getDownloadUrl();
+        if ($downloadUrl) {
+            $request = new Google_Http_Request($downloadUrl, 'GET', null, null);
+            $httpRequest = $service->getClient()->getAuth()->authenticatedRequest($request);
+            $response = $httpRequest->getResponseHttpCode();
+            $datafile = [
+                'contextid' => $contextid,
+                'component' => 'user',
+                'filearea' => 'private',
+                'itemid' => 0,
+                'filepath' => '/' . $shortname . '/',
+                'filename' => $file->getTitle(),
+                'userid' => $userid
+            ];
+            if ($response === 200) {
+                if ($fs->get_file($contextid, 'user', 'private', 0, '/' . $shortname . '/', $file->getTitle()) === false) {
+                    $fs->create_file_from_string($datafile, $httpRequest->getResponseBody());
+                    print_trace('importfilesuccess', 'success', $file->getTitle());
+                } else {
+                    print_trace('importfilealreadyexist', 'warning', $file->getTitle());
+                }
+            } else {
+                print_trace('importfileerror', 'error', ['title' => $file->getTitle(), 'error' => $response]);
+            }
+        } else {
+            $mimetype = $file->getMimeType();
+            $exportlinks = $file->getExportLinks();
+            switch ($mimetype) {
+                case 'application/vnd.google-apps.document':
+                    print_trace('convertdocumentto', 'info', ['title' => $file->getTitle(), 'format' => '.docx']);
+                    $datafile['filename'] = $file->getTitle() . '.docx'; // .odt ??
+                    $url = $exportlinks['application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+                    $url .= '&access_token=' . $token;
+                    $fs->create_file_from_url($datafile, $url);
+                    break;
+                case 'application/vnd.google-apps.presentation':
+                    print_trace('convertdocumentto', 'info', ['title' => $file->getTitle(), 'format' => '.pptx']);
+                    $datafile['filename'] = $file->getTitle() . '.pptx'; // .odp ??
+                    $url = $exportlinks['application/vnd.openxmlformats-officedocument.presentationml.presentation'];
+                    $url .= '&access_token=' . $token;
+                    $fs->create_file_from_url($datafile, $url);
+                    break;
+                case 'application/vnd.google-apps.spreadsheet':
+                    print_trace('convertdocumentto', 'info', ['title' => $file->getTitle(), 'format' => '.xlsx']);
+                    $datafile['filename'] = $file->getTitle() . '.xlsx'; // .ods ??
+                    $url = $exportlinks['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+                    $url .= '&access_token=' . $token;
+                    $fs->create_file_from_url($datafile, $url);
+                    break;
+                case 'application/vnd.google-apps.drawing':
+                    print_trace('convertdocumentto', 'info', ['title' => $file->getTitle(), 'format' => '.svg']);
+                    $datafile['filename'] = $file->getTitle() . '.svg';
+                    $url = $exportlinks['image/svg+xml'];
+                    $url .= '&access_token=' . $token;
+                    $fs->create_file_from_url($datafile, $url);
+                    break;
+                case 'application/vnd.google-apps.form':
+                    // TODO QUIZ or feedback
+                    print_trace('importfileerrorcontent', 'error', $file->getTitle());
+                    break;
+                default:
+                    print_trace('convertdocumentto', 'info', ['title' => $file->getTitle(), 'format' => '.pdf']);
+                    $datafile['filename'] = $file->getTitle() . '.pdf';
+                    $url = $exportlinks['application/pdf'];
+                    $url .= '&access_token=' . $token;
+                    $fs->create_file_from_url($datafile, $url);
+                    break;
+            }
+            if ($mimetype !== 'application/vnd.google-apps.form') {
+                print_trace('importfilesuccess', 'success', $file->getTitle());
+            }
+        }
     }
 
     /**

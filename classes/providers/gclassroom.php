@@ -144,7 +144,7 @@ class gclassroom extends provider {
                 'https://www.googleapis.com/auth/classroom.announcements.readonly',
                 'https://www.googleapis.com/auth/classroom.topics.readonly',
                 // DRIVE_READONLY ??
-                Google_Service_Drive::DRIVE]
+                Google_Service_Drive::DRIVE_READONLY]
         );
         $oauth2 = new Google_Service_Oauth2($client);
         if (isset($_GET["code"])) {
@@ -173,20 +173,20 @@ class gclassroom extends provider {
 
     /**
      * Set Service.
+     * @return Google_Service_Classroom
      */
     protected function get_service(): Google_Service_Classroom {
         if (empty($this->service)) {
             $this->set_service();
             return $this->service;
-        } else {
-            return $this->service;
         }
+        return $this->service;
     }
 
     /**
      * Set Service.
      */
-    protected function set_service() {
+    protected function set_service(): void {
         $this->service = new Google_Service_Classroom($this->client);
     }
 
