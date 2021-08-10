@@ -18,41 +18,32 @@ namespace local_tresipuntimportgc\maps\modules;
 
 use coding_exception;
 use local_tresipuntimportgc\factory\module;
-use local_tresipuntimportgc\factory\module_assign;
+use local_tresipuntimportgc\factory\module_resource;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class gc_mod_coursework_assignment_map
+ * Class gc_mod_drivefile_resource_map
  *
  * @package     local_tresipuntimportgc
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class gc_mod_coursework_assignment_map extends gc_mod_map {
+class gc_material_drivefile_resource_map extends gc_mod_map  {
 
     /**
      * Get Module.
      *
-     * @param $module
+     * @param $material
      * @return module
      * @throws coding_exception
      */
-    public function get_mod($module): module {
-        $visible = $module['state'] === 'PUBLISHED';
-        $section = isset($module['topicId']) ? $module['topicId'] : '';
-        $mats = isset($module['materials']) ? $module['materials'] : [];
+    public function get_mod($material): module {
+        $visible = $material['visible'];
+        $section = $material['section'] ?? '';
         $desc = '';
-        if (isset($module['description']) && $module['description'] !== null) {
-            $desc = self::get_desc_rich($module['description'], $mats);
-        }
-        /* TODO what is mapped as module_assign can also be a form with answers (quiz), so it is impossible to isolate the
-            modules here. It is only possible to know what kind of module it belongs to by reading "materials", i.e. if it
-            contains "form" it is a quiz if it has answers, or feedback if it does not, and is driveFile is a type resource, etc... */
-
-        $materials = $module['materials'] ?? [];
-        return new module_assign(
-            $section, $module['title'], $desc, $visible, $materials
+        return new module_resource(
+            $section, $material['driveFile']['driveFile']['title'], $desc, $visible, $material
         );
     }
 

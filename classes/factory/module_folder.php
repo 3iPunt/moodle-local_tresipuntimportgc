@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class module_assign
+ * Class module_folder
  *
  * @package     local_tresipuntimportgc
  * @copyright   2021 Tresipunt
@@ -27,36 +27,35 @@ namespace local_tresipuntimportgc\factory;
 use coding_exception;
 use context_module;
 use dml_exception;
+use file_exception;
 use Google_Exception;
 use Google_Http_Request;
 use Google_Service_Drive;
 use local_tresipuntimportgc\providers\gclassroom;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response_module;
-use mod_assign_generator;
+use mod_folder_generator;
 use moodle_exception;
+use stored_file_creation_exception;
 
 defined('MOODLE_INTERNAL') || die;
 
-global $CFG;
-require_once($CFG->dirroot . '/mod/assign/locallib.php');
-
 /**
- * Class module_assign
+ * Class module_folder
  *
  * @package     local_tresipuntimportgc
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class module_assign extends module {
+class module_folder extends module {
 
     /** @var string Mod Name */
-    protected $modname = 'assign';
+    protected $modname = 'folder';
 
-    /** @var mod_assign_generator Generator */
+    /** @var mod_folder_generator Generator */
     protected $generator;
 
-    /** @var array $materials */
+    /** array material */
     protected $materials;
 
     /**
@@ -70,7 +69,7 @@ class module_assign extends module {
      * @throws coding_exception
      */
     public function __construct(string $providersection, string $title, string $intro, bool $visible, array $materials) {
-        parent::__construct('mod_assign', $providersection, $title, $intro, $visible);
+        parent::__construct('mod_folder', $providersection, $title, $intro, $visible);
         $this->materials = $materials;
     }
 
@@ -79,9 +78,7 @@ class module_assign extends module {
      *
      * @param int $course_id
      * @return response_module
-     * @throws Google_Exception
      * @throws dml_exception
-     * @throws moodle_exception
      */
     public function create(int $course_id): response_module {
         $course = get_course($course_id);
@@ -90,7 +87,8 @@ class module_assign extends module {
             'name' => $this->title,
             'intro' => $this->intro,
             'introformat' => FORMAT_HTML,
-            'files' => file_get_unused_draft_itemid(),
+            'showexpanded' => true,
+            'files' => file_get_unused_draft_itemid()
         ];
         $options = [
             'section' => $this->get_section($course_id),
@@ -100,26 +98,29 @@ class module_assign extends module {
         $res = $this->generator->create_instance($record, $options);
         if (isset($res)) {
             if (count($this->materials) > 0) {
-                $this->add_additional_files($res);
+                $this->add_files($res);
             }
             return new response_module(true, $this, null);
         }
+
         return new response_module(false, null, new error('12000', 'MODULE_NOT_CREATED'));
     }
 
     /**
      * @param $res
      * @throws Google_Exception
+     * @throws file_exception
      * @throws moodle_exception
+     * @throws stored_file_creation_exception
+     * @throws coding_exception
      */
-    private function add_additional_files($res) {
-        // TODO refactor, duplicate code with importfiles_external
+    private function add_files($res) {
         $context = context_module::instance($res->cmid);
         $fs = get_file_storage();
         $filerecord = array(
             'contextid' => $context->id,
-            'component' => 'mod_assign',
-            'filearea'  => ASSIGN_INTROATTACHMENT_FILEAREA,
+            'component' => 'mod_folder',
+            'filearea'  => 'content',
             'itemid'    => 0,
             'filepath'  => '/'
         );
@@ -198,4 +199,6 @@ class module_assign extends module {
             }
         }
     }
+
+
 }

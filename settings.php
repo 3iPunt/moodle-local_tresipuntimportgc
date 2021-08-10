@@ -108,6 +108,7 @@ if ($hassiteconfig) {
         $options = [
             0 => get_string('calendargenerategdlink', 'local_tresipuntimportgc'),
             1 => get_string('calendarimport', 'local_tresipuntimportgc'),
+            2 => get_string('notimport', 'local_tresipuntimportgc'),
         ];
         $settingspage->add(
             new admin_setting_configselect(

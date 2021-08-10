@@ -24,6 +24,8 @@
 
 namespace local_tresipuntimportgc\factory;
 
+use coding_exception;
+use dml_exception;
 use local_tresipuntimportgc\providers\provider;
 use local_tresipuntimportgc\responses\error_errors;
 use local_tresipuntimportgc\responses\errors;
@@ -67,11 +69,14 @@ class factory  {
      * @param string $fullname
      * @param string $shortname
      * @param bool $visible
+     * @param int $importfiles
      * @return response
+     * @throws coding_exception
+     * @throws dml_exception
      * @throws moodle_exception
      */
     function create_course(
-        string $providerid, int $categoryid, string $fullname, string $shortname, bool $visible
+        string $providerid, int $categoryid, string $fullname, string $shortname, bool $visible, int $importfiles
     ): response {
         print_trace('startingcourse', 'light', $fullname, self::$time);
         //mtrace('*** INICIO IMPORTACIÓN DEL CURSO ***' . PHP_EOL);
@@ -87,17 +92,17 @@ class factory  {
                 $courseid = (int)$createres->data->get_id();
                 print_trace('coursebasecreated', 'success', $courseid, self::$time);
                 //mtrace('CREACIÓN DEL CURSO: OK');
-                // Create Teacher Resource.
-                $restf = $this->provider->get_teacher_folder($providerid);
-                if ($restf->success) {
-                    // TODO import files in course folder, add in config of each course
-                    $course->create_teacher_folder($restf->data->title, $restf->data->link);
-                    print_trace('teacherfoldercreated', 'success', null, self::$time);
-                    //mtrace('  CREACIÓN DE LA CARPETA DEL PROFESOR: OK');
-                } else {
-                    $errors[] = $restf->error;
-                    print_trace('teacherfoldererrorcreated', 'warning', null, self::$time);
-                    //mtrace('  CREACIÓN DE LA CARPETA DEL PROFESOR: ERROR - ' . $restf->error->to_string());
+                // Create Teacher Resource if config.
+                if ($importfiles === 0) {
+                    $restf = $this->provider->get_teacher_folder($providerid);
+                    if ($restf->success) {
+                        $course->create_teacher_folder($restf->data->title, $restf->data->link);
+                        print_trace('teacherfoldercreated', 'success', null, self::$time);
+                    } else {
+                        $errors[] = $restf->error;
+                        print_trace('teacherfoldererrorcreated', 'warning', null, self::$time);
+                        //mtrace('  CREACIÓN DE LA CARPETA DEL PROFESOR: ERROR - ' . $restf->error->to_string());
+                    }
                 }
                 // Create Sections.
                 $ressections = $this->provider->get_sections($providerid);
@@ -122,6 +127,7 @@ class factory  {
                     if ($resmods->success) {
                         print_trace('recoverymodules', 'success', count($resmods->data), self::$time);
                         //mtrace('  RECUPERACIÓN DE LOS MÓDULOS: OK - (' . count($resmods->data) . ')');
+                        // TODO sort mods by Classroom appearance, they now come unordered.
                         foreach ($resmods->data as $mod) {
                             if (!is_null($mod)) {
                                 $resmod = $mod->create($courseid);

@@ -97,6 +97,7 @@ class importfiles_external extends external_api {
         $gdrvieclient = $provider->get_client();
         $tokenjson = json_decode($gdrvieclient->getAccessToken(), true);
         $service = new Google_Service_Drive($gdrvieclient);
+
         $optParams =['q' => "'". $folderid ."' in parents"];
         /** @var Google_Service_Drive_FileList $files */
         $filelist = $service->files->listFiles($optParams);
@@ -134,19 +135,19 @@ class importfiles_external extends external_api {
      */
     private static function import_file(file_storage $fs, Google_Service_Drive_DriveFile $file, Google_Service_Drive $service, string $shortname, int $contextid, int $userid, string $token): void {
         $downloadUrl = $file->getDownloadUrl();
+        $datafile = [
+            'contextid' => $contextid,
+            'component' => 'user',
+            'filearea' => 'private',
+            'itemid' => 0,
+            'filepath' => '/' . $shortname . '/',
+            'filename' => $file->getTitle(),
+            'userid' => $userid
+        ];
         if ($downloadUrl) {
             $request = new Google_Http_Request($downloadUrl, 'GET', null, null);
             $httpRequest = $service->getClient()->getAuth()->authenticatedRequest($request);
             $response = $httpRequest->getResponseHttpCode();
-            $datafile = [
-                'contextid' => $contextid,
-                'component' => 'user',
-                'filearea' => 'private',
-                'itemid' => 0,
-                'filepath' => '/' . $shortname . '/',
-                'filename' => $file->getTitle(),
-                'userid' => $userid
-            ];
             if ($response === 200) {
                 if ($fs->get_file($contextid, 'user', 'private', 0, '/' . $shortname . '/', $file->getTitle()) === false) {
                     $fs->create_file_from_string($datafile, $httpRequest->getResponseBody());
@@ -158,51 +159,60 @@ class importfiles_external extends external_api {
                 print_trace('importfileerror', 'error', ['title' => $file->getTitle(), 'error' => $response]);
             }
         } else {
+            // Files of Google Apps
             $mimetype = $file->getMimeType();
             $exportlinks = $file->getExportLinks();
+            $url = '';
+            $format = '';
             switch ($mimetype) {
                 case 'application/vnd.google-apps.document':
-                    print_trace('convertdocumentto', 'info', ['title' => $file->getTitle(), 'format' => '.docx']);
-                    $datafile['filename'] = $file->getTitle() . '.docx'; // .odt ??
+                    $format = '.docx';
+                    print_trace('convertdocumentto', 'info', ['title' => $file->getTitle(), 'format' => $format]);
+                    $datafile['filename'] = $file->getTitle() . $format; // .odt ??
                     $url = $exportlinks['application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
                     $url .= '&access_token=' . $token;
-                    $fs->create_file_from_url($datafile, $url);
                     break;
                 case 'application/vnd.google-apps.presentation':
-                    print_trace('convertdocumentto', 'info', ['title' => $file->getTitle(), 'format' => '.pptx']);
-                    $datafile['filename'] = $file->getTitle() . '.pptx'; // .odp ??
+                    $format = '.pptx';
+                    print_trace('convertdocumentto', 'info', ['title' => $file->getTitle(), 'format' => $format]);
+                    $datafile['filename'] = $file->getTitle() . $format; // .odp ??
                     $url = $exportlinks['application/vnd.openxmlformats-officedocument.presentationml.presentation'];
                     $url .= '&access_token=' . $token;
-                    $fs->create_file_from_url($datafile, $url);
                     break;
                 case 'application/vnd.google-apps.spreadsheet':
-                    print_trace('convertdocumentto', 'info', ['title' => $file->getTitle(), 'format' => '.xlsx']);
-                    $datafile['filename'] = $file->getTitle() . '.xlsx'; // .ods ??
+                    $format = '.xlsx';
+                    print_trace('convertdocumentto', 'info', ['title' => $file->getTitle(), 'format' => $format]);
+                    $datafile['filename'] = $file->getTitle() . $format; // .ods ??
                     $url = $exportlinks['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
                     $url .= '&access_token=' . $token;
-                    $fs->create_file_from_url($datafile, $url);
                     break;
                 case 'application/vnd.google-apps.drawing':
-                    print_trace('convertdocumentto', 'info', ['title' => $file->getTitle(), 'format' => '.svg']);
-                    $datafile['filename'] = $file->getTitle() . '.svg';
+                    $format = '.svg';
+                    print_trace('convertdocumentto', 'info', ['title' => $file->getTitle(), 'format' => $format]);
+                    $datafile['filename'] = $file->getTitle() . $format;
                     $url = $exportlinks['image/svg+xml'];
                     $url .= '&access_token=' . $token;
-                    $fs->create_file_from_url($datafile, $url);
                     break;
                 case 'application/vnd.google-apps.form':
                     // TODO QUIZ or feedback
                     print_trace('importfileerrorcontent', 'error', $file->getTitle());
                     break;
                 default:
-                    print_trace('convertdocumentto', 'info', ['title' => $file->getTitle(), 'format' => '.pdf']);
-                    $datafile['filename'] = $file->getTitle() . '.pdf';
+                    $format = '.pdf';
+                    print_trace('convertdocumentto', 'info', ['title' => $file->getTitle(), 'format' => $format]);
+                    $datafile['filename'] = $file->getTitle() . $format;
                     $url = $exportlinks['application/pdf'];
                     $url .= '&access_token=' . $token;
-                    $fs->create_file_from_url($datafile, $url);
                     break;
             }
+            // TODO forms in drive?? how to convert?? template feedback?
             if ($mimetype !== 'application/vnd.google-apps.form') {
-                print_trace('importfilesuccess', 'success', $file->getTitle());
+                if ($fs->get_file($contextid, 'user', 'private', 0, '/' . $shortname . '/', $file->getTitle() . $format) === false) {
+                    $fs->create_file_from_url($datafile, $url);
+                    print_trace('importfilesuccess', 'success', $file->getTitle());
+                } else {
+                    print_trace('importfilealreadyexist', 'warning', $file->getTitle());
+                }
             }
         }
     }

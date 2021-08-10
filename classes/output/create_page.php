@@ -24,18 +24,20 @@
 
 namespace local_tresipuntimportgc\output;
 
-use Google_Client;
-use Google_Service_Classroom;
+use coding_exception;
+use dml_exception;
+use file_exception;
+use Google_Exception;
+use invalid_parameter_exception;
 use local_tresipuntimportgc\external\course_external;
 use local_tresipuntimportgc\external\importfiles_external;
-use local_tresipuntimportgc\gprovider;
-use local_tresipuntimportgc\providers\provider;
-use local_tresipuntimportgc\responses\response;
 use moodle_exception;
 use moodle_url;
+use ReflectionException;
 use renderable;
 use renderer_base;
 use stdClass;
+use stored_file_creation_exception;
 use templatable;
 
 defined('MOODLE_INTERNAL') || die;
@@ -69,6 +71,13 @@ class create_page implements renderable, templatable {
      *
      * @param renderer_base $output
      * @return stdClass
+     * @throws Google_Exception
+     * @throws ReflectionException
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws file_exception
+     * @throws invalid_parameter_exception
+     * @throws stored_file_creation_exception
      * @throws moodle_exception
      */
     public function export_for_template(renderer_base $output): stdClass {
@@ -117,15 +126,24 @@ resize_ob.observe(document.querySelector('#region-main'));
                     echo '</h5>';
                     echo '</div>';
                     echo '<div id="gcid_' . $coursedata->providerid . '" class="collapse show" aria-labelledby="heading_' . $coursedata->providerid . '" data-parent="#content_traces">';
-                    $courseresponse = $courseservice::create_course($coursedata->providerid, $coursedata->fullname, $shortname, (int)$coursedata->categoryid, $coursedata->visible === 'on');
-                    /* TODO IMPORTANT This should be done right at the time of course creation, because if this option is checked,
-                       it is necessary to associate the course files to the content bank, and users can delete them from Google Drive.
-                       Right now, if users delete the files or the course from Classroom, all course files are lost in moodle course.
-                       TODO There is still a strong dependency on the GoogleClassroom course if files are not imported into Moodle !!!!!!!!!!!!!!! */
+                    /* TODO IMPORTANT The initial purpose of this plugin is to invite the user to DELETE their Classroom account
+                         AND ALL CONTENT from Drive related to the course, WE CANNOT LINK ANYTHING from Google in Moodle
+                        (it makes no sense), we have to import everything into Moodle no matter what,
+                        STUDENTS WANT PRIVACY!!!! */
+                    $courseresponse = $courseservice::create_course(
+                        $coursedata->providerid,
+                        $coursedata->fullname,
+                        $shortname,
+                        (int)$coursedata->categoryid,
+                        $coursedata->visible === 'on',
+                        $coursedata->importfiles
+
+                    );
                     if ((int)$coursedata->importfiles === 1) {
                         print_trace('importingfiles', 'info');
                         $importfilesservice::importfiles($coursedata->providerid, (int)$courseresponse['id'], $shortname);
                     }
+                    // TODO import calendar.
                     echo '</div>';
                     echo '</div>';
                     $coursesids[$key] = $courseresponse['id'];

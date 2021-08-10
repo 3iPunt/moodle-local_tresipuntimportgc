@@ -16,10 +16,15 @@
 
 namespace local_tresipuntimportgc\maps;
 
+use Exception;
 use Google_Service_Classroom_Course;
 use local_tresipuntimportgc\factory\course;
 use local_tresipuntimportgc\factory\folder;
 use local_tresipuntimportgc\factory\module;
+use local_tresipuntimportgc\factory\module_assign;
+use local_tresipuntimportgc\factory\module_folder;
+use local_tresipuntimportgc\factory\module_label;
+use local_tresipuntimportgc\factory\module_url;
 use local_tresipuntimportgc\factory\section;
 use local_tresipuntimportgc\maps\modules\gc_mod_map;
 
@@ -118,11 +123,12 @@ class gc_map extends map {
             if (isset(gc_mod_map::GC_MODS[$type])) {
                 $modtypes = gc_mod_map::GC_MODS[$type];
                 $class = is_array($modtypes) ? $modtypes[$module['workType']] : $modtypes;
+                //print_object($module);die();
                 if (!empty($class)) {
                     try {
                         $modmap = new $class;
                         return $modmap->get_mod($module);
-                    } catch (\Exception $e) {
+                    } catch (Exception $e) {
                         error_log($e->getMessage());
                         mtrace('    -- ERROR: GET_MODULE: ' . $module['id'] . ' - ' . $e->getMessage());
                         return null;
@@ -136,6 +142,33 @@ class gc_map extends map {
         return null;
     }
 
+    static public function materials(array $module): array {
+        $materials = [];
+        if (isset($module['materials'])) {
+            foreach($module['materials'] as $material) {
+                $type = array_key_first_compatible($material);
+                if (isset(gc_mod_map::GC_MATERIALS[$type])) {
+                    $class = gc_mod_map::GC_MATERIALS[$type];
+                    if (!empty($class)) {
+                        try {
+                            $modmap = new $class;
+                            $material['section'] = $module['topicId'] ?? '';
+                            $material['visible'] = $module['state'] === 'PUBLISHED';
+                            $materials[] = $modmap->get_mod($material);
+                        } catch (Exception $e) {
+                            error_log($e->getMessage());
+                            mtrace('    -- ERROR: GET_MODULE OF MATERIAL:  - ' . $e->getMessage());
+                            return $materials;
+                        }
+                    }
+                } else {
+                    mtrace('    -- ERROR: GET_MODULE_TYPE: ' . $module['id'] . ' - ' . $type);
+                }
+            }
+        }
+        return $materials;
+    }
+
     /**
      * Modules.
      *
@@ -147,6 +180,19 @@ class gc_map extends map {
         $data = [];
         foreach ($modules as $module) {
             $m = self::module($module, $type);
+            /* TODO If there is a form as a subject, it should be a quiz or feedback.
+                (Nothing is linked from Googgle, so keep this in mind). */
+            if (($m instanceof module_assign) === false && ($m instanceof module_folder) === false) {
+                /* if it is an assignment and there are subjects, they will be downloaded and included within it.
+                Otherwise, the subjects will become Moodle mods.*/
+                $materials = self::materials($module);
+                foreach ($materials as $material) {
+                    $data[] = $material;
+                }
+                if (($m instanceof module_label) === true) {
+                    continue;
+                }
+            }
             $data[] = $m;
         }
         return $data;

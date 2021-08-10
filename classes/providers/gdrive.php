@@ -260,7 +260,7 @@ class gdrive extends provider {
             $resmats = $this->get_course_work_materials($id);
             $mods = $resworks->data;
             if ($resmats->success) {
-                $resanoun =$this->get_course_announcements($id);
+                $resanoun = $this->get_course_announcements($id);
                 if ($resanoun->success) {
                     $mods = array_merge($resworks->data, $resmats->data, $resanoun->data);
                     return new response_modules(true, $mods, null);

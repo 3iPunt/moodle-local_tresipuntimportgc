@@ -34,7 +34,7 @@ require_once($CFG->dirroot . '/local/tresipuntimportgc/classes/maps/materials/gc
  */
 abstract class gc_mod_map {
 
-    const GC_MODS = [
+    public const GC_MODS = [
         'courseWork' => [
             'ASSIGNMENT' => gc_mod_coursework_assignment_map::class,
             'SHORT_ANSWER_QUESTION' => gc_mod_coursework_shortq_map::class,
@@ -42,6 +42,13 @@ abstract class gc_mod_map {
         ],
         'courseWorkMaterials' => gc_mod_courseworkmaterials_map::class,
         'announcements' => gc_mod_announcements_map::class
+    ];
+
+    public const GC_MATERIALS = [
+        'driveFile' => gc_material_drivefile_resource_map::class,
+        //'form' => gc_material_form_quiz_map::class,
+        'link' => gc_material_link_url_map::class,
+        //'youtubeVideo' => gc_material_link_url_map::class
     ];
 
     /**
@@ -53,9 +60,15 @@ abstract class gc_mod_map {
      */
     static public function get_desc_rich(string $desc, array $materials = []): string {
         $html = $desc;
+        /* TODO IMPORTANT The initial purpose of this plugin is to invite the user to DELETE their Classroom account
+             AND ALL CONTENT from Drive related to the course, WE CANNOT LINK ANYTHING from Google in Moodle
+            (it makes no sense), we have to import everything into Moodle no matter what,
+            STUDENTS WANT PRIVACY!!!! */
         foreach ($materials as $mat) {
             // array_key_first() Not working for version < 7.3 https://www.php.net/manual/es/function.array-key-first.php
             //$key = array_key_first($mat);
+            /* TODO get materials and update to Moodle filestorage. In description only media files, not docs.
+                Where put materials files?? Only assign allows additional files of any type */
             $key = array_key_first_compatible($mat);
             if (isset(gc_mat_map::GC_MATS[$key])) {
                 $class = gc_mat_map::GC_MATS[$key];
@@ -67,9 +80,9 @@ abstract class gc_mod_map {
                     // TODO change mtrace() to print_trace()
                     mtrace('    -- ERROR: GET_MATERIAL_CLASS: ' . json_encode($mat));
                 }
-            } else {
+            }/* else {
                 mtrace('    -- ERROR: GET_MATERIAL_KEY: ' . json_encode($mat));
-            }
+            }*/
         }
         return $html;
     }

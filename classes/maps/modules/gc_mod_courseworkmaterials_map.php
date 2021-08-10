@@ -18,6 +18,9 @@ namespace local_tresipuntimportgc\maps\modules;
 
 use coding_exception;
 use local_tresipuntimportgc\factory\module;
+use local_tresipuntimportgc\factory\module_folder;
+use local_tresipuntimportgc\factory\module_label;
+use local_tresipuntimportgc\factory\module_resource;
 use local_tresipuntimportgc\factory\module_url;
 
 defined('MOODLE_INTERNAL') || die();
@@ -40,11 +43,28 @@ class gc_mod_courseworkmaterials_map extends gc_mod_map  {
      */
     public function get_mod($module): module {
         $visible = $module['state'] === 'PUBLISHED';
-        $section = isset($module['topicId']) ? $module['topicId'] : '';
-        $mats = isset($module['materials']) ? $module['materials'] : [];
+        $section = $module['topicId'] ?? '';
+        $mats = $module['materials'] ?? [];
         $desc = isset($module['description']) ? self::get_desc_rich($module['description'], $mats) : self::get_desc_rich('', $mats);
-        return new module_url(
-            $section, $module['title'], $desc, $visible, $module['alternateLink']
+        // TODO rethink logic, this is rubbish for understanding how it is supposed to work.
+        $firstkey = array_key_first_compatible($module['materials']);
+        if ($firstkey === 'driveFile' && count($module['materials']) === 1) {
+            return new module_resource(
+                $section, $module['title'], $desc, $visible, reset($module['materials'])
+            );
+        }
+        if (($firstkey === 'form' || $firstkey === 'link') && count($module['materials']) === 1) {
+            return new module_url(
+                $section, $module['title'], $desc, $visible, $module['alternateLink']
+            );
+        }
+        if (count($module['materials']) > 1) {
+            return new module_folder(
+                $section, $module['title'], $desc, $visible, $module['materials']
+            );
+        }
+        return new module_label(
+            $section, $module['title'], $desc, $visible
         );
     }
 

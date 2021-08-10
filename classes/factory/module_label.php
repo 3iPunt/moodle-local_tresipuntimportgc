@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class module_url
+ * Class module_label
  *
  * @package     local_tresipuntimportgc
  * @copyright   2021 Tresipunt
@@ -28,27 +28,24 @@ use coding_exception;
 use dml_exception;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response_module;
-use mod_url_generator;
+use mod_label_generator;
 
 defined('MOODLE_INTERNAL') || die;
 
 /**
- * Class module_url
+ * Class module_label
  *
  * @package     local_tresipuntimportgc
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class module_url extends module {
+class module_label extends module {
 
     /** @var string Mod Name */
-    protected $modname = 'url';
+    protected $modname = 'label';
 
-    /** @var mod_url_generator Generator */
+    /** @var mod_label_generator Generator */
     protected $generator;
-
-    /** @var string Link */
-    protected $link;
 
     /**
      * constructor.
@@ -60,9 +57,8 @@ class module_url extends module {
      * @param string $link
      * @throws coding_exception
      */
-    public function __construct(string $providersection, string $title, string $intro, bool $visible, string $link) {
-        parent::__construct('mod_url', $providersection, $title, $intro, $visible);
-        $this->link = $link;
+    public function __construct(string $providersection, string $title, string $intro, bool $visible) {
+        parent::__construct('mod_label', $providersection, $title, $intro, $visible);
     }
 
     /**
@@ -77,19 +73,15 @@ class module_url extends module {
         $record = [
             'course' => $course,
             'name' => $this->title,
-            'externalurl' => $this->link,
             'intro' => $this->intro,
             'introformat' => FORMAT_HTML,
             'files' => file_get_unused_draft_itemid(),
         ];
-        $options = ['section' => $this->get_section($course_id), 'visible' => $this->visible, 'showdescription' => false];
+        $options = ['section' => $this->get_section($course_id), 'visible' => $this->visible, 'showdescription' => true];
         $res = $this->generator->create_instance($record, $options);
         if (isset($res)) {
             return new response_module(true, $this, null);
-        } else {
-            return new response_module(false, null, new error('15000', 'MODULE_NOT_CREATED'));
         }
+        return new response_module(false, null, new error('15000', 'MODULE_NOT_CREATED'));
     }
-
-
 }

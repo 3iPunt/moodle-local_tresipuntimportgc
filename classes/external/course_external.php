@@ -22,6 +22,7 @@
 
 namespace local_tresipuntimportgc\external;
 
+use coding_exception;
 use core_course_category;
 use external_api;
 use external_function_parameters;
@@ -51,7 +52,8 @@ class course_external extends external_api {
                 'fullname' => new external_value(PARAM_TEXT, 'Course Fullname', VALUE_REQUIRED),
                 'shortname' => new external_value(PARAM_TEXT, 'Course Shortname', VALUE_REQUIRED),
                 'category' => new external_value(PARAM_INT, 'Category ID', VALUE_REQUIRED),
-                'visible' => new external_value(PARAM_BOOL, 'Visibility', VALUE_REQUIRED)
+                'visible' => new external_value(PARAM_BOOL, 'Visibility', VALUE_REQUIRED),
+                'importfiles' => new external_value(PARAM_INT, 'Config for Import Google Drive files', VALUE_REQUIRED),
             )
         );
     }
@@ -62,12 +64,14 @@ class course_external extends external_api {
      * @param string $shortname
      * @param int $category
      * @param bool $visible
+     * @param int $importfiles
      * @return array
+     * @throws coding_exception
      * @throws invalid_parameter_exception
      * @throws moodle_exception
      */
     public static function create_course(
-        string $providerid, string $fullname, string $shortname, int $category, bool $visible): array {
+        string $providerid, string $fullname, string $shortname, int $category, bool $visible, int $importfiles): array {
         global $CFG;
         require_once($CFG->dirroot . '/course/lib.php');
         require_once($CFG->dirroot . '/user/externallib.php');
@@ -77,7 +81,8 @@ class course_external extends external_api {
                 'fullname' => $fullname,
                 'shortname' => $shortname,
                 'category' => $category,
-                'visible' => $visible
+                'visible' => $visible,
+                'importfiles' => $importfiles
             ]
         );
 
@@ -89,7 +94,7 @@ class course_external extends external_api {
                 // Factory.
                 $provider = new gclassroom();
                 $factory = new factory($provider);
-                $res = $factory->create_course($providerid, $moodlecategory->id, $fullname, $shortname, $visible);
+                $res = $factory->create_course($providerid, $moodlecategory->id, $fullname, $shortname, $visible, $importfiles);
                 $success = $res->success;
                 $errors = $res->error->to_string();
                 $id = $res->success ? $res->data : null;
@@ -105,7 +110,6 @@ class course_external extends external_api {
             $errors = 'CATEGORY_NO_EXIST';
             $id = null;
         }
-
         return [
             'success' => $success,
             'errors' => $errors,

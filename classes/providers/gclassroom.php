@@ -18,6 +18,7 @@ namespace local_tresipuntimportgc\providers;
 
 use curl;
 use dml_exception;
+use Exception;
 use Google_Client;
 use Google_Exception;
 use Google_Service_Classroom;
@@ -143,7 +144,6 @@ class gclassroom extends provider {
                 'https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly',
                 'https://www.googleapis.com/auth/classroom.announcements.readonly',
                 'https://www.googleapis.com/auth/classroom.topics.readonly',
-                // DRIVE_READONLY ??
                 Google_Service_Drive::DRIVE_READONLY]
         );
         $oauth2 = new Google_Service_Oauth2($client);
@@ -203,7 +203,7 @@ class gclassroom extends provider {
             $courses = $results->getCourses();
             $data = gc_map::courses($courses);
             return new response_courses(true, $data, null);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return new response_courses(false, [], new error('01000', $e->getMessage()));
         }
     }
@@ -219,7 +219,7 @@ class gclassroom extends provider {
             $course = $this->get_service()->courses->get($id);
             $data = gc_map::course($course);
             return new response_course(true, $data, null);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return new response_course(false, null, new error('01010', $e->getMessage()));
         }
     }
@@ -267,7 +267,7 @@ class gclassroom extends provider {
             } else {
                 $response = new response_sections(false, [], new error('01031', json_encode($res)));
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $response = new response_sections(false, [], new error('01030', $e->getMessage()));
         }
         return $response;
@@ -286,22 +286,19 @@ class gclassroom extends provider {
             $resmats = $this->get_course_work_materials($id);
             $mods = $resworks->data;
             if ($resmats->success) {
-                $resanoun =$this->get_course_announcements($id);
+                $resanoun = $this->get_course_announcements($id);
                 if ($resanoun->success) {
                     $mods = array_merge($resworks->data, $resmats->data, $resanoun->data);
                     return new response_modules(true, $mods, null);
-                } else {
-                    $mods = array_merge($resworks->data, $resmats->data);
-                    mtrace('  -- ERROR: GET_ANNOUNCEMENTS: ' . $resanoun->error->to_string());
-                    return new response_modules(true, $mods, $resanoun->error);
                 }
-            } else {
-                mtrace('  -- ERROR: GET_WORK_MATERIALS: ' . $resmats->error->to_string());
-                return new response_modules(true, $mods, $resmats->error);
+                $mods = array_merge($resworks->data, $resmats->data);
+                mtrace('  -- ERROR: GET_ANNOUNCEMENTS: ' . $resanoun->error->to_string());
+                return new response_modules(true, $mods, $resanoun->error);
             }
-        } else {
-            return $resworks;
+            mtrace('  -- ERROR: GET_WORK_MATERIALS: ' . $resmats->error->to_string());
+            return new response_modules(true, $mods, $resmats->error);
         }
+        return $resworks;
     }
 
     /**
@@ -330,7 +327,7 @@ class gclassroom extends provider {
             } else {
                 $response = new response_modules(false, [], new error('01041', json_encode($res)));
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $response = new response_modules(false, [], new error('01040', $e->getMessage()));
         }
         return $response;
@@ -362,7 +359,7 @@ class gclassroom extends provider {
             } else {
                 $response = new response_modules(false, [], new error('01051', json_encode($res)));
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $response = new response_modules(false, [], new error('01050', $e->getMessage()));
         }
         return $response;
@@ -394,7 +391,7 @@ class gclassroom extends provider {
             } else {
                 $response = new response_modules(false, [], new error('01061', json_encode($res)));
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $response = new response_modules(false, [], new error('01060', $e->getMessage()));
         }
         return $response;
