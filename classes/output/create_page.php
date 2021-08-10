@@ -143,7 +143,7 @@ resize_ob.observe(document.querySelector('#region-main'));
                         print_trace('importingfiles', 'info');
                         $importfilesservice::importfiles($coursedata->providerid, (int)$courseresponse['id'], $shortname);
                     }
-                    // TODO import calendar.
+                    // TODO import calendar right here (it can't be anywhere else).
                     echo '</div>';
                     echo '</div>';
                     $coursesids[$key] = $courseresponse['id'];
