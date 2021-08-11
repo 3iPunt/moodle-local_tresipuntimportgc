@@ -81,7 +81,7 @@ $string['courselinks'] = 'Enlaces a los cursos';
 
 // Traces
 $string['generatingcourses'] = '<h4 class="alert-heading">GENERANDO CURSOS</h4>';
-$string['generatingcoursesfinish'] = '<h4 class="alert-heading">GENERACIÖN DE CURRSOS FINALIZADA</h4>';
+$string['generatingcoursesfinish'] = '<h4 class="alert-heading">GENERACIÓN DE CURSOS FINALIZADA</h4>';
 $string['generatingcourses_help'] = '<p>Se ha comenzado la creación de cursos.<br>Aunque cierre esta pestaña, seguirán creándose cursos.<br>Podrá ver la información generada tanto desde aquí, como desde el fichero log.txt del plugin.</p><hr>';
 $string['shortnamealreadyexist'] = 'El nombre corto <b>{$a}</b> ya está siendo utilizado. Escoja otro nombre corto para este curso y vuelva a intentarlo.';
 $string['returntoimport'] = 'Volver a la página de selección de cursos';

@@ -21,6 +21,7 @@ use dml_exception;
 use Exception;
 use Google_Client;
 use Google_Exception;
+use Google_Service_Calendar;
 use Google_Service_Classroom;
 use Google_Service_Drive;
 use Google_Service_Oauth2;
@@ -136,6 +137,7 @@ class gclassroom extends provider {
         $client->setPrompt('select_account consent');
         $client->setScopes([
                 Google_Service_Classroom::CLASSROOM_COURSES_READONLY,
+                Google_Service_Classroom::CLASSROOM_COURSES,
                 'https://www.googleapis.com/auth/userinfo.email',
                 'https://www.googleapis.com/auth/userinfo.profile',
                 'https://www.googleapis.com/auth/classroom.courses',
@@ -144,7 +146,8 @@ class gclassroom extends provider {
                 'https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly',
                 'https://www.googleapis.com/auth/classroom.announcements.readonly',
                 'https://www.googleapis.com/auth/classroom.topics.readonly',
-                Google_Service_Drive::DRIVE_READONLY]
+                Google_Service_Drive::DRIVE_READONLY,
+                Google_Service_Calendar::CALENDAR_READONLY]
         );
         $oauth2 = new Google_Service_Oauth2($client);
         if (isset($_GET["code"])) {
