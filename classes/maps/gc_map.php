@@ -180,11 +180,9 @@ class gc_map extends map {
         $data = [];
         foreach ($modules as $module) {
             $m = self::module($module, $type);
-            /* TODO If there is a form as a subject, it should be a quiz or feedback.
-                (Nothing is linked from Googgle, so keep this in mind). */
-            if (($m instanceof module_assign) === false && ($m instanceof module_folder) === false) {
-                /* if it is an assignment and there are subjects, they will be downloaded and included within it.
-                Otherwise, the subjects will become Moodle mods.*/
+            /* TODO if it is an assignment and there are files, they will be downloaded and included within it. Otherwise, the files will become Moodle mods. */
+            /*if (($m instanceof module_assign) === false && ($m instanceof module_folder) === false) {
+                // if it is an assignment and there are subjects, they will be downloaded and included within it. Otherwise, the subjects will become Moodle mods.
                 $materials = self::materials($module);
                 foreach ($materials as $material) {
                     $data[] = $material;
@@ -192,7 +190,7 @@ class gc_map extends map {
                 if (($m instanceof module_label) === true) {
                     continue;
                 }
-            }
+            }*/
             $data[] = $m;
         }
         return $data;

@@ -127,6 +127,7 @@ class gclassroom extends provider {
      * @throws moodle_exception
      */
     protected function set_client() {
+        // Needs the same client as for the first login, if a new client or provider with other scopes is created, it skips it because it is already logged in.
         $client = new Google_Client();
         $client->setApplicationName(get_string('pluginname', 'local_tresipuntimportgc'));
         $client->setClientId($this->clientid );
@@ -135,6 +136,7 @@ class gclassroom extends provider {
         $client->setRedirectUri((new moodle_url('/local/tresipuntimportgc/import.php'))->out(false));
         $client->setAccessType('offline');
         $client->setPrompt('select_account consent');
+        // TODO Are so many classroom scopes necessary? Isn't there a generic one like in drive or calendar?
         $client->setScopes([
                 Google_Service_Classroom::CLASSROOM_COURSES_READONLY,
                 Google_Service_Classroom::CLASSROOM_COURSES,

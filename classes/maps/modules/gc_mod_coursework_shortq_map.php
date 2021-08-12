@@ -40,8 +40,8 @@ class gc_mod_coursework_shortq_map extends gc_mod_map  {
      */
     public function get_mod($module): module {
         $visible = $module['state'] === 'PUBLISHED';
-        $section = isset($module['topicId']) ? $module['topicId'] : '';
-        $mats = isset($module['materials']) ? $module['materials'] : [];
+        $section = $module['topicId'] ?? '';
+        $mats = $module['materials'] ?? [];
         $desc = self::get_desc_rich($module['description'], $mats);
         return new module_quiz(
             $section, $module['title'], $desc, $visible

@@ -23,8 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_tresipuntimportgc\external\course_external;
-use local_tresipuntimportgc\output\create_page;
 use local_tresipuntimportgc\output\import_page;
 use local_tresipuntimportgc\providers\gclassroom;
 

@@ -32,12 +32,9 @@
     "": "" }
 }}
 <div class="card desc_form_component" style="display: flex; flex-direction: row; margin-top: 15px">
-    <img class="card-img-top" src="{{ thumbnailurl }}" alt="{{ title }}" style="width: 10rem;">
     <div class="card-body">
         <h4 class="card-title">{{ title }}</h4>
         <h6 class="card-subtitle mb-2 text-muted">{{# str }} form, local_tresipuntimportgc {{/ str }}</h6>
-        <a href="{{ formurl }}" class="btn btn-primary" target="_blank">
-            {{# str }} view_more, local_tresipuntimportgc {{/ str }}
-        </a>
+        <iframe src="{{ formurl }}" width="640" height="378" frameborder="0" marginheight="0" marginwidth="0">{{# str }} loading {{/ str }}</iframe>
     </div>
 </div>

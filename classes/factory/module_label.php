@@ -26,9 +26,12 @@ namespace local_tresipuntimportgc\factory;
 
 use coding_exception;
 use dml_exception;
+use html_writer;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response_module;
 use mod_label_generator;
+use moodle_exception;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -47,6 +50,9 @@ class module_label extends module {
     /** @var mod_label_generator Generator */
     protected $generator;
 
+    /** @var array $materials */
+    protected $material;
+
     /**
      * constructor.
      *
@@ -54,11 +60,12 @@ class module_label extends module {
      * @param string $title
      * @param string $intro
      * @param bool $visible
-     * @param string $link
+     * @param array $material
      * @throws coding_exception
      */
-    public function __construct(string $providersection, string $title, string $intro, bool $visible) {
+    public function __construct(string $providersection, string $title, string $intro, bool $visible, array $material) {
         parent::__construct('mod_label', $providersection, $title, $intro, $visible);
+        $this->material = $material;
     }
 
     /**
@@ -66,7 +73,9 @@ class module_label extends module {
      *
      * @param int $course_id
      * @return response_module
+     * @throws coding_exception
      * @throws dml_exception
+     * @throws moodle_exception
      */
     public function create(int $course_id): response_module {
         $course = get_course($course_id);
@@ -77,11 +86,35 @@ class module_label extends module {
             'introformat' => FORMAT_HTML,
             'files' => file_get_unused_draft_itemid(),
         ];
-        $options = ['section' => $this->get_section($course_id), 'visible' => $this->visible, 'showdescription' => true];
+        $options = [
+            'section' => $this->get_section($course_id),
+            'visible' => $this->visible,
+            'showdescription' => true
+        ];
+        if (count($this->material) > 0 && array_key_first_compatible($this->material) === 'form') {
+            $record = $this->add_form($record);
+        }
         $res = $this->generator->create_instance($record, $options);
         if (isset($res)) {
             return new response_module(true, $this, null);
         }
         return new response_module(false, null, new error('15000', 'MODULE_NOT_CREATED'));
+    }
+
+    /**
+     * @param array $res
+     * @return array
+     * @throws coding_exception
+     */
+    private function add_form(array $res): array{
+        $res['intro'] = html_writer::tag('iframe', get_string('loading'), [
+            'src' => $this->material['form']['formUrl'],
+            'width' => '640',
+            'height' => '378',
+            'frameborder' => '0',
+            'marginheight' => '0',
+            'marginwidth' => '0',
+        ]);
+        return $res;
     }
 }

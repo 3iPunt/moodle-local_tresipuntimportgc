@@ -44,12 +44,13 @@ abstract class gc_mod_map {
         'announcements' => gc_mod_announcements_map::class
     ];
 
-    public const GC_MATERIALS = [
+
+   /* public const GC_MATERIALS = [
         'driveFile' => gc_material_drivefile_resource_map::class,
         //'form' => gc_material_form_quiz_map::class,
         'link' => gc_material_link_url_map::class,
         //'youtubeVideo' => gc_material_link_url_map::class
-    ];
+    ];*/
 
     /**
      * Get Description Rich.

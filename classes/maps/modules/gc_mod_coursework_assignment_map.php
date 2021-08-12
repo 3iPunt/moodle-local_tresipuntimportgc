@@ -19,6 +19,8 @@ namespace local_tresipuntimportgc\maps\modules;
 use coding_exception;
 use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\factory\module_assign;
+use local_tresipuntimportgc\factory\module_label;
+use local_tresipuntimportgc\factory\module_quiz;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -40,19 +42,24 @@ class gc_mod_coursework_assignment_map extends gc_mod_map {
      */
     public function get_mod($module): module {
         $visible = $module['state'] === 'PUBLISHED';
-        $section = isset($module['topicId']) ? $module['topicId'] : '';
-        $mats = isset($module['materials']) ? $module['materials'] : [];
-        $desc = '';
-        if (isset($module['description']) && $module['description'] !== null) {
-            $desc = self::get_desc_rich($module['description'], $mats);
-        }
+        $section = $module['topicId'] ?? '';
+        $mats = $module['materials'] ?? [];
+        $desc = isset($module['description']) ? self::get_desc_rich($module['description'], $mats) : self::get_desc_rich('', $mats);
         /* TODO what is mapped as module_assign can also be a form with answers (quiz), so it is impossible to isolate the
             modules here. It is only possible to know what kind of module it belongs to by reading "materials", i.e. if it
             contains "form" it is a quiz if it has answers, or feedback if it does not, and is driveFile is a type resource, etc... */
-
-        $materials = $module['materials'] ?? [];
+        $firstkey = array_key_first_compatible($module['materials'][0]);
+        if ($firstkey === 'form' && count($module['materials']) === 1) {
+            // TODO create a quiz using the google form api (not included in Moodle!!!). Provisionally the form is embedded in a tag
+            /*return new module_quiz(
+                $section, $module['title'], $desc, $visible, reset($mats)
+            );*/
+            return new module_label(
+                $section, $module['title'], $desc, $visible, reset($mats)
+            );
+        }
         return new module_assign(
-            $section, $module['title'], $desc, $visible, $materials
+            $section, $module['title'], $desc, $visible, $mats
         );
     }
 
