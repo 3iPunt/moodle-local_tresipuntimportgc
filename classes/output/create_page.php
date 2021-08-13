@@ -97,11 +97,9 @@ class create_page implements renderable, templatable {
             ob_start();
             flush();
             print_trace('generatingcourses_help', 'info', null, $time);
-            // TODO review script, not work
             echo "<script>
-let body = document.getElementById('page-local-tresipuntimportgc-import');
 const resize_ob = new ResizeObserver(function() {
-	body.scrollTop = document.getElementById('page-local-tresipuntimportgc-import').scrollHeight;
+    window.scrollTo(0, document.getElementById('page-local-tresipuntimportgc-import').scrollHeight)
 });
 resize_ob.observe(document.querySelector('#region-main'));
 </script>";
@@ -153,6 +151,7 @@ resize_ob.observe(document.querySelector('#region-main'));
                     print_trace('shortnamealreadyexist', 'danger', $shortname, $time);
                 }
             }
+            echo '<script>resize_ob.disconnect()</script>';
             echo '</div>';
             print_trace('generatingcoursesfinish', 'info', $time);
             ob_end_clean();
