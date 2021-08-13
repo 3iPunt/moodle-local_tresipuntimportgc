@@ -82,13 +82,12 @@ class module_url extends module {
             'introformat' => FORMAT_HTML,
             'files' => file_get_unused_draft_itemid(),
         ];
-        $options = ['section' => $this->get_section($course_id), 'visible' => $this->visible, 'showdescription' => false];
+        $options = ['section' => $this->get_section($course_id), 'visible' => $this->visible, 'showdescription' => true];
         $res = $this->generator->create_instance($record, $options);
         if (isset($res)) {
             return new response_module(true, $this, null);
-        } else {
-            return new response_module(false, null, new error('15000', 'MODULE_NOT_CREATED'));
         }
+        return new response_module(false, null, new error('15000', 'MODULE_NOT_CREATED'));
     }
 
 

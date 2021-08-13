@@ -44,7 +44,7 @@ class gc_mod_coursework_shortq_map extends gc_mod_map  {
         $mats = $module['materials'] ?? [];
         $desc = self::get_desc_rich($module['description'], $mats);
         return new module_quiz(
-            $section, $module['title'], $desc, $visible
+            $section, $module, $desc, $visible
         );
     }
 }

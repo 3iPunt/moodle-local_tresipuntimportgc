@@ -59,7 +59,7 @@ class gc_mod_coursework_assignment_map extends gc_mod_map {
             );
         }
         return new module_assign(
-            $section, $module['title'], $desc, $visible, $mats
+            $section, $module, $desc, $visible, $mats
         );
     }
 

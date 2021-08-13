@@ -50,17 +50,21 @@ class module_quiz extends module {
     /** @var mod_quiz_generator Generator */
     protected $generator;
 
+    /** array module */
+    protected $module;
+
     /**
      * constructor.
      *
      * @param string $providersection
-     * @param string $title
+     * @param array $module
      * @param string $intro
      * @param bool $visible
      * @throws coding_exception
      */
-    public function __construct(string $providersection, string $title, string $intro, bool $visible) {
-        parent::__construct('mod_quiz', $providersection, $title, $intro, $visible);
+    public function __construct(string $providersection, array $module, string $intro, bool $visible) {
+        parent::__construct('mod_quiz', $providersection, $module['title'], $intro, $visible);
+        $this->module = $module;
     }
 
     /**
@@ -132,6 +136,15 @@ class module_quiz extends module {
             'showblocks'             => 0,
             'navmethod'              => QUIZ_NAVMETHOD_FREE,
         ];
+        if (isset($this->module['dueDate'])) {
+            $hour = 0;
+            $minute = 0;
+            if (isset($this->module['dueTime'])) {
+                $hour = $this->module['dueTime']['hours'];
+                $minute = $this->module['dueTime']['minutes'] ?? 0;
+            }
+            $record['timeclose'] = mktime($hour, $minute, 0, $this->module['dueDate']['month'], $this->module['dueDate']['day'], $this->module['dueDate']['year']);
+        }
         $options = ['section' => $this->get_section($course_id), 'visible' => $this->visible, 'showdescription' => false];
         $res = $this->generator->create_instance($record, $options);
         if (isset($res)) {

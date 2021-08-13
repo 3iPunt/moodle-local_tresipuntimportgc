@@ -106,8 +106,10 @@ class module_label extends module {
      * @return array
      * @throws coding_exception
      */
-    private function add_form(array $res): array{
-        $res['intro'] = html_writer::tag('iframe', get_string('loading'), [
+    private function add_form(array $res): array {
+        $res['intro'] = html_writer::tag('h4', $this->title, ['class' => 'card-title']);
+        $res['intro'] .= html_writer::tag('h6', get_string('form', 'local_tresipuntimportgc'), ['class' => 'card-subtitle mb-2 text-muted']);
+        $res['intro'] .= html_writer::tag('iframe', get_string('loading'), [
             'src' => $this->material['form']['formUrl'],
             'width' => '640',
             'height' => '378',

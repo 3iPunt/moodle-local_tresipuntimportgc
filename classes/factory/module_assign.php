@@ -57,6 +57,9 @@ class module_assign extends module {
     /** @var mod_assign_generator Generator */
     protected $generator;
 
+    /** @var array $module */
+    protected $module;
+
     /** @var array $materials */
     protected $materials;
 
@@ -64,15 +67,15 @@ class module_assign extends module {
      * constructor.
      *
      * @param string $providersection
-     * @param string $title
+     * @param array $module
      * @param string $intro
      * @param bool $visible
-     * @param array $materials
      * @throws coding_exception
      */
-    public function __construct(string $providersection, string $title, string $intro, bool $visible, array $materials) {
-        parent::__construct('mod_assign', $providersection, $title, $intro, $visible);
-        $this->materials = $materials;
+    public function __construct(string $providersection, array $module, string $intro, bool $visible) {
+        parent::__construct('mod_assign', $providersection, $module['title'], $intro, $visible);
+        $this->module = $module;
+        $this->materials = $this->module['materials'];
     }
 
     /**
@@ -93,6 +96,15 @@ class module_assign extends module {
             'introformat' => FORMAT_HTML,
             'files' => file_get_unused_draft_itemid(),
         ];
+        if (isset($this->module['dueDate'])) {
+            $hour = 0;
+            $minute = 0;
+            if (isset($this->module['dueTime'])) {
+                $hour = $this->module['dueTime']['hours'];
+                $minute = $this->module['dueTime']['minutes'] ?? 0;
+            }
+            $record['duedate'] = mktime($hour, $minute, 0, $this->module['dueDate']['month'], $this->module['dueDate']['day'], $this->module['dueDate']['year']);
+        }
         $options = [
             'section' => $this->get_section($course_id),
             'visible' => $this->visible,
