@@ -166,7 +166,6 @@ define([
                                     'categoryid': courseContent.find('#category-' + id).val(),
                                     'visible': courseContent.find('#visible-' + id).val(),
                                     'importfiles': courseContent.find('#importfiles-' + id).val(),
-                                    /* 'teacherfolderimportfiles': courseContent.find('#teacherfolderimportfiles-' + id).val(),*/
                                     'calendarimport': courseContent.find('#calendarimport-' + id).val()
                                 };
                             } else {

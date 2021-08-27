@@ -30,6 +30,7 @@ use file_exception;
 use Google_Exception;
 use invalid_parameter_exception;
 use local_tresipuntimportgc\external\course_external;
+use local_tresipuntimportgc\external\importcalendar_external;
 use local_tresipuntimportgc\external\importfiles_external;
 use moodle_exception;
 use moodle_url;
@@ -89,7 +90,6 @@ class create_page implements renderable, templatable {
         $coursestitle = [];
         if (count($this->courses) > 0) {
             $courseservice = new course_external();
-            $importfilesservice = new importfiles_external();
             @ini_set('zlib.output_compression',0);
             @ini_set('implicit_flush',1);
             @ob_end_clean();
@@ -111,10 +111,11 @@ resize_ob.observe(document.querySelector('#region-main'));
                     $shortname = str_replace(' ', '_', normalize_str($coursedata->fullname));
                 }
                 $coursedata->importfiles = $coursedata->importfiles ?? (int)get_config('local_tresipuntimportgc', 'importfiles');
-                /*$coursedata->teacherfolderimportfiles = $coursedata->teacherfolderimportfiles ?? (int)get_config('local_tresipuntimportgc', 'teacherfolderimportfiles');*/
                 $coursedata->calendarimport = $coursedata->calendarimport ?? (int)get_config('local_tresipuntimportgc', 'calendarimport');
                 if ($DB->get_record('course', ['shortname' => $shortname]) === false) {
-                    // TODO refactor with html_writer?? (the content is not known at any time)
+                    // TODO refactor with html_writer??? (the content is not known at any time)
+                    // I hate having to do these things, but it is not possible to do it with mustache, the traces is displayed thanks to ob_flush()
+                    // a mustache is called at the end of the process
                     echo '<div class="card">';
                     echo '<div class="card-header" id="heading_' . $coursedata->providerid . '">';
                     echo '<h5 class="mb-0">';
@@ -124,23 +125,25 @@ resize_ob.observe(document.querySelector('#region-main'));
                     echo '</h5>';
                     echo '</div>';
                     echo '<div id="gcid_' . $coursedata->providerid . '" class="collapse show" aria-labelledby="heading_' . $coursedata->providerid . '" data-parent="#content_traces">';
-                    /* TODO IMPORTANT The initial purpose of this plugin is to invite the user to DELETE their Classroom account
-                         AND ALL CONTENT from Drive related to the course, WE CANNOT LINK ANYTHING from Google in Moodle
-                        (it makes no sense), we have to import everything into Moodle no matter what,
-                        STUDENTS WANT PRIVACY!!!! */
-                    $courseresponse = $courseservice::create_course(
-                        $coursedata->providerid,
-                        $coursedata->fullname,
-                        $shortname,
-                        (int)$coursedata->categoryid,
-                        $coursedata->visible === 'on',
-                        $coursedata->importfiles
+                        $courseresponse = $courseservice::create_course(
+                            $coursedata->providerid,
+                            $coursedata->fullname,
+                            $shortname,
+                            (int)$coursedata->categoryid,
+                            $coursedata->visible === 'on',
+                            $coursedata->importfiles
 
-                    );
-                    if ((int)$coursedata->importfiles === 1) {
-                        print_trace('importingfiles', 'info');
-                        $importfilesservice::importfiles($coursedata->providerid, (int)$courseresponse['id'], $shortname);
-                    }
+                        );
+                        if ((int)$coursedata->importfiles === 1) {
+                            print_trace('importingfiles', 'info');
+                            $importfilesservice = new importfiles_external();
+                            $importfilesservice::importfiles($coursedata->providerid, (int)$courseresponse['id'], $shortname);
+                        }
+                        if ((int)$coursedata->calendarimport === 1) {
+                            print_trace('importingcalendar', 'info');
+                            $importfilesservice = new importcalendar_external();
+                            $importfilesservice::importcalendar($coursedata->providerid, (int)$courseresponse['id']);
+                        }
                     // TODO import calendar right here (it can't be anywhere else).
                     echo '</div>';
                     echo '</div>';

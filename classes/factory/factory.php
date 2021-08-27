@@ -91,6 +91,7 @@ class factory  {
             if ($createres->success) {
                 $courseid = (int)$createres->data->get_id();
                 print_trace('coursebasecreated', 'success', $courseid, self::$time);
+                // TODO add cover image if a non-generic Classroom image is associated with it
                 //mtrace('CREACIÓN DEL CURSO: OK');
                 // Create Teacher Resource if config.
                 if ($importfiles === 0) {

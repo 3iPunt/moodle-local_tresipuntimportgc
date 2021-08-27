@@ -23,23 +23,17 @@
 namespace local_tresipuntimportgc\external;
 
 use coding_exception;
-use context_course;
 use context_user;
-use core_contentbank\contentbank;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
 use file_exception;
-use file_storage;
 use Google_Exception;
-use Google_Http_Request;
 use Google_Service_Drive;
 use Google_Service_Drive_DriveFile;
-use Google_Service_Drive_FileList;
 use invalid_parameter_exception;
 use local_tresipuntimportgc\providers\gclassroom;
-use local_tresipuntimportgc\providers\gdrive;
 use moodle_exception;
 use ReflectionException;
 use stored_file_creation_exception;

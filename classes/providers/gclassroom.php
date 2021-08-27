@@ -237,13 +237,12 @@ class gclassroom extends provider {
      */
     public function get_teacher_folder(string $id): response_folder {
         $course = $this->get_service()->courses->get($id);
-        $tr = isset($course->toSimpleObject()->teacherFolder) ? $course->toSimpleObject()->teacherFolder : null;
+        $tr = $course->toSimpleObject()->teacherFolder ?? null;
         if (isset($tr)) {
             $data = gc_map::teacher_folder($tr);
             return new response_folder(true, $data, null);
-        } else {
-            return new response_folder(false, null, new error('01020', 'Not teacher foler'));
         }
+        return new response_folder(false, null, new error('01020', 'Not teacher foler'));
     }
 
     /**

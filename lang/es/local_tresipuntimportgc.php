@@ -123,6 +123,12 @@ $string['importfileerror'] = 'El archivo <b>{$a->name}</b> no se ha podido impor
 $string['importfileerrorcontent'] = 'El archivo <b>{$a}</b> no tiene ningún contenido almacenado en Drive';
 $string['convertdocumentto'] = 'Convirtiendo el archivo <b>{$a->title}</b> a formato <b>{$a->format}</b>';
 
+// Traces importcalendar
+$string['importingcalendar'] = 'Importando Google Calendar del curso al calendario de Moodle';
+$string['noteventsfound'] = 'No se han encontrado eventos en el calendario del curso';
+$string['eventsfound'] = 'Se han encontrado {$a} eventos en el calendario del curso sin relación con contenidos del curso';
+$string['conference'] = 'Reunión en Hangouts';
+
 // Traces errors
 $string['user_can_not_view_category'] = 'No tienes acceso a la categoría "{$a->category}", el curso "{$a->course}" no se creará.';
 $string['category_no_exist'] = 'La categoría con id {$a->categoryid} no existe, el curso "{$a->course}" no se creará.';
