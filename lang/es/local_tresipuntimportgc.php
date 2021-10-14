@@ -58,6 +58,10 @@ $string['googlecalendarimport'] = 'Importación del calendario del curso';
 $string['googlecalendarimport_help'] = 'Seleccione cómo se importará el calendario del curso';
 $string['calendargenerategdlink'] = 'Generar un enlace directo al calendario en la primera sección del curso';
 $string['calendarimport'] = 'Importar el calendario del curso al calendario de Moodle';
+$string['formsiframegenerate'] = 'Generar un iframe con el formulario de Google incrustado';
+$string['formsimport'] = 'Importar formularios como recursos de Moodle';
+$string['googleformsimport'] = 'Importación de Formularios de Google';
+$string['googleformsimport_help'] = 'Seleccione cómo se importarán los formularios de Google (dependiendo de las preguntas que contengan, se importarán de distinta forma)';
 
 $string['classroom_courses'] = 'Cursos disponibles de tu cuenta de Google Classroom';
 $string['selectallcourses'] = 'Seleccionar todos los cursos';

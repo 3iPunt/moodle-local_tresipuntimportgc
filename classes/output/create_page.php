@@ -132,7 +132,6 @@ resize_ob.observe(document.querySelector('#region-main'));
                             (int)$coursedata->categoryid,
                             $coursedata->visible === 'on',
                             $coursedata->importfiles
-
                         );
                         if ((int)$coursedata->importfiles === 1) {
                             print_trace('importingfiles', 'info');

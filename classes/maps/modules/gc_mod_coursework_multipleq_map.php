@@ -18,6 +18,7 @@ namespace local_tresipuntimportgc\maps\modules;
 
 use coding_exception;
 use local_tresipuntimportgc\factory\module;
+use local_tresipuntimportgc\factory\module_form;
 use local_tresipuntimportgc\factory\module_quiz;
 
 defined('MOODLE_INTERNAL') || die();
@@ -43,7 +44,7 @@ class gc_mod_coursework_multipleq_map extends gc_mod_map  {
         $section = $module['topicId'] ?? '';
         $mats = $module['materials'] ?? [];
         $desc = self::get_desc_rich($module['description'], $mats);
-        return new module_quiz(
+        return new module_form(
             $section, $module, $desc, $visible
         );
     }

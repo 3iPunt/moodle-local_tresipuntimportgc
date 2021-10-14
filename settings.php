@@ -82,6 +82,18 @@ if ($hassiteconfig) {
                 new lang_string('allowconfig','local_tresipuntimportgc'),
                 new lang_string('allowconfig_help','local_tresipuntimportgc'), 0));
 
+        // Google Forms
+        $options = [
+            0 => get_string('formsiframegenerate', 'local_tresipuntimportgc'),
+            1 => get_string('formsimport', 'local_tresipuntimportgc'),
+            2 => get_string('notimport', 'local_tresipuntimportgc'),
+        ];
+        $settingspage->add(
+            new admin_setting_configselect(
+                'local_tresipuntimportgc/formsimport',
+                new lang_string('googleformsimport','local_tresipuntimportgc'),
+                new lang_string('googleformsimport_help','local_tresipuntimportgc'), 0, $options));
+
         // Google Drive Files
         $options = [
             0 => get_string('generategdlink', 'local_tresipuntimportgc'),

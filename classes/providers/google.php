@@ -43,13 +43,13 @@ require_once($CFG->libdir . '/google/lib.php');
 require_once($CFG->libdir . '/google/src/Google/Service/Drive.php');
 
 /**
- * Class gclassroom
+ * Class google
  *
  * @package     local_tresipuntimportgc
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class gclassroom extends provider {
+class google extends provider {
 
     public const TIMEOUT = 30;
     public const GOOGLE_CLASSROOM_URL = 'https://classroom.googleapis.com/v1/courses/';
@@ -70,7 +70,7 @@ class gclassroom extends provider {
     protected $service;
 
     /**
-     * gclassroom constructor.
+     * google constructor.
      *
      * @throws Google_Exception
      * @throws dml_exception
@@ -285,6 +285,7 @@ class gclassroom extends provider {
      * @return response_modules
      */
     public function get_modules(string $id): response_modules {
+        // TODO sort
         $resworks = $this->get_course_works($id);
         if ($resworks->success) {
             $resmats = $this->get_course_work_materials($id);
@@ -354,8 +355,13 @@ class gclassroom extends provider {
             $data = json_decode($req, true);
             if (isset($res['HTTP/1.0'])) {
                 if ($res['HTTP/1.0'] === '200 OK') {
-                    $mods = gc_map::modules($data['courseWorkMaterial'], 'courseWorkMaterials');
-                    $response = new response_modules(true, $mods);
+                    if (isset($data['courseWorkMaterial'])) {
+                        $mods = gc_map::modules($data['courseWorkMaterial'], 'courseWorkMaterials');
+                        $response = new response_modules(true, $mods);
+                    } else {
+                        $response = new response_modules(true);
+                    }
+
                 } else {
                     $msg = $this->get_msg_curl($data, $res);
                     $response = new response_modules(false, [], new error('01052', $msg));

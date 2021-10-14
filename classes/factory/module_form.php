@@ -42,7 +42,7 @@ require_once($CFG->dirroot . '/mod/quiz/lib.php');
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class module_quiz extends module {
+class module_form extends module {
 
     /** @var string Mod Name */
     protected $modname = 'quiz';

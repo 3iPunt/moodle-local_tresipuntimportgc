@@ -30,7 +30,7 @@ use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
 use local_tresipuntimportgc\factory\factory;
-use local_tresipuntimportgc\providers\gclassroom;
+use local_tresipuntimportgc\providers\google;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -92,7 +92,7 @@ class course_external extends external_api {
         if ($moodlecategory) {
             if (core_course_category::can_view_category($moodlecategory)) {
                 // Factory.
-                $provider = new gclassroom();
+                $provider = new google();
                 $factory = new factory($provider);
                 $res = $factory->create_course($providerid, $moodlecategory->id, $fullname, $shortname, $visible, $importfiles);
                 $success = $res->success;

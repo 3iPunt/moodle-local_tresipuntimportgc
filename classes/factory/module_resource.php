@@ -31,7 +31,7 @@ use file_exception;
 use Google_Exception;
 use Google_Http_Request;
 use Google_Service_Drive;
-use local_tresipuntimportgc\providers\gclassroom;
+use local_tresipuntimportgc\providers\google;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response_module;
 use mod_resource_generator;
@@ -117,7 +117,7 @@ class module_resource extends module {
         global $USER;
         $context = context_module::instance($res->cmid);
         $fs = get_file_storage();
-        $provider = new gclassroom();
+        $provider = new google();
         $gdrvieclient = $provider->get_client();
         $tokenjson = json_decode($gdrvieclient->getAccessToken(), true);
         $service = new Google_Service_Drive($gdrvieclient);

@@ -56,7 +56,7 @@ class gc_mod_courseworkmaterials_map extends gc_mod_map  {
         }
         if ($firstkey === 'form' && count($module['materials']) === 1) {
             // TODO create a quiz using the google form api (not included in Moodle!!!). Provisionally the form is embedded in a tag
-            /*return new module_quiz(
+            /*return new module_form(
                 $section, $module['title'], $desc, $visible, reset($mats)
             );*/
             return new module_label(
@@ -74,7 +74,7 @@ class gc_mod_courseworkmaterials_map extends gc_mod_map  {
             );
         }
         return new module_label(
-            $section, $module['title'], $desc, $visible
+            $section, $module['title'], $desc, $visible, reset($mats)
         );
     }
 

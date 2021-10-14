@@ -33,7 +33,7 @@ use Google_Exception;
 use Google_Service_Drive;
 use Google_Service_Drive_DriveFile;
 use invalid_parameter_exception;
-use local_tresipuntimportgc\providers\gclassroom;
+use local_tresipuntimportgc\providers\google;
 use moodle_exception;
 use ReflectionException;
 use stored_file_creation_exception;
@@ -84,7 +84,7 @@ class importfiles_external extends external_api {
                 'shortname' => $shortname
             ]
         );
-        $provider = new gclassroom();
+        $provider = new google();
         $courseclassroom = $provider->get_course($providerid);
         $folderid = accessProtected($courseclassroom->data->providerdata, 'modelData')['teacherFolder']['id'];
         // Needs the same client as for the first login, if a new client or provider with other scopes is created, it skips it because it is already logged in.

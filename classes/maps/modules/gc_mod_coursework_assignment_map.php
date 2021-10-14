@@ -19,8 +19,9 @@ namespace local_tresipuntimportgc\maps\modules;
 use coding_exception;
 use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\factory\module_assign;
+use local_tresipuntimportgc\factory\module_form;
 use local_tresipuntimportgc\factory\module_label;
-use local_tresipuntimportgc\factory\module_quiz;
+use local_tresipuntimportgc\factory\module_formz;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -50,13 +51,24 @@ class gc_mod_coursework_assignment_map extends gc_mod_map {
             contains "form" it is a quiz if it has answers, or feedback if it does not, and is driveFile is a type resource, etc... */
         $firstkey = array_key_first_compatible($module['materials'][0]);
         if ($firstkey === 'form' && count($module['materials']) === 1) {
-            // TODO create a quiz using the google form api (not included in Moodle!!!). Provisionally the form is embedded in a tag
-            /*return new module_quiz(
-                $section, $module['title'], $desc, $visible, reset($mats)
-            );*/
-            return new module_label(
-                $section, $module['title'], $desc, $visible, reset($mats)
-            );
+            switch ((int)get_config('local_tresipuntimportgc', 'formsimport')) {
+                case 0:
+                    return new module_label(
+                        $section, $module['title'], $desc, $visible, reset($mats)
+                    );
+                case 1:
+                    // TODO create a quiz using the google form api (not included in Moodle!!!). Provisionally the form is embedded in a tag
+                    /*print_object($module);
+                    print_object($mats);die();*/
+                    // Comprobar si todas las preguntas tienen respuestas, entonces quiz. De otro modo feedback
+                    return new module_form(
+                        $section, $module, $desc, $visible, reset($mats)
+                    );
+                case 2:
+                    return new module_label(
+                        $section, '', '', 0, reset($mats)
+                    );
+            }
         }
         return new module_assign(
             $section, $module, $desc, $visible, $mats

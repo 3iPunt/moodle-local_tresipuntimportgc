@@ -24,7 +24,7 @@
  */
 
 use local_tresipuntimportgc\output\import_page;
-use local_tresipuntimportgc\providers\gclassroom;
+use local_tresipuntimportgc\providers\google;
 
 require_once('../../config.php');
 require_once('./lib.php');
@@ -45,15 +45,15 @@ $output = $PAGE->get_renderer('local_tresipuntimportgc');
 
 echo $OUTPUT->header();
 // TODO delete, ONLY FOR DEV delete all courses first
-/*$oldcourses = get_courses();
+$oldcourses = get_courses();
 foreach($oldcourses as $oldcourse) {
     if ((int)$oldcourse->id !== 1) {
         delete_course($oldcourse);
     }
-}*/
+}
 /*******************************************/
 if ($has_capability) {
-    $provider = new gclassroom();
+    $provider = new google();
     $page = new import_page($provider);
     echo $output->render($page);
 } else {

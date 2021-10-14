@@ -33,7 +33,7 @@ use Google_Service_Calendar;
 use Google_Service_Calendar_Event;
 use html_writer;
 use invalid_parameter_exception;
-use local_tresipuntimportgc\providers\gclassroom;
+use local_tresipuntimportgc\providers\google;
 use moodle_exception;
 use ReflectionException;
 use stdClass;
@@ -80,7 +80,7 @@ class importcalendar_external extends external_api {
                 'courseid' => $courseid
             ]
         );
-        $provider = new gclassroom();
+        $provider = new google();
         $courseclassroom = $provider->get_course($providerid);
         // Needs the same client as for the first login, if a new client or provider with other scopes is created, it skips it because it is already logged in.
         $gdrvieclient = $provider->get_client();
