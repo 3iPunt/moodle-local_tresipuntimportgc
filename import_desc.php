@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Create Courses GC.
+ * Import Courses GC.
  *
  * @package    local_tresipuntimportgc
  * @subpackage tresipuntimportgc
@@ -23,10 +23,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_tresipuntimportgc\external\course_external;
-use local_tresipuntimportgc\output\create_page;
+use local_tresipuntimportgc\output\import_desc_page;
 
 require_once('../../config.php');
+require_once('./lib.php');
 
 global $PAGE, $OUTPUT;
 
@@ -34,43 +34,19 @@ require_login();
 
 $has_capability = has_capability('local/tresipuntimportgc:import',  context_system::instance());
 
-$title = get_string('create_page', 'local_tresipuntimportgc');
+$title = get_string('import_page', 'local_tresipuntimportgc');
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url('/local/tresipuntimportgc/import.php');
+$PAGE->set_url('/local/tresipuntimportgc/import_desc.php');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
-
 $output = $PAGE->get_renderer('local_tresipuntimportgc');
 
 echo $OUTPUT->header();
 
-// TODO delete, ONLY FOR DEV delete all courses first
-/*$oldcourses = get_courses();
-foreach($oldcourses as $oldcourse) {
-    if ((int)$oldcourse->id !== 1) {
-        delete_course($oldcourse);
-    }
-}*/
-/*******************************************/
 if ($has_capability) {
-    if (!empty($_COOKIE)) {
-        $courses = json_decode($_COOKIE['coursesIds']);
-        if (isset($courses)) {
-            $page = new create_page($courses);
-            echo $output->render($page);
-        } else {
-            throw new moodle_exception(
-                'No courses selected'
-            );
-        }
-
-    } else {
-        // TODO error browser cookies or js
-        throw new moodle_exception(
-            'error browser cookies or js'
-        );
-    }
+    $page = new import_desc_page();
+    echo $output->render($page);
 } else {
     throw new moodle_exception(
         get_string('not_capability', 'local_tresipuntimportgc')

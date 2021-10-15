@@ -136,7 +136,6 @@ class google extends provider {
         $client->setRedirectUri((new moodle_url('/local/tresipuntimportgc/import.php'))->out(false));
         $client->setAccessType('offline');
         $client->setPrompt('select_account consent');
-        // TODO Are so many classroom scopes necessary? Isn't there a generic one like in drive or calendar?
         $client->setScopes([
                 Google_Service_Classroom::CLASSROOM_COURSES_READONLY,
                 Google_Service_Classroom::CLASSROOM_COURSES,
@@ -152,13 +151,16 @@ class google extends provider {
                 Google_Service_Calendar::CALENDAR_READONLY]
         );
         $oauth2 = new Google_Service_Oauth2($client);
-        if (isset($_GET["code"])) {
+
+        if (!isset($_SESSION['token']) && isset($_GET["code"])) {
             $client->authenticate($_GET['code']);
             $_SESSION['token'] = $client->getAccessToken();
         }
+
         if (isset($_SESSION['token'])) {
             $client->setAccessToken($_SESSION['token']);
         }
+
         if (isset($_REQUEST['error'])) {
             // TODO get error.
             echo "<script type='text/javascript'>alert('error')</script>";
@@ -357,11 +359,10 @@ class google extends provider {
                 if ($res['HTTP/1.0'] === '200 OK') {
                     if (isset($data['courseWorkMaterial'])) {
                         $mods = gc_map::modules($data['courseWorkMaterial'], 'courseWorkMaterials');
-                        $response = new response_modules(true, $mods);
                     } else {
-                        $response = new response_modules(true);
+                        $mods = gc_map::modules([], 'courseWorkMaterials');
                     }
-
+                    $response = new response_modules(true, $mods);
                 } else {
                     $msg = $this->get_msg_curl($data, $res);
                     $response = new response_modules(false, [], new error('01052', $msg));

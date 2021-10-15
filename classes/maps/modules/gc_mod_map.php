@@ -60,7 +60,7 @@ abstract class gc_mod_map {
      * @return string
      */
     static public function get_desc_rich(string $desc, array $materials = []): string {
-        $html = $desc;
+        $html = nl2br($desc);
         /* TODO IMPORTANT The initial purpose of this plugin is to invite the user to DELETE their Classroom account
              AND ALL CONTENT from Drive related to the course, WE CANNOT LINK ANYTHING from Google in Moodle
             (it makes no sense), we have to import everything into Moodle no matter what,

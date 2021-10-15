@@ -64,6 +64,7 @@ $string['googleformsimport'] = 'Importing Google Forms';
 $string['googleformsimport_help'] = 'Select how Google Forms will be imported (depending on the questions they contain, they will be imported differently)';
 
 $string['classroom_courses'] = 'Courses available from your Google Classroom account';
+$string['editcourses'] = 'You can edit the default values of the course by clicking on the button with the pencil icon';
 $string['selectallcourses'] = 'Select all courses';
 $string['create'] = 'Create courses';
 $string['createcourses'] = 'Create selected courses';
@@ -136,3 +137,13 @@ $string['conference'] = 'Hangouts meeting';
 // Traces errors
 $string['user_can_not_view_category'] = 'You do not have access to the category "{$a->category}", the course "{$a->course}" shall not be created.';
 $string['category_no_exist'] = 'The category with id {$a->categoryid} does not exist, the course "{$a->course}" shall not be created.';
+
+$string['tresipuntimportgc:import'] = 'Import courses from a Google Classroom account';
+$string['import_page_desc_01'] = 'Instructions for Importing courses from Google Classroom';
+$string['import_page_desc_02'] = 'From this page you can import courses from a Google Classroom account.';
+$string['import_page_desc_03'] = 'To perform this operation, you must give your Google account permissions to our platform.';
+$string['import_page_desc_04'] = "By clicking the 'Next' button, you will be redirected to a Google account authentication form.";
+$string['import_page_desc_05'] = "There, you will need to log in with your Google account data, and Google will show you the permissions that our platform needs to carry out the import. In that form you must accept the permissions. Remember, these permissions you can revoke at any time from your Google account.";
+$string['import_page_desc_06'] = "If the authentication with Google is successful, you will be shown a list of the courses in your Google Classroom account.";
+$string['import_page_desc_07'] = "In case of error, contact the platform administrator.";
+$string['import_page_desc_08'] = "Next";

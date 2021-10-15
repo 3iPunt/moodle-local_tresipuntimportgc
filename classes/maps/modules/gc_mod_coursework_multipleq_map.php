@@ -43,7 +43,8 @@ class gc_mod_coursework_multipleq_map extends gc_mod_map  {
         $visible = $module['state'] === 'PUBLISHED';
         $section = $module['topicId'] ?? '';
         $mats = $module['materials'] ?? [];
-        $desc = self::get_desc_rich($module['description'], $mats);
+        $desc = $module['description'] ?? '';
+        $desc = self::get_desc_rich($desc, $mats);
         return new module_form(
             $section, $module, $desc, $visible
         );

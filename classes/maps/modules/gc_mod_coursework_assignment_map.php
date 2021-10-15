@@ -49,25 +49,27 @@ class gc_mod_coursework_assignment_map extends gc_mod_map {
         /* TODO what is mapped as module_assign can also be a form with answers (quiz), so it is impossible to isolate the
             modules here. It is only possible to know what kind of module it belongs to by reading "materials", i.e. if it
             contains "form" it is a quiz if it has answers, or feedback if it does not, and is driveFile is a type resource, etc... */
-        $firstkey = array_key_first_compatible($module['materials'][0]);
-        if ($firstkey === 'form' && count($module['materials']) === 1) {
-            switch ((int)get_config('local_tresipuntimportgc', 'formsimport')) {
-                case 0:
-                    return new module_label(
-                        $section, $module['title'], $desc, $visible, reset($mats)
-                    );
-                case 1:
-                    // TODO create a quiz using the google form api (not included in Moodle!!!). Provisionally the form is embedded in a tag
-                    /*print_object($module);
-                    print_object($mats);die();*/
-                    // Comprobar si todas las preguntas tienen respuestas, entonces quiz. De otro modo feedback
-                    return new module_form(
-                        $section, $module, $desc, $visible, reset($mats)
-                    );
-                case 2:
-                    return new module_label(
-                        $section, '', '', 0, reset($mats)
-                    );
+        if (isset($module['materials'][0])) {
+            $firstkey = array_key_first_compatible($module['materials'][0]);
+            if ($firstkey === 'form' && count($module['materials']) === 1) {
+                switch ((int)get_config('local_tresipuntimportgc', 'formsimport')) {
+                    case 0:
+                        return new module_label(
+                            $section, $module['title'], $desc, $visible, reset($mats)
+                        );
+                    case 1:
+                        // TODO create a quiz using the google form api (not included in Moodle!!!). Provisionally the form is embedded in a tag
+                        /*print_object($module);
+                        print_object($mats);die();*/
+                        // Comprobar si todas las preguntas tienen respuestas, entonces quiz. De otro modo feedback
+                        return new module_form(
+                            $section, $module, $desc, $visible, reset($mats)
+                        );
+                    case 2:
+                        return new module_label(
+                            $section, '', '', 0, reset($mats)
+                        );
+                }
             }
         }
         return new module_assign(

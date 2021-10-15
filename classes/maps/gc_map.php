@@ -45,7 +45,7 @@ class gc_map extends map {
      * @param object $course
      * @return course
      */
-    static public function course(object $course): course {
+    public static function course(object $course): course {
         /** @var Google_Service_Classroom_Course $gcourse */
         $gcourse = $course;
         $des = $gcourse->getDescription() ? $gcourse->getDescription() : '';
@@ -58,7 +58,7 @@ class gc_map extends map {
      * @param array $courses
      * @return course[]
      */
-    static public function courses(array $courses): array {
+    public static function courses(array $courses): array {
         $data = [];
         foreach ($courses as $course) {
             $c = self::course($course);
@@ -73,7 +73,7 @@ class gc_map extends map {
      * @param string[] $folder
      * @return folder|null
      */
-    static public function teacher_folder(array $folder): ?folder {
+    public static function teacher_folder(array $folder): ?folder {
         if (isset($folder['id']) && isset($folder['title']) && isset($folder['alternateLink'])) {
             return new folder($folder['id'], $folder['title'], $folder['alternateLink']);
         } else {
@@ -87,7 +87,7 @@ class gc_map extends map {
      * @param string[] $section
      * @return section
      */
-    static public function section(array $section): ?section {
+    public static function section(array $section): ?section {
         if (isset($section['name']) && isset($section['topicId'])) {
             return new section($section['name'], $section['topicId']);
         } else {
@@ -101,7 +101,7 @@ class gc_map extends map {
      * @param array $sections
      * @return section[]
      */
-    static public function sections(array $sections): array {
+    public static function sections(array $sections): array {
         $data = [];
         foreach ($sections as $section) {
             $s = self::section($section);
@@ -117,9 +117,9 @@ class gc_map extends map {
      * @param string $type
      * @return module
      */
-    static public function module(array $module, string $type = ''): ?module {
+    public static function module(array $module, string $type = ''): ?module {
         $item = null;
-        if ($module['assigneeMode'] === 'ALL_STUDENTS') {
+        if (isset($module['assigneeMode']) && $module['assigneeMode'] === 'ALL_STUDENTS') {
             if (isset(gc_mod_map::GC_MODS[$type])) {
                 $modtypes = gc_mod_map::GC_MODS[$type];
                 $class = is_array($modtypes) ? $modtypes[$module['workType']] : $modtypes;
@@ -142,7 +142,7 @@ class gc_map extends map {
         return null;
     }
 
-    static public function materials(array $module): array {
+    public static function materials(array $module): array {
         $materials = [];
         if (isset($module['materials'])) {
             foreach($module['materials'] as $material) {
@@ -176,7 +176,7 @@ class gc_map extends map {
      * @param string $type
      * @return module[]
      */
-    static public function modules(array $modules, string $type = ''): array {
+    public static function modules(array $modules, string $type = ''): array {
         $data = [];
         foreach ($modules as $module) {
             $m = self::module($module, $type);

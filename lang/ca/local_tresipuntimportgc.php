@@ -64,6 +64,7 @@ $string['googleformsimport'] = 'Importing Google Forms';
 $string['googleformsimport_help'] = 'Select how Google Forms will be imported (depending on the questions they contain, they will be imported differently)';
 
 $string['classroom_courses'] = 'Courses available from your Google Classroom account';
+$string['editcourses'] = 'Podeu editar els valors predeterminats del curs fent clic al botó amb la icona de llapis';
 $string['selectallcourses'] = 'Select all courses';
 $string['create'] = 'Create courses';
 $string['createcourses'] = 'Create selected courses';
@@ -136,3 +137,13 @@ $string['conference'] = 'Hangouts meeting';
 // Traces errors
 $string['user_can_not_view_category'] = 'You do not have access to the category "{$a->category}", the course "{$a->course}" shall not be created.';
 $string['category_no_exist'] = 'The category with id {$a->categoryid} does not exist, the course "{$a->course}" shall not be created.';
+
+$string['tresipuntimportgc:import'] = "Importa cursos d'un compte de Google Classroom";
+$string['import_page_desc_01'] = 'Instruccions per a Importa cursos de Google Classroom';
+$string['import_page_desc_02'] = "Des d'aquesta pàgina podrà importar els cursos d'un compte de Google Classroom.";
+$string['import_page_desc_03'] = "Per realitzar aquesta operació, haurà de donar permisos del seu compte de Google a la nostra plataforma.";
+$string['import_page_desc_04'] = "A l'fer clic al botó 'Següent', es redirigirà a un formulari d'autenticació del compte de Google.";
+$string['import_page_desc_05'] = "Allà, haurà d'iniciar sessió amb les dades del seu compte de Google, i Google li mostrarà els permisos que necessita la nostra plataforma per realitzar la importació. En aquest formulari ha d'acceptar els permisos. Recordeu, aquests permisos vostè podrà revocar en qualsevol moment des del seu compte de Google.";
+$string['import_page_desc_06'] = "Si l'autenticació amb Google és correcta, se li mostrarà un llistat dels cursos del seu compte de Google Classroom.";
+$string['import_page_desc_07'] = "En cas d'error, poseu-vos en contacte amb l'administrador de la plataforma.";
+$string['import_page_desc_08'] = "Següent";

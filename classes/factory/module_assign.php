@@ -75,7 +75,7 @@ class module_assign extends module {
     public function __construct(string $providersection, array $module, string $intro, bool $visible) {
         parent::__construct('mod_assign', $providersection, $module['title'], $intro, $visible);
         $this->module = $module;
-        $this->materials = $this->module['materials'];
+        $this->materials = $this->module['materials'] ?? [];
     }
 
     /**

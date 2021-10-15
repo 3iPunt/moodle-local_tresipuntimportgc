@@ -26,16 +26,16 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
 
-    // View upload CSV page.
+    // Import course from Google Classroom.
     'local/tresipuntimportgc:import' => array(
-        'captype' => 'read',
+        'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
             'student' => CAP_PROHIBIT,
-            'coursecreator' => CAP_PROHIBIT,
+            'coursecreator' => CAP_ALLOW,
             'guest' => CAP_PROHIBIT,
             'teacher' => CAP_PROHIBIT,
-            'editingteacher' => CAP_ALLOW,
+            'editingteacher' => CAP_PROHIBIT,
             'manager' => CAP_ALLOW,
         ),
     ),

@@ -27,9 +27,6 @@ namespace local_tresipuntimportgc\output;
 use coding_exception;
 use core_course_category;
 use dml_exception;
-use Google_Client;
-use Google_Service_Classroom;
-use local_tresipuntimportgc\gprovider;
 use local_tresipuntimportgc\providers\provider;
 use renderable;
 use renderer_base;
@@ -101,7 +98,6 @@ class import_page implements renderable, templatable {
             ['value' => 0, 'text' => get_string('calendargenerategdlink', 'local_tresipuntimportgc'), 'selected' => $calendarimport === 0 ? 'selected' : ''],
             ['value' => 1, 'text' => get_string('calendarimport', 'local_tresipuntimportgc'), 'selected' => $calendarimport === 1 ? 'selected' : '']
         ];
-        // TODO exporter
         return $data;
     }
 
@@ -124,6 +120,5 @@ class import_page implements renderable, templatable {
             }
         }
         return $cats;
-
     }
 }

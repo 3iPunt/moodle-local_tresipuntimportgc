@@ -33,6 +33,7 @@
 }}
 <div class="local_tresipuntimportgc_import_page" data-region="local_tresipuntimportgc_import_page">
     <h3>{{#str}}classroom_courses, local_tresipuntimportgc{{/str}}</h3>
+    <p>{{#str}}editcourses, local_tresipuntimportgc{{/str}}</p>
     <hr>
     <div class="custom-control custom-checkbox">
         <input type="checkbox" class="custom-control-input" id="allchecks">
@@ -73,16 +74,16 @@
                         <div class="card card-body">
                             <form data-form="{{ id }}">
                                 <div class="form-row">
-                                    <div class="col-md-3 mb-3">
+                                    <div class="col-md-12 col-xl-3 mb-3">
                                         <label for="name-{{ id }}">
                                             {{#str}}uniquename_course, local_tresipuntimportgc{{/str}}
                                             <button type="button" class="btn helplabel" data-container="body" data-toggle="popover" data-placement="bottom" data-content="{{# str }} uniquename_course_help, local_tresipuntimportgc {{/ str }}">
                                                 <i class="fa fa-question-circle text-info" aria-hidden="true"></i>
                                             </button>
                                         </label>
-                                        <input type="text" class="form-control" id="name-{{ id }}" value="">
+                                        <input type="text" class="form-control" id="name-{{ id }}" value="{{ name }}">
                                     </div>
-                                    <div class="col-md-7 mb-3">
+                                    <div class="col-md-12 col-xl-6 mb-3">
                                         <label for="category-{{ id }}">
                                             {{#str}}select_category, local_tresipuntimportgc{{/str}}
                                             <button type="button" class="btn helplabel" data-container="body" data-toggle="popover" data-placement="bottom" data-content="{{# str }} select_category_help, local_tresipuntimportgc {{/ str }}">
@@ -95,7 +96,7 @@
                                             {{/ categories }}
                                         </select>
                                     </div>
-                                    <div class="col-md-2 d-flex align-items-center justify-content-center">
+                                    <div class="col-md-12 col-xl-3 d-flex align-items-center justify-content-center">
                                         <input type="checkbox" class="custom-control-input" id="visible-{{ id }}" checked>
                                         <label class="custom-control-label" for="visible-{{ id }}">{{#str}}course_visible, local_tresipuntimportgc{{/str}}</label>
                                     </div>

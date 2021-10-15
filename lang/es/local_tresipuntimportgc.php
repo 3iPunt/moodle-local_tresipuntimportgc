@@ -64,6 +64,7 @@ $string['googleformsimport'] = 'Importación de Formularios de Google';
 $string['googleformsimport_help'] = 'Seleccione cómo se importarán los formularios de Google (dependiendo de las preguntas que contengan, se importarán de distinta forma)';
 
 $string['classroom_courses'] = 'Cursos disponibles de tu cuenta de Google Classroom';
+$string['editcourses'] = 'Puede editar los valores por defecto del curso, haciendo clic en el botón con el ícono de lápiz';
 $string['selectallcourses'] = 'Seleccionar todos los cursos';
 $string['create'] = 'Crear cursos';
 $string['createcourses'] = 'Crear cursos seleccionados';
@@ -136,3 +137,13 @@ $string['conference'] = 'Reunión en Hangouts';
 // Traces errors
 $string['user_can_not_view_category'] = 'No tienes acceso a la categoría "{$a->category}", el curso "{$a->course}" no se creará.';
 $string['category_no_exist'] = 'La categoría con id {$a->categoryid} no existe, el curso "{$a->course}" no se creará.';
+
+$string['tresipuntimportgc:import'] = 'Importar cursos de una cuenta de Google Classroom';
+$string['import_page_desc_01'] = 'Instrucciones para Importar cursos de Google Classroom';
+$string['import_page_desc_02'] = 'Desde esta página podrá importar los cursos de una cuenta de Google Classroom.';
+$string['import_page_desc_03'] = 'Para realizar esta operación, deberá dar permisos de su cuenta de Google a nuestra plataforma.';
+$string['import_page_desc_04'] = "Al hacer clic en el botón 'Siguiente', se redirigirá a un formulario de autenticación de la cuenta de Google.";
+$string['import_page_desc_05'] = "Allí, deberá iniciar sesión con los datos de su cuenta de Google, y Google le mostrará los permisos que necesita nuestra plataforma para realizar la importación. En ese formulario debe aceptar los permisos. Recuerde, estos permisos usted podrá revocarlos en cualquier momento desde su cuenta de Google.";
+$string['import_page_desc_06'] = "Si la autenticación con Google es correcta, se le mostrará un listado de los cursos de su cuenta de Google Classroom.";
+$string['import_page_desc_07'] = "En caso de error, póngase en contacto con el administrador de la plataforma.";
+$string['import_page_desc_08'] = "Siguiente";
