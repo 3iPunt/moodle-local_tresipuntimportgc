@@ -21,6 +21,7 @@ use local_tresipuntimportgc\factory\course;
 use local_tresipuntimportgc\factory\folder;
 use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\factory\section;
+use local_tresipuntimportgc\providers\google;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -77,18 +78,20 @@ abstract class map {
      * Module.
      *
      * @param array $module
+     * @param google $provider
      * @param string $type
      * @return module
      */
-    abstract static public function module(array $module, string $type = ''): ?module;
+    abstract static public function module(array $module, google $provider, string $type = ''): ?module;
 
     /**
      * Modules.
      *
      * @param array $modules
+     * @param google $provider
      * @param string $type
      * @return module[]
      */
-    abstract static public function modules(array $modules, string $type = ''): array;
+    abstract static public function modules(array $modules, google $provider, string $type = ''): array;
 
 }

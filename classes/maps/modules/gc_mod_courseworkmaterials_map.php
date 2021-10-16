@@ -19,9 +19,11 @@ namespace local_tresipuntimportgc\maps\modules;
 use coding_exception;
 use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\factory\module_folder;
+use local_tresipuntimportgc\factory\module_form;
 use local_tresipuntimportgc\factory\module_label;
 use local_tresipuntimportgc\factory\module_resource;
 use local_tresipuntimportgc\factory\module_url;
+use local_tresipuntimportgc\providers\google;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -38,10 +40,11 @@ class gc_mod_courseworkmaterials_map extends gc_mod_map  {
      * Get Module.
      *
      * @param $module
+     * @param google $provider
      * @return module
      * @throws coding_exception
      */
-    public function get_mod($module): module {
+    public function get_mod($module, google $provider): module {
         $visible = $module['state'] === 'PUBLISHED';
         $section = $module['topicId'] ?? '';
         $mats = $module['materials'] ?? [];
@@ -56,12 +59,12 @@ class gc_mod_courseworkmaterials_map extends gc_mod_map  {
         }
         if ($firstkey === 'form' && count($module['materials']) === 1) {
             // TODO create a quiz using the google form api (not included in Moodle!!!). Provisionally the form is embedded in a tag
-            /*return new module_form(
+            return new module_form(
+                $section, $module['title'], $desc, $visible, $provider
+            );
+            /*return new module_label(
                 $section, $module['title'], $desc, $visible, reset($mats)
             );*/
-            return new module_label(
-                $section, $module['title'], $desc, $visible, reset($mats)
-            );
         }
         if ($firstkey === 'link' && count($module['materials']) === 1) {
             return new module_url(

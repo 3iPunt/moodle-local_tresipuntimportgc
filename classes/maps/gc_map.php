@@ -27,6 +27,7 @@ use local_tresipuntimportgc\factory\module_label;
 use local_tresipuntimportgc\factory\module_url;
 use local_tresipuntimportgc\factory\section;
 use local_tresipuntimportgc\maps\modules\gc_mod_map;
+use local_tresipuntimportgc\providers\google;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -117,19 +118,17 @@ class gc_map extends map {
      * @param string $type
      * @return module
      */
-    public static function module(array $module, string $type = ''): ?module {
+    public static function module(array $module, google $provider, string $type = ''): ?module {
         $item = null;
         if (isset($module['assigneeMode']) && $module['assigneeMode'] === 'ALL_STUDENTS') {
             if (isset(gc_mod_map::GC_MODS[$type])) {
                 $modtypes = gc_mod_map::GC_MODS[$type];
                 $class = is_array($modtypes) ? $modtypes[$module['workType']] : $modtypes;
-                //print_object($module);die();
                 if (!empty($class)) {
                     try {
                         $modmap = new $class;
-                        return $modmap->get_mod($module);
+                        return $modmap->get_mod($module, $provider);
                     } catch (Exception $e) {
-                        error_log($e->getMessage());
                         mtrace('    -- ERROR: GET_MODULE: ' . $module['id'] . ' - ' . $e->getMessage());
                         return null;
                     }
@@ -174,12 +173,13 @@ class gc_map extends map {
      *
      * @param array $modules
      * @param string $type
+     * @param google|null $provider
      * @return module[]
      */
-    public static function modules(array $modules, string $type = ''): array {
+    public static function modules(array $modules, google $provider, string $type = ''): array {
         $data = [];
         foreach ($modules as $module) {
-            $m = self::module($module, $type);
+            $m = self::module($module, $provider, $type);
             /* TODO if it is an assignment and there are files, they will be downloaded and included within it. Otherwise, the files will become Moodle mods. */
             /*if (($m instanceof module_assign) === false && ($m instanceof module_folder) === false) {
                 // if it is an assignment and there are subjects, they will be downloaded and included within it. Otherwise, the subjects will become Moodle mods.

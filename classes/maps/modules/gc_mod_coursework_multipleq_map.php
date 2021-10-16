@@ -36,17 +36,18 @@ class gc_mod_coursework_multipleq_map extends gc_mod_map  {
      * Get Module.
      *
      * @param $module
+     * @param $provider
      * @return module
      * @throws coding_exception
      */
-    public function get_mod($module): module {
+    public function get_mod($module, $provider): module {
         $visible = $module['state'] === 'PUBLISHED';
         $section = $module['topicId'] ?? '';
         $mats = $module['materials'] ?? [];
         $desc = $module['description'] ?? '';
         $desc = self::get_desc_rich($desc, $mats);
         return new module_form(
-            $section, $module, $desc, $visible
+            $section, $module, $desc, $visible, $provider
         );
     }
 

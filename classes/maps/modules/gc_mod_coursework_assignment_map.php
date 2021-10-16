@@ -17,11 +17,13 @@
 namespace local_tresipuntimportgc\maps\modules;
 
 use coding_exception;
+use dml_exception;
 use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\factory\module_assign;
 use local_tresipuntimportgc\factory\module_form;
 use local_tresipuntimportgc\factory\module_label;
 use local_tresipuntimportgc\factory\module_formz;
+use local_tresipuntimportgc\providers\google;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -38,10 +40,12 @@ class gc_mod_coursework_assignment_map extends gc_mod_map {
      * Get Module.
      *
      * @param $module
+     * @param google $provider
      * @return module
      * @throws coding_exception
+     * @throws dml_exception
      */
-    public function get_mod($module): module {
+    public function get_mod($module, google $provider): module {
         $visible = $module['state'] === 'PUBLISHED';
         $section = $module['topicId'] ?? '';
         $mats = $module['materials'] ?? [];
@@ -59,11 +63,8 @@ class gc_mod_coursework_assignment_map extends gc_mod_map {
                         );
                     case 1:
                         // TODO create a quiz using the google form api (not included in Moodle!!!). Provisionally the form is embedded in a tag
-                        /*print_object($module);
-                        print_object($mats);die();*/
-                        // Comprobar si todas las preguntas tienen respuestas, entonces quiz. De otro modo feedback
                         return new module_form(
-                            $section, $module, $desc, $visible, reset($mats)
+                            $section, $module, $desc, $visible, $provider
                         );
                     case 2:
                         return new module_label(

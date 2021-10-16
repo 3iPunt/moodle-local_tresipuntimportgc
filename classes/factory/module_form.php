@@ -26,6 +26,7 @@ namespace local_tresipuntimportgc\factory;
 
 use coding_exception;
 use dml_exception;
+use local_tresipuntimportgc\providers\google;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response_module;
 use mod_quiz_generator;
@@ -45,13 +46,16 @@ require_once($CFG->dirroot . '/mod/quiz/lib.php');
 class module_form extends module {
 
     /** @var string Mod Name */
-    protected $modname = 'quiz';
+    protected $modname;
 
     /** @var mod_quiz_generator Generator */
     protected $generator;
 
     /** array module */
     protected $module;
+
+    /** @var google $provider */
+    protected $provider;
 
     /**
      * constructor.
@@ -60,11 +64,24 @@ class module_form extends module {
      * @param array $module
      * @param string $intro
      * @param bool $visible
+     * @param google $provider
      * @throws coding_exception
      */
-    public function __construct(string $providersection, array $module, string $intro, bool $visible) {
-        parent::__construct('mod_quiz', $providersection, $module['title'], $intro, $visible);
+    public function __construct(string $providersection, array $module, string $intro, bool $visible, google $provider) {
         $this->module = $module;
+        $this->provider = $provider;
+        $this->modname = 'mod_quiz';
+        if ((isset($module['workType']) && $module['workType'] === 'SHORT_ANSWER_QUESTION') ||
+            (isset($module['workType']) && $module['workType'] === 'MULTIPLE_CHOICE_QUESTION')) {
+            $this->modname = 'mod_feedback';
+        }
+        if (isset($module['materials'][0]) && array_key_first_compatible($module['materials'][0]) === 'form' && count($module['materials']) === 1) {
+            // TODO find out how to get the id of the form to be able to make the request
+            //print_object($module);
+            //$form = $provider->get_form('1FAIpQLScWvIaAHadkyFMC-tf4CwDMY3rfVbsGH-4aI8eVYcNlVOdc0Q');
+
+        }
+        parent::__construct($this->modname, $providersection, $module['title'], $intro, $visible);
     }
 
     /**

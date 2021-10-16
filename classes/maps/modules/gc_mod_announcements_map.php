@@ -19,6 +19,7 @@ namespace local_tresipuntimportgc\maps\modules;
 use coding_exception;
 use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\factory\module_share;
+use local_tresipuntimportgc\providers\google;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -38,7 +39,7 @@ class gc_mod_announcements_map extends gc_mod_map  {
      * @return module
      * @throws coding_exception
      */
-    public function get_mod($module): module {
+    public function get_mod($module, google $provider): module {
         $visible = $module['state'] === 'PUBLISHED';
         $mats = isset($module['materials']) ? $module['materials'] : [];
         $desc = self::get_desc_rich('', $mats);

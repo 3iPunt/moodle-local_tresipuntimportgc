@@ -24,6 +24,7 @@ use Google_Exception;
 use Google_Service_Calendar;
 use Google_Service_Classroom;
 use Google_Service_Drive;
+use Google_Service_Forms;
 use Google_Service_Oauth2;
 use local_tresipuntimportgc\maps\gc_map;
 use local_tresipuntimportgc\responses\error;
@@ -41,6 +42,7 @@ global $CFG;
 require_once($CFG->libdir . '/google/src/Google/autoload.php');
 require_once($CFG->libdir . '/google/lib.php');
 require_once($CFG->libdir . '/google/src/Google/Service/Drive.php');
+require_once($CFG->dirroot . '/local/tresipuntimportgc/classes/providers/Forms.php');
 
 /**
  * Class google
@@ -53,6 +55,7 @@ class google extends provider {
 
     public const TIMEOUT = 30;
     public const GOOGLE_CLASSROOM_URL = 'https://classroom.googleapis.com/v1/courses/';
+    public const GOOGLE_FORMS_URL = 'https://forms.googleapis.com/v1/rest?version=v1beta/';
 
     /** @var string Json */
     protected $json;
@@ -68,6 +71,8 @@ class google extends provider {
 
     /** @var Google_Service_Classroom Service */
     protected $service;
+
+    protected $formsservice;
 
     /**
      * google constructor.
@@ -147,8 +152,11 @@ class google extends provider {
                 'https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly',
                 'https://www.googleapis.com/auth/classroom.announcements.readonly',
                 'https://www.googleapis.com/auth/classroom.topics.readonly',
+                Google_Service_Drive::DRIVE,
                 Google_Service_Drive::DRIVE_READONLY,
-                Google_Service_Calendar::CALENDAR_READONLY]
+                Google_Service_Calendar::CALENDAR_READONLY,
+                'https://www.googleapis.com/auth/forms.body',
+                'https://www.googleapis.com/auth/forms.body.readonly']
         );
         $oauth2 = new Google_Service_Oauth2($client);
 
@@ -195,6 +203,22 @@ class google extends provider {
      */
     protected function set_service(): void {
         $this->service = new Google_Service_Classroom($this->client);
+    }
+
+
+    /**
+     * @return Google_Service_Forms
+     */
+    protected function get_forms_service(): Google_Service_Forms {
+        if (empty($this->formsservice)) {
+            $this->set_forms_service();
+            return $this->formsservice;
+        }
+        return $this->formsservice;
+    }
+
+    protected function set_forms_service() {
+        $this->formsservice = new Google_Service_Forms($this->client);
     }
 
     /**
@@ -280,6 +304,29 @@ class google extends provider {
 
     }
 
+    public function get_form(string $id) {
+        // TODO
+        /*$form = $this->get_forms_service()->forms->get($id);
+        //print_object($form);
+        //print_object($this->get_forms_service()->forms->get());
+        //print_object($this->get_forms_service()->forms_responses->listFormsResponses($id));
+        //die();
+        $data = gc_map::course($form);
+        return new response_course(true, $data, null);
+        /*$curl = new curl();
+        $url = self::GOOGLE_FORMS_URL . $id;
+        $curl->setHeader($this->get_headers());
+        $req = $curl->get($url, [], $this->get_options_curl('GET'));
+        $res = $curl->getResponse();
+        $data = json_decode($req, true);
+        print_object($res);
+        print_object($data);
+        if ($res) {
+            return $res;
+        }*/
+        return '';
+    }
+
     /**
      * Get Modules.
      *
@@ -325,7 +372,7 @@ class google extends provider {
             $data = json_decode($req, true);
             if (isset($res['HTTP/1.0'])) {
                 if ($res['HTTP/1.0'] === '200 OK') {
-                    $mods = isset($data['courseWork']) ? gc_map::modules($data['courseWork'], 'courseWork') : gc_map::modules([], 'courseWork');
+                    $mods = isset($data['courseWork']) ? gc_map::modules($data['courseWork'], $this, 'courseWork') : gc_map::modules([], $this, 'courseWork');
                     $response = new response_modules(true, $mods);
                 } else {
                     $msg = $this->get_msg_curl($data, $res);
@@ -358,9 +405,9 @@ class google extends provider {
             if (isset($res['HTTP/1.0'])) {
                 if ($res['HTTP/1.0'] === '200 OK') {
                     if (isset($data['courseWorkMaterial'])) {
-                        $mods = gc_map::modules($data['courseWorkMaterial'], 'courseWorkMaterials');
+                        $mods = gc_map::modules($data['courseWorkMaterial'], $this, 'courseWorkMaterials');
                     } else {
-                        $mods = gc_map::modules([], 'courseWorkMaterials');
+                        $mods = gc_map::modules([], $this, 'courseWorkMaterials');
                     }
                     $response = new response_modules(true, $mods);
                 } else {
@@ -393,7 +440,7 @@ class google extends provider {
             $data = json_decode($req, true);
             if (isset($res['HTTP/1.0'])) {
                 if ($res['HTTP/1.0'] === '200 OK') {
-                    $mods = isset($data['announcements']) ? gc_map::modules($data['announcements'], 'announcements') : gc_map::modules([], 'announcements');
+                    $mods = isset($data['announcements']) ? gc_map::modules($data['announcements'], $this, 'announcements') : gc_map::modules([], $this, 'announcements');
                     $response = new response_modules(true, $mods);
                 } else {
                     $msg = $this->get_msg_curl($data, $res);
