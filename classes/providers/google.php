@@ -25,6 +25,7 @@ use Google_Service_Calendar;
 use Google_Service_Classroom;
 use Google_Service_Drive;
 use Google_Service_Forms;
+use Google_Service_Forms_Form;
 use Google_Service_Oauth2;
 use local_tresipuntimportgc\maps\gc_map;
 use local_tresipuntimportgc\responses\error;
@@ -119,7 +120,7 @@ class google extends provider {
      *
      * @return mixed
      */
-    protected function get_token() {
+    public function get_token() {
         $accesstokenjson = $this->client->getAccessToken();
         $accesstoken = json_decode($accesstokenjson);
         return $accesstoken->access_token;
@@ -304,27 +305,12 @@ class google extends provider {
 
     }
 
-    public function get_form(string $id) {
-        // TODO
-        /*$form = $this->get_forms_service()->forms->get($id);
-        //print_object($form);
-        //print_object($this->get_forms_service()->forms->get());
-        //print_object($this->get_forms_service()->forms_responses->listFormsResponses($id));
-        //die();
-        $data = gc_map::course($form);
-        return new response_course(true, $data, null);
-        /*$curl = new curl();
-        $url = self::GOOGLE_FORMS_URL . $id;
-        $curl->setHeader($this->get_headers());
-        $req = $curl->get($url, [], $this->get_options_curl('GET'));
-        $res = $curl->getResponse();
-        $data = json_decode($req, true);
-        print_object($res);
-        print_object($data);
-        if ($res) {
-            return $res;
-        }*/
-        return '';
+    /**
+     * @param string $id
+     * @return Google_Service_Forms_Form
+     */
+    public function get_form(string $id): Google_Service_Forms_Form {
+        return $this->get_forms_service()->forms->get($id);
     }
 
     /**
