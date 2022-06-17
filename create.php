@@ -46,12 +46,12 @@ $output = $PAGE->get_renderer('local_tresipuntimportgc');
 echo $OUTPUT->header();
 
 // TODO delete, ONLY FOR DEV delete all courses first
-$oldcourses = get_courses();
+/*$oldcourses = get_courses();
 foreach($oldcourses as $oldcourse) {
     if ((int)$oldcourse->id !== 1) {
         delete_course($oldcourse);
     }
-}
+}*/
 /*******************************************/
 if ($has_capability) {
     if (!empty($_COOKIE)) {
