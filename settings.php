@@ -23,18 +23,20 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+global $ADMIN, $CFG;
+
+$ADMIN->add('courses', new admin_externalpage('local_tresipuntimportgc_import',
+    new lang_string('import_page', 'local_tresipuntimportgc'),
+    $CFG->wwwroot . '/local/tresipuntimportgc/import.php', ['local/tresipuntimportgc:import']));
 
 if ($hassiteconfig) {
-    global $ADMIN, $CFG;
     $ADMIN->add('modules', new admin_category('local_tresipuntimportgc_category',
         new lang_string('pluginname', 'local_tresipuntimportgc')));
     $settingspage = new admin_settingpage(
         'local_tresipuntimportgc_config',
         new lang_string('pluginconfig', 'local_tresipuntimportgc'));
     $ADMIN->add('local_tresipuntimportgc_category', $settingspage);
-    $ADMIN->add('courses', new admin_externalpage('local_tresipuntimportgc_import',
-        new lang_string('import_page', 'local_tresipuntimportgc'),
-        $CFG->wwwroot . '/local/tresipuntimportgc/import.php', ['moodle/site:config']));
+
     if ($ADMIN->fulltree) {
         /* GOOGLE API */
         $settingspage->add(

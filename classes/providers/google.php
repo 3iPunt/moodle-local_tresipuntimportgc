@@ -144,19 +144,15 @@ class google extends provider {
         $client->setPrompt('select_account consent');
         $client->setScopes([
                 Google_Service_Classroom::CLASSROOM_COURSES_READONLY,
-                Google_Service_Classroom::CLASSROOM_COURSES,
                 'https://www.googleapis.com/auth/userinfo.email',
                 'https://www.googleapis.com/auth/userinfo.profile',
-                'https://www.googleapis.com/auth/classroom.courses',
                 'https://www.googleapis.com/auth/classroom.coursework.me.readonly',
                 'https://www.googleapis.com/auth/classroom.coursework.students.readonly ',
                 'https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly',
                 'https://www.googleapis.com/auth/classroom.announcements.readonly',
                 'https://www.googleapis.com/auth/classroom.topics.readonly',
-                Google_Service_Drive::DRIVE,
                 Google_Service_Drive::DRIVE_READONLY,
                 Google_Service_Calendar::CALENDAR_READONLY,
-                'https://www.googleapis.com/auth/forms.body',
                 'https://www.googleapis.com/auth/forms.body.readonly']
         );
         $oauth2 = new Google_Service_Oauth2($client);
