@@ -69,6 +69,7 @@ $string['selectallcourses'] = 'Seleccionar todos los cursos';
 $string['create'] = 'Crear cursos';
 $string['createcourses'] = 'Crear cursos seleccionados';
 $string['createcourses_help'] = 'Si continúa, se recargará la página y empezarán a generarse los cursos seleccionados, mostrando las información de la traza. <br>NO SE PODRÁ DETENER LA OPERACIÓN HASTA QUE TERMINE POR SÍ MISMA.<br>¿Esta seguro?';
+$string['changeaccount'] = 'Cambiar cuenta';
 
 $string['error_client'] = 'Error al generar el cliente';
 $string['view_more'] = 'Ver más';
@@ -126,6 +127,7 @@ $string['importfilesuccess'] = 'El archivo <b>{$a}</b> se ha importado correctam
 $string['importfilealreadyexist'] = 'Ya se encuentra un archivo con el nombre <b>{$a}</b> en el área privada de este usuario';
 $string['importfileerror'] = 'El archivo <b>{$a->name}</b> no se ha podido importar: {$a->error}';
 $string['importfileerrorcontent'] = 'El archivo <b>{$a}</b> no tiene ningún contenido almacenado en Drive';
+$string['emptyurl'] = 'URL vacía';
 $string['convertdocumentto'] = 'Convirtiendo el archivo <b>{$a->title}</b> a formato <b>{$a->format}</b>';
 
 // Traces importcalendar

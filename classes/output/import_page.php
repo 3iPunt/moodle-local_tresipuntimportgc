@@ -27,7 +27,9 @@ namespace local_tresipuntimportgc\output;
 use coding_exception;
 use core_course_category;
 use dml_exception;
+use Google_Exception;
 use local_tresipuntimportgc\providers\provider;
+use moodle_exception;
 use renderable;
 use renderer_base;
 use stdClass;
@@ -64,8 +66,10 @@ class import_page implements renderable, templatable {
      *
      * @param renderer_base $output
      * @return stdClass
-     * @throws dml_exception
+     * @throws Google_Exception
+     * @throws moodle_exception
      * @throws coding_exception
+     * @throws dml_exception
      */
     public function export_for_template(renderer_base $output): stdClass {
         $data = new stdClass();
@@ -98,6 +102,7 @@ class import_page implements renderable, templatable {
             ['value' => 0, 'text' => get_string('calendargenerategdlink', 'local_tresipuntimportgc'), 'selected' => $calendarimport === 0 ? 'selected' : ''],
             ['value' => 1, 'text' => get_string('calendarimport', 'local_tresipuntimportgc'), 'selected' => $calendarimport === 1 ? 'selected' : '']
         ];
+        $data->changeaccount = $this->provider->get_client()->createAuthUrl();
         return $data;
     }
 

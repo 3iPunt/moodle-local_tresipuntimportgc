@@ -50,7 +50,10 @@ class gc_mod_courseworkmaterials_map extends gc_mod_map  {
         $mats = $module['materials'] ?? [];
         $desc = isset($module['description']) ? self::get_desc_rich($module['description'], $mats) : self::get_desc_rich('', $mats);
         // TODO rethink logic, this is rubbish for understanding how it is supposed to work.
-        $firstkey = array_key_first_compatible($module['materials'][0]);
+        $firstkey = '';
+        if (isset($module['materials'][0])) {
+            $firstkey = array_key_first_compatible($module['materials'][0]);
+        }
 
         if ($firstkey === 'driveFile' && count($module['materials']) === 1) {
             return new module_resource(
@@ -71,13 +74,16 @@ class gc_mod_courseworkmaterials_map extends gc_mod_map  {
                 $section, $module['title'], $desc, $visible, $module['alternateLink']
             );
         }
-        if (count($module['materials']) > 1) {
+        if (isset($module['materials']) && count($module['materials']) > 1) {
             return new module_folder(
                 $section, $module['title'], $desc, $visible, $module['materials']
             );
         }
+        if (!empty($mats)) {
+            $mats = reset($mats);
+        }
         return new module_label(
-            $section, $module['title'], $desc, $visible, reset($mats)
+            $section, $module['title'], $desc, $visible, $mats
         );
     }
 

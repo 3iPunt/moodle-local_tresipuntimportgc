@@ -163,6 +163,7 @@ function import_file(
         $exportlinks = $file->getExportLinks();
         $url = '';
         $format = '';
+        // TODO https://developers.google.com/drive/api/guides/mime-types
         switch ($mimetype) {
             case 'application/vnd.google-apps.document':
                 $format = '.docx';
@@ -196,6 +197,12 @@ function import_file(
                 // TODO QUIZ or feedback
                 print_trace('importfileerrorcontent', 'error', $file->getTitle());
                 break;
+            case 'application/vnd.google-apps.folder':
+                // TODO create a folder in the Moodle repository and upload these files
+                $format = '.zip';
+                print_trace('convertdocumentto', 'info', ['title' => $file->getTitle(), 'format' => $format]);
+                $datafile['filename'] = $file->getTitle() . $format;
+                break;
             default:
                 $format = '.pdf';
                 print_trace('convertdocumentto', 'info', ['title' => $file->getTitle(), 'format' => $format]);
@@ -207,8 +214,16 @@ function import_file(
         // TODO forms in drive?? how to convert?? template feedback?
         if ($mimetype !== 'application/vnd.google-apps.form') {
             if ($fs->get_file($contextid, $component, $filearea, 0, $filepath, $file->getTitle() . $format) === false) {
-                $fs->create_file_from_url($datafile, $url);
-                print_trace('importfilesuccess', 'success', $file->getTitle());
+                if ($url !== '') {
+                    try {
+                        $fs->create_file_from_url($datafile, $url);
+                        print_trace('importfilesuccess', 'success', $file->getTitle());
+                    } catch (Exception $e) {
+                        print_trace('importfileerror', 'danger', ['name' => $file->getTitle(), 'error' => $e->getMessage()]);
+                    }
+                } else {
+                    print_trace('importfileerror', 'danger', ['name' => $file->getTitle(), 'error' => get_string('emptyurl', 'local_tresipuntimportgc')]);
+                }
             } else {
                 print_trace('importfilealreadyexist', 'warning', $file->getTitle());
             }

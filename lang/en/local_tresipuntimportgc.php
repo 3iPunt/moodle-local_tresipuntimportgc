@@ -69,6 +69,7 @@ $string['selectallcourses'] = 'Select all courses';
 $string['create'] = 'Create courses';
 $string['createcourses'] = 'Create selected courses';
 $string['createcourses_help'] = 'If you continue, the page will reload and the selected courses will start to be generated, showing the trace information. <br>THE OPERATION CANNOT BE STOPPED UNTIL IT HAS ENDED BY ITSELF.';
+$string['changeaccount'] = 'Change account';
 
 $string['error_client'] = 'Error when generating the client';
 $string['view_more'] = 'View more';
@@ -126,6 +127,7 @@ $string['importfilesuccess'] = 'The file <b>{$a}</b> has been successfully impor
 $string['importfilealreadyexist'] = 'A file with the name <b>{$a}</b> is already in this user\'s private area';
 $string['importfileerror'] = 'The file <b>{$a->name}</b> could not be imported: {$a->error}';
 $string['importfileerrorcontent'] = 'File <b>{$a}</b> has no content stored in Drive';
+$string['emptyurl'] = 'Empty URL';
 $string['convertdocumentto'] = 'Converting the file <b>{$a->title}</b> to format <b>{$a->format}</b>';
 
 // Traces importcalendar
