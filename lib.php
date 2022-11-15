@@ -204,6 +204,7 @@ function import_file(
                 $datafile['filename'] = $file->getTitle() . $format;
                 break;
             default:
+                break;
                 $format = '.pdf';
                 print_trace('convertdocumentto', 'info', ['title' => $file->getTitle(), 'format' => $format]);
                 $datafile['filename'] = $file->getTitle() . $format;

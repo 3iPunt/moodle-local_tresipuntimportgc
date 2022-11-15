@@ -126,7 +126,7 @@ $string['filesfound'] = 'Se han encontrado {$a} archivos';
 $string['importfilesuccess'] = 'El archivo <b>{$a}</b> se ha importado correctamente';
 $string['importfilealreadyexist'] = 'Ya se encuentra un archivo con el nombre <b>{$a}</b> en el área privada de este usuario';
 $string['importfileerror'] = 'El archivo <b>{$a->name}</b> no se ha podido importar: {$a->error}';
-$string['importfileerrorcontent'] = 'El archivo <b>{$a}</b> no tiene ningún contenido almacenado en Drive';
+$string['importfileerrorcontent'] = 'El archivo <b>{$a}</b> es un formulario de Google (aún por implementar) o no tiene ningún contenido almacenado en Drive';
 $string['emptyurl'] = 'URL vacía';
 $string['convertdocumentto'] = 'Convirtiendo el archivo <b>{$a->title}</b> a formato <b>{$a->format}</b>';
 
