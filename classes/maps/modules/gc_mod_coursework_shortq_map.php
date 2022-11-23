@@ -44,7 +44,7 @@ class gc_mod_coursework_shortq_map extends gc_mod_map  {
         $visible = $module['state'] === 'PUBLISHED';
         $section = $module['topicId'] ?? '';
         $mats = $module['materials'] ?? [];
-        $desc = self::get_desc_rich($module['description'], $mats);
+        $desc = self::get_desc_rich($module['description'] ?? '', $mats);
         return new module_form(
             $section, $module, $desc, $visible, $provider
         );
