@@ -119,7 +119,7 @@ resize_ob.observe(document.querySelector('#region-main'));
                     echo '<div class="card">';
                     echo '<div class="card-header" id="heading_' . $coursedata->providerid . '">';
                     echo '<h5 class="mb-0">';
-                    echo '<button class="btn btn-link" data-toggle="collapse" data-target="#gcid_' . $coursedata->providerid . '" aria-expanded="true" aria-controls="' . $coursedata->providerid . '">';
+                    echo '<button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#gcid_' . $coursedata->providerid . '" aria-expanded="true" aria-controls="' . $coursedata->providerid . '">';
                     echo '<h4>' . $coursedata->fullname . '</h4>';
                     echo '</button>';
                     echo '</h5>';
