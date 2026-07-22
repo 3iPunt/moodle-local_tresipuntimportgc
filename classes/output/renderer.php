@@ -53,6 +53,32 @@ class renderer extends plugin_renderer_base {
     /**
      * Defer to template.
      *
+     * @param import_view $view
+     *
+     * @return string html for the page
+     * @throws moodle_exception
+     */
+    public function render_import_view(import_view $view): string {
+        $data = $view->export_for_template($this);
+        return parent::render_from_template('local_tresipuntimportgc/import_view', $data);
+    }
+
+    /**
+     * Defer to template.
+     *
+     * @param progress_view $view
+     *
+     * @return string html for the page
+     * @throws moodle_exception
+     */
+    public function render_progress_view(progress_view $view): string {
+        $data = $view->export_for_template($this);
+        return parent::render_from_template('local_tresipuntimportgc/progress_view', $data);
+    }
+
+    /**
+     * Defer to template.
+     *
      * @param create_page $page
      *
      * @return string html for the page

@@ -43,7 +43,7 @@ if ($hassiteconfig) {
             new admin_setting_heading(
                 'local_tresipuntimportgc_gc',
                 new lang_string('gcheading', 'local_tresipuntimportgc'),
-                '')
+                new lang_string('gcheading_desc', 'local_tresipuntimportgc', $CFG->wwwroot))
         );
         // Credentials Json
         $settingspage->add(new admin_setting_configtext('local_tresipuntimportgc/credentialsjson',
@@ -74,7 +74,7 @@ if ($hassiteconfig) {
             new admin_setting_heading(
                 'local_tresipuntimportgc_config_import',
                 new lang_string('configimportheading', 'local_tresipuntimportgc'),
-                '')
+                new lang_string('configimportheading_help', 'local_tresipuntimportgc'))
         );
 
         // Allow users to configure courses

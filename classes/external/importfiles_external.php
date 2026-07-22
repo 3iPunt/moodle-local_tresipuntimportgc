@@ -28,15 +28,9 @@ use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
-use file_exception;
-use Google_Exception;
-use Google_Service_Drive;
-use Google_Service_Drive_DriveFile;
 use invalid_parameter_exception;
 use local_tresipuntimportgc\providers\google;
 use moodle_exception;
-use ReflectionException;
-use stored_file_creation_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -61,22 +55,20 @@ class importfiles_external extends external_api {
     }
 
     /**
-     * @param string $providerid
-     * @param int $courseid
-     * @param string $shortname
+     * Imports the Drive files of the course teacher folder into the private
+     * files area of the current user.
+     *
+     * @param  string $providerid Classroom course id.
+     * @param  int    $courseid   Moodle course id (echoed back).
+     * @param  string $shortname  Course shortname (private files subfolder).
      * @return array
-     * @throws Google_Exception
-     * @throws ReflectionException
      * @throws coding_exception
-     * @throws file_exception
-     * @throws stored_file_creation_exception
      * @throws invalid_parameter_exception
      * @throws moodle_exception
      */
     public static function importfiles(string $providerid, int $courseid, string $shortname): array {
-        global $CFG, $USER;
-        require_once($CFG->dirroot . '/course/lib.php');
-        require_once($CFG->dirroot . '/user/externallib.php');
+        global $USER;
+
         self::validate_parameters(
             self::importfiles_parameters(), [
                 'providerid' => $providerid,
@@ -85,41 +77,39 @@ class importfiles_external extends external_api {
             ]
         );
         $provider = new google();
-        $courseclassroom = $provider->get_course($providerid);
-        $folderid = accessProtected($courseclassroom->data->providerdata, 'modelData')['teacherFolder']['id'];
-        // Needs the same client as for the first login, if a new client or provider with other scopes is created, it skips it because it is already logged in.
-        $gdrvieclient = $provider->get_client();
-        $tokenjson = json_decode($gdrvieclient->getAccessToken(), true);
-        $service = new Google_Service_Drive($gdrvieclient);
-
-        $optParams =['q' => "'". $folderid ."' in parents"];
-        $filelist = $service->files->listFiles($optParams);
-        /** @var Google_Service_Drive_DriveFile[] $files */
-        $files = $filelist->getItems();
-        $context = context_user::instance($USER->id);
-        $fs = get_file_storage();
         $errors = [];
+
+        $resfolder = $provider->get_teacher_folder($providerid);
+        if (!$resfolder->success || $resfolder->data === null) {
+            print_trace('teacherfoldererrorcreated', 'warning');
+            return ['success' => false, 'errors' => $resfolder->error ? $resfolder->error->to_string() : '', 'id' => $courseid];
+        }
+        $resfiles = $provider->list_drive_folder($resfolder->data->get_providerid());
+        if (!$resfiles->success) {
+            print_trace('importfileerror', 'danger', ['name' => $shortname, 'error' => $resfiles->error->to_string()]);
+            return ['success' => false, 'errors' => $resfiles->error->to_string(), 'id' => $courseid];
+        }
+
+        $files = $resfiles->data;
+        $context = context_user::instance($USER->id);
         print_trace('filesfound', 'info', count($files));
         if (count($files) > 0) {
-            $fs->create_directory($context->id, 'user', 'private', 0, '/' . $shortname . '/');
-            foreach ($files as $file) {
-                import_file(
-                    $fs,
-                    $file,
-                    $service,
+            get_file_storage()->create_directory($context->id, 'user', 'private', 0, '/' . $shortname . '/');
+            foreach ($files as $filemeta) {
+                local_tresipuntimportgc_store_drive_file(
+                    $provider,
+                    $filemeta,
                     $context->id,
-                    (int)$USER->id,
-                    $tokenjson['access_token'],
+                    (int) $USER->id,
                     'user',
                     'private',
                     '/' . $shortname . '/'
                 );
             }
         }
-        // TODO response
         return [
             'success' => true,
-            'errors' => $errors,
+            'errors' => implode('; ', $errors),
             'id' => $courseid
         ];
     }

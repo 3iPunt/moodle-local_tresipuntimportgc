@@ -17,7 +17,6 @@
 namespace local_tresipuntimportgc\maps;
 
 use Exception;
-use Google_Service_Classroom_Course;
 use local_tresipuntimportgc\factory\course;
 use local_tresipuntimportgc\factory\folder;
 use local_tresipuntimportgc\factory\module;
@@ -27,7 +26,7 @@ use local_tresipuntimportgc\factory\module_label;
 use local_tresipuntimportgc\factory\module_url;
 use local_tresipuntimportgc\factory\section;
 use local_tresipuntimportgc\maps\modules\gc_mod_map;
-use local_tresipuntimportgc\providers\google;
+use local_tresipuntimportgc\providers\provider;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -41,16 +40,14 @@ defined('MOODLE_INTERNAL') || die();
 class gc_map extends map {
 
     /**
-     * Courses.
+     * Course.
      *
-     * @param object $course
+     * @param array $course Course data as a plain associative array.
      * @return course
      */
-    public static function course(object $course): course {
-        /** @var Google_Service_Classroom_Course $gcourse */
-        $gcourse = $course;
-        $des = $gcourse->getDescription() ? $gcourse->getDescription() : '';
-        return new course($gcourse->getId(), $des, $gcourse);
+    public static function course(array $course): course {
+        $des = $course['description'] ?? '';
+        return new course($course['id'], $des, (object) $course);
     }
 
     /**
@@ -118,7 +115,7 @@ class gc_map extends map {
      * @param string $type
      * @return module
      */
-    public static function module(array $module, google $provider, string $type = ''): ?module {
+    public static function module(array $module, provider $provider, string $type = ''): ?module {
         $item = null;
         if (isset($module['assigneeMode']) && $module['assigneeMode'] === 'ALL_STUDENTS') {
             if (isset(gc_mod_map::GC_MODS[$type])) {
@@ -173,10 +170,10 @@ class gc_map extends map {
      *
      * @param array $modules
      * @param string $type
-     * @param google|null $provider
+     * @param provider|null $provider
      * @return module[]
      */
-    public static function modules(array $modules, google $provider, string $type = ''): array {
+    public static function modules(array $modules, provider $provider, string $type = ''): array {
         $data = [];
         foreach ($modules as $module) {
             $m = self::module($module, $provider, $type);

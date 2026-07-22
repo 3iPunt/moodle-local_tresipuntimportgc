@@ -27,15 +27,10 @@ namespace local_tresipuntimportgc\factory;
 use coding_exception;
 use context_module;
 use dml_exception;
-use Exception;
-use Google_Exception;
-use Google_Http_Request;
-use Google_Service_Drive;
 use local_tresipuntimportgc\providers\google;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response_module;
 use mod_assign_generator;
-use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -83,7 +78,6 @@ class module_assign extends module {
      *
      * @param int $course_id
      * @return response_module
-     * @throws Google_Exception
      * @throws dml_exception
      * @throws moodle_exception
      */
@@ -121,36 +115,28 @@ class module_assign extends module {
     }
 
     /**
-     * @param $res
-     * @throws Google_Exception
-     * @throws moodle_exception
+     * Imports the Drive files of the materials as assignment intro attachments.
+     *
+     * @param  object $res Generator result (with cmid).
+     * @return void
+     * @throws coding_exception
      */
-    private function add_additional_files($res) {
+    private function add_additional_files($res): void {
         global $USER;
+
         $context = context_module::instance($res->cmid);
-        $fs = get_file_storage();
         $provider = new google();
-        $gdrvieclient = $provider->get_client();
-        $tokenjson = json_decode($gdrvieclient->getAccessToken(), true);
-        $service = new Google_Service_Drive($gdrvieclient);
         foreach ($this->materials as $material) {
             if (array_key_first_compatible($material) === 'driveFile') {
-                try {
-                    $file = $service->files->get($material['driveFile']['driveFile']['id']);
-                    import_file(
-                        $fs,
-                        $file,
-                        $service,
-                        $context->id,
-                        (int)$USER->id,
-                        $tokenjson['access_token'],
-                        'mod_assign',
-                        ASSIGN_INTROATTACHMENT_FILEAREA,
-                        '/'
-                    );
-                } catch (Exception $e) {
-                    print "An error occurred: " . $e->getMessage();
-                }
+                local_tresipuntimportgc_import_drive_file(
+                    $provider,
+                    $material['driveFile']['driveFile']['id'],
+                    $context->id,
+                    (int) $USER->id,
+                    'mod_assign',
+                    ASSIGN_INTROATTACHMENT_FILEAREA,
+                    '/'
+                );
             }
         }
     }

@@ -27,7 +27,6 @@ namespace local_tresipuntimportgc\output;
 use coding_exception;
 use dml_exception;
 use file_exception;
-use Google_Exception;
 use invalid_parameter_exception;
 use local_tresipuntimportgc\external\course_external;
 use local_tresipuntimportgc\external\importcalendar_external;
@@ -43,9 +42,6 @@ use templatable;
 
 defined('MOODLE_INTERNAL') || die;
 global $CFG;
-require_once($CFG->libdir . '/google/src/Google/autoload.php');
-require_once($CFG->libdir . '/google/lib.php');
-require_once($CFG->libdir . '/google/src/Google/Service/Drive.php');
 /**
  * Class import_page
  *
@@ -72,7 +68,6 @@ class create_page implements renderable, templatable {
      *
      * @param renderer_base $output
      * @return stdClass
-     * @throws Google_Exception
      * @throws ReflectionException
      * @throws coding_exception
      * @throws dml_exception

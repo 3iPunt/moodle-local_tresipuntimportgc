@@ -1,0 +1,78 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+  @template local_tresipuntimportgc/progress_view
+
+  Import run progress (minimal, reload based; the page refreshes itself while
+  the run is open).
+
+  Context variables required for this template:
+  * header - context for components/page_header
+  * run - {account, launchedby, startedon}
+  * courses - list of {fullname, statuslabel, statusclass, courseurl, haslogs, logs}
+  * selectionurl - URL of the selection page
+
+  Example context (json):
+  {
+    "header": {}, "run": {"account": "a@b.c", "launchedby": "User",
+    "startedon": "22/07/2026"}, "courses": [], "selectionurl": "#"
+  }
+}}
+<div class="local-tipgc" data-region="tipgc-progress">
+    {{#header}}{{> local_tresipuntimportgc/components/page_header }}{{/header}}
+
+    <div class="d-flex align-items-center justify-content-between flex-wrap mt-3 mb-3">
+        <div class="text-muted small">
+            {{# str }} launchedby, local_tresipuntimportgc, {{ run.launchedby }} {{/ str }}
+            · <span class="tipgc-mono">{{ run.account }}</span>
+            · <span class="tipgc-mono">{{ run.startedon }}</span>
+        </div>
+        <a class="btn btn-primary" href="{{ selectionurl }}">{{# str }} import_page, local_tresipuntimportgc {{/ str }}</a>
+    </div>
+
+    <div class="tipgc-courses">
+        {{# courses }}
+            <div class="tipgc-card tipgc-course mb-2">
+                <div class="d-flex align-items-center p-3">
+                    <div class="flex-grow-1 min-w-0">
+                        <span class="tipgc-course-name">{{ fullname }}</span>
+                        <span class="tipgc-badge {{ statusclass }} ml-2 ms-2">{{ statuslabel }}</span>
+                        {{# courseurl }}
+                            <a href="{{ courseurl }}" class="ml-2 ms-2 small">{{# str }} gotocourse, local_tresipuntimportgc {{/ str }}</a>
+                        {{/ courseurl }}
+                    </div>
+                </div>
+                {{# haslogs }}
+                    <details class="tipgc-logs px-3 pb-3">
+                        <summary>{{# str }} traces, local_tresipuntimportgc {{/ str }}</summary>
+                        <div class="tipgc-log-lines mt-2">
+                            {{# logs }}
+                                <div class="tipgc-log-line tipgc-log-{{ level }}">
+                                    <span class="tipgc-mono tipgc-log-time">{{ time }}</span>
+                                    <span class="tipgc-log-msg">{{{ message }}}</span>
+                                </div>
+                            {{/ logs }}
+                        </div>
+                    </details>
+                {{/ haslogs }}
+                {{^ haslogs }}
+                    <div class="px-3 pb-3 text-muted small">{{# str }} notraces, local_tresipuntimportgc {{/ str }}</div>
+                {{/ haslogs }}
+            </div>
+        {{/ courses }}
+    </div>
+</div>

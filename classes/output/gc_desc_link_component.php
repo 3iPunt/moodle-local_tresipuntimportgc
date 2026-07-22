@@ -24,8 +24,6 @@
 
 namespace local_tresipuntimportgc\output;
 
-use Google_Client;
-use Google_Service_Classroom;
 use local_tresipuntimportgc\gprovider;
 use local_tresipuntimportgc\providers\provider;
 use renderable;
@@ -35,9 +33,6 @@ use templatable;
 
 defined('MOODLE_INTERNAL') || die;
 global $CFG;
-require_once($CFG->libdir . '/google/src/Google/autoload.php');
-require_once($CFG->libdir . '/google/lib.php');
-require_once($CFG->libdir . '/google/src/Google/Service/Drive.php');
 /**
  * Class gc_desc_link_component
  *

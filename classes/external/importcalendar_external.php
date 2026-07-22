@@ -28,14 +28,10 @@ use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
-use Google_Exception;
-use Google_Service_Calendar;
-use Google_Service_Calendar_Event;
 use html_writer;
 use invalid_parameter_exception;
 use local_tresipuntimportgc\providers\google;
 use moodle_exception;
-use ReflectionException;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -61,19 +57,21 @@ class importcalendar_external extends external_api {
     }
 
     /**
-     * @param string $providerid
-     * @param int $courseid
+     * Imports the course calendar events into the Moodle course calendar.
+     *
+     * Only events not linked to Classroom content are imported: content
+     * events are already covered when their module is created.
+     *
+     * @param  string $providerid Classroom course id.
+     * @param  int    $courseid   Moodle course id.
      * @return array
-     * @throws Google_Exception
-     * @throws ReflectionException
      * @throws coding_exception
      * @throws invalid_parameter_exception
      * @throws moodle_exception
      */
     public static function importcalendar(string $providerid, int $courseid): array {
-        global $CFG, $USER;
-        require_once($CFG->dirroot . '/course/lib.php');
-        require_once($CFG->dirroot . '/user/externallib.php');
+        global $USER;
+
         self::validate_parameters(
             self::importcalendar_parameters(), [
                 'providerid' => $providerid,
@@ -81,76 +79,50 @@ class importcalendar_external extends external_api {
             ]
         );
         $provider = new google();
-        $courseclassroom = $provider->get_course($providerid);
-        // Needs the same client as for the first login, if a new client or provider with other scopes is created, it skips it because it is already logged in.
-        $gdrvieclient = $provider->get_client();
-        $tokenjson = json_decode($gdrvieclient->getAccessToken(), true);
-        $service = new Google_Service_Calendar($gdrvieclient);
-        $calendarid = accessProtected($courseclassroom->data->providerdata, 'modelData')['calendarId'];
-        $optParams = array(
-            'maxResults' => 100,
-            'orderBy' => 'startTime',
-            'singleEvents' => true,
-            'timeMin' => date('c'),
-        );
-        $results = $service->events->listEvents($calendarid, $optParams);
-        /** @var Google_Service_Calendar_Event[] $googleevents */
-        $googleevents = $results->getItems();
-        if (empty($googleevents)) {
+        $resevents = $provider->get_calendar_events($providerid);
+        if (!$resevents->success) {
+            print_trace('importfileerror', 'danger',
+                ['name' => $providerid, 'error' => $resevents->error->to_string()]);
+            return ['success' => false, 'errors' => $resevents->error->to_string(), 'id' => $courseid];
+        }
+
+        // Discard the events tied to course contents.
+        $events = array_filter($resevents->data, static function ($event) {
+            return !$event->isclassroom;
+        });
+
+        if (empty($events)) {
             print_trace('noteventsfound', 'warning');
         } else {
-            // First we discard here the events related to course contents, as their calendar event is already created when creating the mod.
-            foreach ($googleevents as $key => $googleevent) {
-                // There is no other way to distinguish classroom calendar events from those created manually in the same calendar.
-                if (strripos($googleevent->getDescription(), 'https://classroom.google.com') !== false) {
-                    unset($googleevents[$key]);
-                }
-            }
-            print_trace('eventsfound', 'warning', count($googleevents));
-            foreach ($googleevents as $googleevent) {
-                $start = $googleevent->getStart()->dateTime;
-                if (empty($start)) {
-                    $start = $googleevent->getStart()->date;
-                }
-                $end = $googleevent->getEnd()->dateTime;
-                if (empty($end)) {
-                    $end = $googleevent->getEnd()->date;
-                }
-                $start = strtotime($start);
-                $end = strtotime($end);
-
-                $modeldata = accessProtected($googleevent, 'modelData');
+            print_trace('eventsfound', 'warning', count($events));
+            foreach ($events as $googleevent) {
                 // TODO template.
-                $summary = html_writer::tag('p', $googleevent->getDescription());
+                $summary = html_writer::tag('p', $googleevent->description);
                 // TODO replace link to Meet Conference for a Zoom, BigBlue, etc resource.
-                if (isset($modeldata['conferenceData']['entryPoints']) && count($modeldata['conferenceData']['entryPoints']) > 0) {
-                    foreach($modeldata['conferenceData']['entryPoints'] as $entrypoint) {
-                        if ($entrypoint['entryPointType'] === 'video') {
-                            $summary.= '<hr>';
-                            $summary .= html_writer::link($entrypoint['uri'], get_string('conference', 'local_tresipuntimportgc'), ['target' => 'blank']);
-                        }
-                    }
+                foreach ($googleevent->conferencelinks as $link) {
+                    $summary .= '<hr>';
+                    $summary .= html_writer::link($link,
+                        get_string('conference', 'local_tresipuntimportgc'), ['target' => 'blank']);
                 }
-                // TODO replace files of event link for.... ???
-                if (isset($modeldata['attachments']) && count($modeldata['attachments']) > 0) {
-                    $summary.= '<hr>';
+                if (!empty($googleevent->attachments)) {
+                    $summary .= '<hr>';
                     $summary .= html_writer::tag('h5', get_string('files'));
-                    foreach($modeldata['attachments'] as $attachment) {
-                        $summary .= html_writer::link($attachment['fileUrl'], $attachment['title'], ['target' => '_blank']);
+                    foreach ($googleevent->attachments as $attachment) {
+                        $summary .= html_writer::link($attachment->url, $attachment->title, ['target' => '_blank']);
                     }
                 }
                 if ($googleevent->location !== '') {
-                    $summary.= '<hr>';
+                    $summary .= '<hr>';
                     $summary .= html_writer::tag('h5', get_string('location', 'moodle'));
                     $summary .= html_writer::tag('p', $googleevent->location);
-                    $summary.= '<br>';
+                    $summary .= '<br>';
                 }
 
                 $event = new stdClass();
                 $event->eventtype = 'course';
-                $event->checkcapability  = false; // user must have event creation permissions
+                $event->checkcapability = false; // User must have event creation permissions.
                 $event->type = CALENDAR_EVENT_COURSE;
-                $event->name = $googleevent->getSummary();
+                $event->name = $googleevent->title;
                 $event->description = $summary;
                 $event->format = FORMAT_HTML;
                 $event->courseid = $courseid;
@@ -158,18 +130,16 @@ class importcalendar_external extends external_api {
                 $event->userid = $USER->id;
                 $event->modulename = '0';
                 $event->instance = 0;
-                $event->timestart = $start;
+                $event->timestart = $googleevent->timestart;
                 $event->visible = 1;
-                $event->timeduration = $end - $start;
+                $event->timeduration = $googleevent->timeduration;
                 calendar_event::create($event);
             }
         }
-        $errors = [];
 
-        // TODO response
         return [
             'success' => true,
-            'errors' => $errors,
+            'errors' => '',
             'id' => $courseid
         ];
     }

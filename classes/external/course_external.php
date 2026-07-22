@@ -96,7 +96,7 @@ class course_external extends external_api {
                 $factory = new factory($provider);
                 $res = $factory->create_course($providerid, $moodlecategory->id, $fullname, $shortname, $visible, $importfiles);
                 $success = $res->success;
-                $errors = $res->error->to_string();
+                $errors = $res->error ? $res->error->to_string() : '';
                 $id = $res->success ? $res->data : null;
             } else {
                 $success = false;

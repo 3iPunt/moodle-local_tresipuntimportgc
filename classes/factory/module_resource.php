@@ -27,16 +27,10 @@ namespace local_tresipuntimportgc\factory;
 use coding_exception;
 use context_module;
 use dml_exception;
-use file_exception;
-use Google_Exception;
-use Google_Http_Request;
-use Google_Service_Drive;
 use local_tresipuntimportgc\providers\google;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response_module;
 use mod_resource_generator;
-use moodle_exception;
-use stored_file_creation_exception;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -106,40 +100,27 @@ class module_resource extends module {
     }
 
     /**
-     * @param $res
-     * @throws Google_Exception
-     * @throws file_exception
-     * @throws moodle_exception
-     * @throws stored_file_creation_exception
+     * Imports the Drive file of the material into the resource file area.
+     *
+     * @param  object $res Generator result (with cmid).
+     * @return void
      * @throws coding_exception
      */
-    private function add_file($res) {
+    private function add_file($res): void {
         global $USER;
-        $context = context_module::instance($res->cmid);
-        $fs = get_file_storage();
-        $provider = new google();
-        $gdrvieclient = $provider->get_client();
-        $tokenjson = json_decode($gdrvieclient->getAccessToken(), true);
-        $service = new Google_Service_Drive($gdrvieclient);
-        if (array_key_first_compatible($this->material) === 'driveFile') {
-            try {
-                $file = $service->files->get($this->material['driveFile']['driveFile']['id']);
-                import_file(
-                    $fs,
-                    $file,
-                    $service,
-                    $context->id,
-                    (int)$USER->id,
-                    $tokenjson['access_token'],
-                    'mod_resource',
-                    'content',
-                    '/'
-                );
-            } catch (Exception $e) {
-                print "An error occurred: " . $e->getMessage();
-            }
-        }
 
+        $context = context_module::instance($res->cmid);
+        if (array_key_first_compatible($this->material) === 'driveFile') {
+            local_tresipuntimportgc_import_drive_file(
+                new google(),
+                $this->material['driveFile']['driveFile']['id'],
+                $context->id,
+                (int) $USER->id,
+                'mod_resource',
+                'content',
+                '/'
+            );
+        }
     }
 
 

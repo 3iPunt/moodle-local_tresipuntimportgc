@@ -19,7 +19,7 @@ namespace local_tresipuntimportgc\maps\modules;
 use coding_exception;
 use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\factory\module_form;
-use local_tresipuntimportgc\providers\google;
+use local_tresipuntimportgc\providers\provider;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -36,11 +36,11 @@ class gc_mod_coursework_shortq_map extends gc_mod_map  {
      * Get Module.
      *
      * @param $module
-     * @param google $provider
+     * @param provider $provider
      * @return module
      * @throws coding_exception
      */
-    public function get_mod($module, google $provider): module {
+    public function get_mod($module, provider $provider): module {
         $visible = $module['state'] === 'PUBLISHED';
         $section = $module['topicId'] ?? '';
         $mats = $module['materials'] ?? [];

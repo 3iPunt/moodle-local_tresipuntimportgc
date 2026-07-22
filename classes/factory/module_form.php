@@ -26,8 +26,6 @@ namespace local_tresipuntimportgc\factory;
 
 use coding_exception;
 use dml_exception;
-use Google_Service_Drive;
-use Google_Service_Forms_Form;
 use local_tresipuntimportgc\providers\google;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response_module;
@@ -78,26 +76,14 @@ class module_form extends module {
             $this->modname = 'mod_feedback';
         }
         if (isset($module['materials'][0]) && array_key_first_compatible($module['materials'][0]) === 'form' && count($module['materials']) === 1) {
-            // TODO find out how to get the id of the form to be able to make the request
             $formurl = $module['materials'][0]['form']['formUrl'];
-            $gdrvieclient = $this->provider->get_client();
-            $service = new Google_Service_Drive($gdrvieclient);
-            $allforms = $service->files->listFiles(['q' => "mimeType = 'application/vnd.google-apps.form'"]);
-            foreach($allforms->getItems() as $form) {
-                $dataform = $this->provider->get_form($form['id']);
-                if (assert($dataform instanceof Google_Service_Forms_Form) && $dataform->getResponderUri() === $formurl) {
-                    $currentform = $dataform;
-                    break;
-                }
+            // Only forms the connected account can edit are readable via API;
+            // forms owned by another teacher will simply not be found.
+            $resform = $this->provider->get_form_by_url($formurl);
+            if ($resform->success && $resform->data !== null) {
+                $this->intro = $resform->data->description;
+                // TODO when isquiz, import questions once the Forms API mapping lands.
             }
-            if (isset($currentform)) {
-                $this->intro = $currentform->getInfo()->description;
-                if ((int)$currentform->getSettings()->getQuizSettings()->getIsQuiz() === 1) {
-                    // TODO start logic.
-                }
-            }
-            // TODO the user is not the author of the form, so it cannot be imported (trace??).
-            //print_object($currentform);
         }
         parent::__construct($this->modname, $providersection, $module['title'], $intro, $visible);
     }

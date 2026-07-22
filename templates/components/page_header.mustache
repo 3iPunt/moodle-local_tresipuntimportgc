@@ -1,0 +1,58 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+  @template local_tresipuntimportgc/components/page_header
+
+  Co-branded page header (C11): Tresipunt + Google Classroom marks on the
+  left block, bold title with optional status badge and muted description on
+  the right block.
+
+  Context variables required for this template:
+  * logotresipunt - URL of the Tresipunt horizontal logo (pix)
+  * logotresipunticon - URL of the Tresipunt square icon (pix)
+  * logoclassroom - URL of the Classroom isotype (pix)
+  * title - page title
+  * description - one-line muted description
+  * hasstatus - whether to show the status badge
+  * statuslabel - badge text
+  * statusclass - badge modifier class (tipgc-badge-*)
+
+  Example context (json):
+  {
+    "logotresipunt": "#", "logotresipunticon": "#", "logoclassroom": "#",
+    "title": "Importar cursos de Google Classroom",
+    "description": "Elige las clases y su configuración.",
+    "hasstatus": false, "statuslabel": "", "statusclass": ""
+  }
+}}
+<div class="tipgc-header d-flex flex-wrap align-items-stretch">
+    <div class="tipgc-header-brands d-flex align-items-center">
+        <img src="{{ logotresipunt }}" alt="Tresipunt" class="tipgc-logo-full" height="42">
+        <img src="{{ logotresipunticon }}" alt="Tresipunt" class="tipgc-logo-mark" height="42">
+        <span class="tipgc-header-divider" aria-hidden="true"></span>
+        <img src="{{ logoclassroom }}" alt="Google Classroom" height="42">
+    </div>
+    <div class="tipgc-header-text d-flex flex-column justify-content-center">
+        <div class="d-flex align-items-center flex-wrap">
+            <h1 class="tipgc-header-title h2 m-0">{{ title }}</h1>
+            {{# hasstatus }}
+                <span class="tipgc-badge {{ statusclass }} ml-2 ms-2">{{ statuslabel }}</span>
+            {{/ hasstatus }}
+        </div>
+        <p class="tipgc-header-desc m-0">{{ description }}</p>
+    </div>
+</div>

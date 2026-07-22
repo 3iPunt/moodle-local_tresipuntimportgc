@@ -57,4 +57,13 @@ class folder  {
         $this->link = $link;
     }
 
+    /**
+     * Provider (Drive) id of the folder.
+     *
+     * @return string
+     */
+    public function get_providerid(): string {
+        return $this->providerid;
+    }
+
 }

@@ -40,4 +40,18 @@ $capabilities = array(
         ),
     ),
 
+    // View the imports panel (history, detail and traces).
+    'local/tresipuntimportgc:viewreports' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'student' => CAP_PROHIBIT,
+            'guest' => CAP_PROHIBIT,
+            'teacher' => CAP_PROHIBIT,
+            'editingteacher' => CAP_PROHIBIT,
+            'coursecreator' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ),
+    ),
+
 );

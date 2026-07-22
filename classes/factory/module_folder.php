@@ -27,17 +27,10 @@ namespace local_tresipuntimportgc\factory;
 use coding_exception;
 use context_module;
 use dml_exception;
-use Exception;
-use file_exception;
-use Google_Exception;
-use Google_Http_Request;
-use Google_Service_Drive;
 use local_tresipuntimportgc\providers\google;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response_module;
 use mod_folder_generator;
-use moodle_exception;
-use stored_file_creation_exception;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -108,39 +101,28 @@ class module_folder extends module {
     }
 
     /**
-     * @param $res
-     * @throws Google_Exception
-     * @throws file_exception
-     * @throws moodle_exception
-     * @throws stored_file_creation_exception
+     * Imports the Drive files of the materials into the folder file area.
+     *
+     * @param  object $res Generator result (with cmid).
+     * @return void
      * @throws coding_exception
      */
-    private function add_files($res) {
+    private function add_files($res): void {
         global $USER;
+
         $context = context_module::instance($res->cmid);
-        $fs = get_file_storage();
         $provider = new google();
-        $gdrvieclient = $provider->get_client();
-        $tokenjson = json_decode($gdrvieclient->getAccessToken(), true);
-        $service = new Google_Service_Drive($gdrvieclient);
         foreach ($this->materials as $material) {
             if (array_key_first_compatible($material) === 'driveFile') {
-                try {
-                    $file = $service->files->get($material['driveFile']['driveFile']['id']);
-                    import_file(
-                        $fs,
-                        $file,
-                        $service,
-                        $context->id,
-                        (int)$USER->id,
-                        $tokenjson['access_token'],
-                        'mod_folder',
-                        'content',
-                        '/'
-                    );
-                } catch (Exception $e) {
-                    print "An error occurred: " . $e->getMessage();
-                }
+                local_tresipuntimportgc_import_drive_file(
+                    $provider,
+                    $material['driveFile']['driveFile']['id'],
+                    $context->id,
+                    (int) $USER->id,
+                    'mod_folder',
+                    'content',
+                    '/'
+                );
             }
         }
     }

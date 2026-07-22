@@ -23,7 +23,7 @@ use local_tresipuntimportgc\factory\module_assign;
 use local_tresipuntimportgc\factory\module_form;
 use local_tresipuntimportgc\factory\module_label;
 use local_tresipuntimportgc\factory\module_formz;
-use local_tresipuntimportgc\providers\google;
+use local_tresipuntimportgc\providers\provider;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -40,12 +40,12 @@ class gc_mod_coursework_assignment_map extends gc_mod_map {
      * Get Module.
      *
      * @param $module
-     * @param google $provider
+     * @param provider $provider
      * @return module
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function get_mod($module, google $provider): module {
+    public function get_mod($module, provider $provider): module {
         $visible = $module['state'] === 'PUBLISHED';
         $section = $module['topicId'] ?? '';
         $mats = $module['materials'] ?? [];

@@ -19,7 +19,7 @@ namespace local_tresipuntimportgc\maps\modules;
 use coding_exception;
 use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\maps\materials\gc_mat_map;
-use local_tresipuntimportgc\providers\google;
+use local_tresipuntimportgc\providers\provider;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -93,10 +93,10 @@ abstract class gc_mod_map {
      * Get Module.
      *
      * @param $module
-     * @param google $provider
+     * @param provider $provider
      * @return module
      * @throws coding_exception
      */
-    abstract public function get_mod($module, google $provider): module;
+    abstract public function get_mod($module, provider $provider): module;
 
 }

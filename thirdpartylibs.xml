@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<libraries>
+  <library>
+    <location>.extlib/vendor</location>
+    <name>Google APIs Client Library for PHP (and Composer dependencies)</name>
+    <description>google/apiclient pruned to the Classroom, Drive, Calendar, Forms and Oauth2
+      services, plus its dependencies (google/auth, guzzlehttp/guzzle, guzzlehttp/psr7,
+      guzzlehttp/promises, psr/*, monolog/monolog, firebase/php-jwt, ralouphie/getallheaders,
+      symfony polyfills). Managed with the composer.json at the plugin root.</description>
+    <license>Apache-2.0</license>
+    <version>2.19.4</version>
+    <repository>https://github.com/googleapis/google-api-php-client</repository>
+  </library>
+</libraries>

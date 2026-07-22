@@ -1,0 +1,28 @@
+{
+    "name": "tresipunt/local_tresipuntimportgc",
+    "description": "Third-party dependencies for the Google Classroom import plugin (vendored under .extlib).",
+    "license": "GPL-3.0-or-later",
+    "type": "project",
+    "require": {
+        "google/apiclient": "^2.19"
+    },
+    "config": {
+        "vendor-dir": ".extlib/vendor",
+        "platform": {
+            "php": "8.1"
+        },
+        "optimize-autoloader": true
+    },
+    "scripts": {
+        "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
+    },
+    "extra": {
+        "google/apiclient-services": [
+            "Classroom",
+            "Drive",
+            "Calendar",
+            "Forms",
+            "Oauth2"
+        ]
+    }
+}
