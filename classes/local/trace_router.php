@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Routes legacy print_trace() calls to the persistent logger.
+ * Routes import traces to the persistent logger (and the task log in CLI).
  *
  * @package    local_tresipuntimportgc
  * @copyright  2026 3iPunt (contacte@tresipunt.com)
@@ -26,11 +26,8 @@ namespace local_tresipuntimportgc\local;
 
 /**
  * Static registry: while an import course runs, its logger is set here and
- * every print_trace() call is persisted as a trace of that course.
- *
- * Bridge for the progressive adaptation: the factories still call the global
- * print_trace(); registering a logger here captures those traces without
- * touching every call site.
+ * every trace() call is persisted as a trace of that course. In CLI (cron,
+ * adhoc tasks) the trace is also written to the task log via mtrace().
  *
  * @package    local_tresipuntimportgc
  * @copyright  2026 3iPunt (contacte@tresipunt.com)
@@ -58,5 +55,34 @@ class trace_router {
      */
     public static function get_logger(): ?logger {
         return self::$logger;
+    }
+
+    /**
+     * Persists one trace of the running import course.
+     *
+     * The message is a string id of the plugin; the legacy visual types
+     * ('danger', 'light', 'primary'...) are collapsed into the three levels
+     * of the persistent log (error, warning, info).
+     *
+     * @param  string $traceid String id of the message.
+     * @param  string $type    Trace type (error/danger, warning, rest = info).
+     * @param  mixed  $param   Optional parameter for the string.
+     * @return void
+     * @throws \coding_exception
+     */
+    public static function trace(string $traceid, string $type, $param = null): void {
+        $message = get_string($traceid, 'local_tresipuntimportgc', $param);
+        if (self::$logger !== null) {
+            if ($type === 'danger' || $type === 'error') {
+                self::$logger->error($message);
+            } else if ($type === 'warning') {
+                self::$logger->warning($message);
+            } else {
+                self::$logger->info($message);
+            }
+        }
+        if (defined('CLI_SCRIPT') && CLI_SCRIPT) {
+            mtrace('  ' . strip_tags($message));
+        }
     }
 }

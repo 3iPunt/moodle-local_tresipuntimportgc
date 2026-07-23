@@ -75,6 +75,9 @@ class import_view implements renderable, templatable {
     /** @var string Error message from the provider, if any. */
     private $errormsg;
 
+    /** @var bool Whether the current user can open the imports panel. */
+    private $canviewpanel;
+
     /**
      * Constructor.
      *
@@ -88,6 +91,7 @@ class import_view implements renderable, templatable {
      * @param string      $authurl            OAuth consent URL.
      * @param bool        $isadmin            User can reach site settings.
      * @param string      $errormsg           Provider error message, if any.
+     * @param bool        $canviewpanel       User can open the imports panel.
      */
     public function __construct(
         string $state,
@@ -99,7 +103,8 @@ class import_view implements renderable, templatable {
         ?string $accountemail = null,
         string $authurl = '',
         bool $isadmin = false,
-        string $errormsg = ''
+        string $errormsg = '',
+        bool $canviewpanel = false
     ) {
         $this->state = $state;
         $this->courses = $courses;
@@ -111,6 +116,7 @@ class import_view implements renderable, templatable {
         $this->authurl = $authurl;
         $this->isadmin = $isadmin;
         $this->errormsg = $errormsg;
+        $this->canviewpanel = $canviewpanel;
     }
 
     /**
@@ -126,7 +132,9 @@ class import_view implements renderable, templatable {
             'logotresipunticon' => $output->image_url('tresipunt_icon', 'local_tresipuntimportgc')->out(false),
             'logoclassroom' => $output->image_url('icon', 'local_tresipuntimportgc')->out(false),
             'title' => get_string('import_page', 'local_tresipuntimportgc'),
-            'description' => get_string('selection_desc', 'local_tresipuntimportgc'),
+            'description' => ($this->state === 'list')
+                ? get_string('selection_desc', 'local_tresipuntimportgc')
+                : get_string('connect_intro', 'local_tresipuntimportgc'),
             'hasstatus' => false,
             'statuslabel' => '',
             'statusclass' => '',
@@ -150,6 +158,8 @@ class import_view implements renderable, templatable {
         $data->calendaroptions = $this->calendaroptions;
         $data->sesskey = sesskey();
         $data->actionurl = (new moodle_url('/local/tresipuntimportgc/import.php'))->out(false);
+        $data->canviewpanel = $this->canviewpanel;
+        $data->panelurl = (new moodle_url('/local/tresipuntimportgc/panel.php'))->out(false);
         return $data;
     }
 }

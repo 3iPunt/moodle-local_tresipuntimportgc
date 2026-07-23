@@ -15,25 +15,26 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The local_tresipuntimportgc import Google Classroom Course.
+ * A Google Classroom class was imported as a Moodle course.
  *
- * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    local_tresipuntimportgc
+ * @copyright  2026 3iPunt (contacte@tresipunt.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_tresipuntimportgc\event;
 
 use core\event\base;
-use stdClass;
+use local_tresipuntimportgc\models\import_course;
+use moodle_url;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * gc_course_imported
+ * Triggered by the import task when a course finishes importing successfully.
  *
  * @package    local_tresipuntimportgc
- * @copyright  2021 Tresipunt
+ * @copyright  2026 3iPunt (contacte@tresipunt.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class gc_course_imported extends base {
@@ -45,8 +46,29 @@ class gc_course_imported extends base {
      */
     protected function init() {
         $this->data['crud'] = 'c';
-        $this->data['objecttable'] = 'course';
+        $this->data['objecttable'] = 'local_tresipuntimportgc_course';
         $this->data['edulevel'] = self::LEVEL_OTHER;
+    }
+
+    /**
+     * Builds the event from an import course record.
+     *
+     * @param  import_course $course   Import course (already successful).
+     * @param  int           $courseid Created Moodle course id.
+     * @return self
+     */
+    public static function create_from_course(import_course $course, int $courseid): self {
+        /** @var self $event */
+        $event = self::create([
+            'context' => \context_system::instance(),
+            'objectid' => (int) $course->get('id'),
+            'other' => [
+                'importid' => (int) $course->get('importid'),
+                'courseid' => $courseid,
+                'providerid' => (string) $course->get('providerid'),
+            ],
+        ]);
+        return $event;
     }
 
     /**
@@ -55,7 +77,7 @@ class gc_course_imported extends base {
      * @return string
      */
     public static function get_name(): string {
-        return 'Tresipunt Import Course Google Classroom';
+        return get_string('event_courseimported', 'local_tresipuntimportgc');
     }
 
     /**
@@ -64,53 +86,35 @@ class gc_course_imported extends base {
      * @return string
      */
     public function get_description(): string {
+        return "The user with id '$this->userid' imported the Google Classroom class " .
+            "'{$this->other['providerid']}' as the course with id '{$this->other['courseid']}'.";
+    }
 
-        $res = new stdClass();
-        $res->success = false;
-        $courseid = isset($this->other["courseid"]) ? $this->other["courseid"] : '';
-        $providerid = isset($this->other["providerid"]) ? $this->other["providerid"] : '';
-        if (isset($this->other["response"])) {
-            $response = $this->other["response"];
-            if (!is_array($response)) {
-                $res = json_decode($response);
-            } else {
-                $response = json_encode($response);
-            }
-        } else {
-            $response = '';
-        }
-
-        if (!empty($res->success)) {
-            $msg = "The userid ('$this->relateduserid') create Desktop ID '$desktopid' with Isard Id '$isardid' and template '$templateid'";
-        } else {
-            $msg = "ERROR: The userid ('$this->relateduserid') COULD NOT CREATE Desktop, with Isard Id '$isardid' and template '$templateid'." .
-                " Response: " . $response;
-        }
-        return $msg;
+    /**
+     * Progress page of the import run.
+     *
+     * @return moodle_url
+     */
+    public function get_url(): moodle_url {
+        return new moodle_url('/local/tresipuntimportgc/progress.php',
+            ['id' => $this->other['importid']]);
     }
 
     /**
      * Custom validation.
      *
-     * @throws \coding_exception
      * @return void
+     * @throws \coding_exception
      */
     protected function validate_data() {
         parent::validate_data();
-
-        if (!isset($this->relateduserid)) {
-            throw new \coding_exception('The \'relateduserid\' must be set.');
+        if (!isset($this->other['importid'])) {
+            throw new \coding_exception('The \'importid\' value must be set in other.');
         }
-
-        if (!isset($this->other['response'])) {
-            throw new \coding_exception('The \'response\' value must be set in other.');
-        }
-
         if (!isset($this->other['courseid'])) {
             throw new \coding_exception('The \'courseid\' value must be set in other.');
         }
-
-        if (!isset($this->other['courseid'])) {
+        if (!isset($this->other['providerid'])) {
             throw new \coding_exception('The \'providerid\' value must be set in other.');
         }
     }

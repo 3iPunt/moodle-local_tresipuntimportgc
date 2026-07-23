@@ -32,6 +32,7 @@ require_once('./lib.php');
 global $PAGE, $OUTPUT, $USER;
 
 use core\output\notification;
+use local_tresipuntimportgc\local\helper;
 use local_tresipuntimportgc\local\importer;
 use local_tresipuntimportgc\output\import_view;
 use local_tresipuntimportgc\providers\google;
@@ -73,7 +74,7 @@ if ($action === 'import') {
         }
         $shortname = clean_param(trim($item['shortname'] ?? ''), PARAM_TEXT);
         if ($shortname === '') {
-            $shortname = strtolower(str_replace(' ', '_', normalize_str($item['fullname'])));
+            $shortname = helper::shortname_slug($item['fullname']);
         }
         $configs[] = [
             'providerid' => clean_param($item['providerid'], PARAM_RAW_TRIMMED),
@@ -128,7 +129,7 @@ if (!$provider->is_configured()) {
             'section' => $d->section ?? ($d->room ?? ''),
             'archived' => ($d->courseState ?? '') === 'ARCHIVED',
             'link' => $d->alternateLink ?? '',
-            'defaultshortname' => strtolower(str_replace(' ', '_', normalize_str($d->name ?? ''))),
+            'defaultshortname' => helper::shortname_slug($d->name ?? ''),
         ];
     }
     $categories = [];
@@ -156,7 +157,8 @@ if (!$provider->is_configured()) {
     ];
     $view = new import_view('list', $courses, $categories, $allowconfig, $filesoptions,
         $calendaroptions, $provider->get_account_email(), $provider->get_auth_url(),
-        $isadmin, $errormsg);
+        $isadmin, $errormsg,
+        has_capability('local/tresipuntimportgc:viewreports', context_system::instance()));
 }
 
 $renderer = $PAGE->get_renderer('local_tresipuntimportgc');

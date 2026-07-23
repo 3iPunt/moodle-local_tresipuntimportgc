@@ -93,14 +93,22 @@ define([
     };
 
     /**
-     * Updates the counter and the import button state.
+     * Updates the counter, the import button state and the row highlight.
      */
     var refreshFooter = function() {
+        rows().forEach(function(row) {
+            row.classList.toggle('tipgc-selected',
+                row.querySelector('[data-action="toggle"]').checked);
+        });
         var count = selectedRows().length;
         var importbtn = root.querySelector('[data-action="import"]');
         importbtn.disabled = count === 0;
         Str.get_string('nselected', 'local_tresipuntimportgc', count).then(function(s) {
             root.querySelector('[data-region="selected-note"]').textContent = s;
+            var countnote = root.querySelector('[data-region="count-note"]');
+            if (countnote) {
+                countnote.textContent = count > 0 ? s : '';
+            }
             return s;
         }).catch(Notification.exception);
         var selectall = root.querySelector('[data-action="selectall"]');

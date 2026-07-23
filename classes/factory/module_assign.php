@@ -27,6 +27,7 @@ namespace local_tresipuntimportgc\factory;
 use coding_exception;
 use context_module;
 use dml_exception;
+use local_tresipuntimportgc\local\drive_files;
 use local_tresipuntimportgc\providers\google;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response_module;
@@ -127,8 +128,8 @@ class module_assign extends module {
         $context = context_module::instance($res->cmid);
         $provider = new google();
         foreach ($this->materials as $material) {
-            if (array_key_first_compatible($material) === 'driveFile') {
-                local_tresipuntimportgc_import_drive_file(
+            if (array_key_first($material) === 'driveFile') {
+                drive_files::import(
                     $provider,
                     $material['driveFile']['driveFile']['id'],
                     $context->id,

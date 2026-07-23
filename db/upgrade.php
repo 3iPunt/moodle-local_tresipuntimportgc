@@ -111,5 +111,25 @@ function xmldb_local_tresipuntimportgc_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2026072201, 'local', 'tresipuntimportgc');
     }
 
+    if ($oldversion < 2026072301) {
+        // Settings cleanup (2.0): credentials JSON no longer exists and the
+        // selects only keep the implemented options, so old values are remapped.
+        unset_config('credentialsjson', 'local_tresipuntimportgc');
+
+        if ((int) get_config('local_tresipuntimportgc', 'importfiles') === 2) {
+            // Nextcloud option removed: fall back to "do not import".
+            set_config('importfiles', 3, 'local_tresipuntimportgc');
+        }
+        if ((int) get_config('local_tresipuntimportgc', 'calendarimport') !== 1) {
+            set_config('calendarimport', 2, 'local_tresipuntimportgc');
+        }
+        if ((int) get_config('local_tresipuntimportgc', 'formsimport') === 1) {
+            // Quiz conversion was never implemented: fall back to embed.
+            set_config('formsimport', 0, 'local_tresipuntimportgc');
+        }
+
+        upgrade_plugin_savepoint(true, 2026072301, 'local', 'tresipuntimportgc');
+    }
+
     return true;
 }

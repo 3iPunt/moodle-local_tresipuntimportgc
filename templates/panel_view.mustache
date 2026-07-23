@@ -1,0 +1,135 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+  @template local_tresipuntimportgc/panel_view
+
+  Imports panel: site-wide history with status filters, search and paging.
+
+  Context variables required for this template:
+  * header - context for components/page_header
+  * rows - table rows
+  * hasrows, emptysite, noresults, hasfilters, cronstalled - state flags
+  * statuschips - {key, label, active}
+  * search, pagingnote, pagingbar, selectionurl, panelurl
+
+  Example context (json):
+  {
+    "header": {}, "rows": [], "hasrows": false, "emptysite": true,
+    "noresults": false, "hasfilters": false, "cronstalled": false,
+    "statuschips": [], "search": "", "pagingnote": "", "pagingbar": "",
+    "selectionurl": "#", "panelurl": "#"
+  }
+}}
+<div class="local-tipgc" data-region="tipgc-panel">
+    <div class="d-flex align-items-start justify-content-between flex-wrap">
+        <div class="flex-grow-1 min-w-0">
+            {{#header}}{{> local_tresipuntimportgc/components/page_header }}{{/header}}
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end mt-3 mb-3">
+        <a class="btn btn-primary" href="{{ selectionurl }}">{{# str }} newimport, local_tresipuntimportgc {{/ str }}</a>
+    </div>
+
+    {{# cronstalled }}
+        <div class="alert alert-warning" role="alert">
+            <strong>{{# str }} cronpanel_title, local_tresipuntimportgc {{/ str }}</strong><br>
+            {{# str }} cron_desc, local_tresipuntimportgc {{/ str }}
+        </div>
+    {{/ cronstalled }}
+
+    {{# emptysite }}
+        <div class="tipgc-card tipgc-empty text-center p-5">
+            <h4>{{# str }} panel_empty_title, local_tresipuntimportgc {{/ str }}</h4>
+            <p class="text-muted">{{# str }} panel_empty_desc, local_tresipuntimportgc {{/ str }}</p>
+            <a class="btn btn-primary" href="{{ selectionurl }}">{{# str }} newimport, local_tresipuntimportgc {{/ str }}</a>
+        </div>
+    {{/ emptysite }}
+
+    {{^ emptysite }}
+        <form method="get" action="{{ panelurl }}" class="tipgc-card p-3 mb-3">
+            <div class="d-flex align-items-center flex-wrap tipgc-toolbar">
+                <div class="tipgc-chips" role="group">
+                    {{# statuschips }}
+                        <button type="submit" name="status" value="{{# active }}{{/ active }}{{^ active }}{{ key }}{{/ active }}"
+                                class="tipgc-chip {{# active }}active{{/ active }}">{{ label }}</button>
+                    {{/ statuschips }}
+                </div>
+                <input type="text" name="search" value="{{ search }}" class="form-control tipgc-search ml-2 ms-2"
+                       placeholder="{{# str }} panel_searchplaceholder, local_tresipuntimportgc {{/ str }}"
+                       aria-label="{{# str }} panel_searchplaceholder, local_tresipuntimportgc {{/ str }}">
+                <button type="submit" class="btn btn-secondary ml-2 ms-2">{{# str }} search, core {{/ str }}</button>
+                {{# hasfilters }}
+                    <a href="{{ panelurl }}" class="btn btn-link">{{# pix }} clear, local_tresipuntimportgc {{/ pix }}{{# str }} clearselection, local_tresipuntimportgc {{/ str }}</a>
+                {{/ hasfilters }}
+            </div>
+        </form>
+
+        {{# noresults }}
+            <div class="tipgc-card tipgc-empty text-center p-5">
+                <h4>{{# str }} panel_noresults_title, local_tresipuntimportgc {{/ str }}</h4>
+                <p class="text-muted">{{# str }} panel_noresults_desc, local_tresipuntimportgc {{/ str }}</p>
+                <a class="btn btn-secondary" href="{{ panelurl }}">{{# str }} clearselection, local_tresipuntimportgc {{/ str }}</a>
+            </div>
+        {{/ noresults }}
+
+        {{# hasrows }}
+            <div class="tipgc-card tipgc-table-wrap">
+                <table class="tipgc-table w-100">
+                    <thead>
+                        <tr>
+                            <th>{{# str }} col_date, local_tresipuntimportgc {{/ str }}</th>
+                            <th>{{# str }} col_user, local_tresipuntimportgc {{/ str }}</th>
+                            <th>{{# str }} col_courses, local_tresipuntimportgc {{/ str }}</th>
+                            <th>{{# str }} col_status, local_tresipuntimportgc {{/ str }}</th>
+                            <th class="text-right text-end"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{# rows }}
+                            <tr class="{{# active }}tipgc-row-active{{/ active }}">
+                                <td class="text-nowrap">{{ date }}</td>
+                                <td>
+                                    {{ user }}
+                                    {{# account }}<div class="tipgc-mono tipgc-account-cell">{{ account }}</div>{{/ account }}
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center tipgc-minibar-cell">
+                                        <div class="tipgc-progressbar tipgc-minibar" aria-hidden="true">
+                                            <div class="tipgc-progressbar-seg tipgc-seg-success" style="width: {{ psuccess }}%"></div>
+                                            <div class="tipgc-progressbar-seg tipgc-seg-error" style="width: {{ perror }}%"></div>
+                                            <div class="tipgc-progressbar-seg tipgc-seg-running" style="width: {{ prunning }}%"></div>
+                                        </div>
+                                        <span class="tipgc-mono ml-2 ms-2">{{ ratio }}</span>
+                                    </div>
+                                </td>
+                                <td><span class="tipgc-badge {{ statusclass }}">{{ statuslabel }}</span></td>
+                                <td class="text-right text-end text-nowrap">
+                                    <a href="{{ detailurl }}" class="btn btn-outline-secondary btn-sm">{{# str }} viewdetail, local_tresipuntimportgc {{/ str }}{{# pix }} chevronright, local_tresipuntimportgc {{/ pix }}</a>
+                                </td>
+                            </tr>
+                        {{/ rows }}
+                    </tbody>
+                </table>
+                <div class="d-flex align-items-center justify-content-between flex-wrap tipgc-table-foot px-3 py-2">
+                    <span class="text-muted small">{{ pagingnote }}</span>
+                    <div>{{{ pagingbar }}}</div>
+                </div>
+            </div>
+        {{/ hasrows }}
+    {{/ emptysite }}
+</div>

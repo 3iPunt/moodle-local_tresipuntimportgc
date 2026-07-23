@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Import run progress page (minimal: refreshes itself while the run is open).
+ * Import run progress page: live polling mode and historic mode.
  *
  * @package    local_tresipuntimportgc
  * @copyright  2026 3iPunt (contacte@tresipunt.com)
@@ -41,8 +41,8 @@ require_capability('local/tresipuntimportgc:import', context_system::instance())
 $import = new import($importid);
 
 // Page setup.
-$title = get_string('progress_title', 'local_tresipuntimportgc',
-    userdate($import->get('timecreated'), get_string('strftimedatetimeshort', 'langconfig')));
+$startedon = userdate($import->get('timecreated'), get_string('strftimedatetimeshort', 'langconfig'));
+$title = get_string('progress_title', 'local_tresipuntimportgc', $startedon);
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/tresipuntimportgc/progress.php', ['id' => $importid]);
 $PAGE->set_title($title);
@@ -66,44 +66,76 @@ $runstatus = [
 
 $state = $import->get_status();
 $finished = in_array($state, [import::STATUS_COMPLETED, import::STATUS_PARTIAL, import::STATUS_ERROR], true);
-if (!$finished) {
-    // Cheap live view until the polling page lands: reload every 5 seconds.
-    $PAGE->set_periodic_refresh_delay(5);
-}
 
-$launcher = $DB->get_record('user', ['id' => $import->get('userid')]);
-$run = (object) [
-    'statuslabel' => get_string($runstatus[$state][0], 'local_tresipuntimportgc'),
-    'statusclass' => $runstatus[$state][1],
-    'account' => (string) $import->get('googleaccount'),
-    'launchedby' => $launcher ? fullname($launcher) : '',
-    'startedon' => userdate($import->get('timecreated'), get_string('strftimedatetimeshort', 'langconfig')),
-];
+// Cron health: the queue does not move if scheduled tasks are not running.
+$lastcron = (int) get_config('core', 'lastcronstart');
+$cronstalled = !$finished && (time() - $lastcron > 600);
 
+$counts = ['pending' => 0, 'running' => 0, 'success' => 0, 'error' => 0, 'discarded' => 0];
+$created = [];
 $courses = [];
+$lastlogid = 0;
 foreach ($import->get_courses() as $course) {
     $status = $course->get('status');
+    $counts[$status]++;
     $logs = [];
+    $errorcount = 0;
     foreach ($course->get_logs() as $log) {
+        $lastlogid = max($lastlogid, (int) $log->get('id'));
+        $errorcount += $log->get('level') === 'error' ? 1 : 0;
         $logs[] = [
             'time' => userdate($log->get('timecreated'), get_string('strftimetime24', 'langconfig')),
             'level' => $log->get('level'),
             'message' => format_text($log->get('message'), FORMAT_HTML, ['context' => context_system::instance()]),
         ];
     }
+    $courseurl = $course->get('courseid')
+        ? (new moodle_url('/course/view.php', ['id' => $course->get('courseid')]))->out(false) : '';
+    if ($status === import_course::STATUS_SUCCESS) {
+        $created[] = ['name' => format_string($course->get('fullname')), 'url' => $courseurl];
+    }
     $courses[] = [
+        'id' => (int) $course->get('id'),
+        'status' => $status,
         'fullname' => format_string($course->get('fullname')),
         'statuslabel' => get_string($coursestatus[$status][0], 'local_tresipuntimportgc'),
         'statusclass' => $coursestatus[$status][1],
-        'courseurl' => $course->get('courseid')
-            ? (new moodle_url('/course/view.php', ['id' => $course->get('courseid')]))->out(false) : '',
+        'courseurl' => $courseurl,
+        'canretry' => $status === import_course::STATUS_ERROR,
+        'candiscard' => $status === import_course::STATUS_PENDING,
+        'haserrors' => $errorcount > 0,
+        'errorcount' => $errorcount,
         'haslogs' => count($logs) > 0,
         'logs' => $logs,
     ];
 }
+$total = $counts['pending'] + $counts['running'] + $counts['success'] + $counts['error'];
+$pct = static function (int $n) use ($total): float {
+    return $total > 0 ? round($n / $total * 100, 2) : 0;
+};
+
+$launcher = $DB->get_record('user', ['id' => $import->get('userid')]);
+$run = (object) [
+    'statuslabel' => get_string($runstatus[$state][0], 'local_tresipuntimportgc'),
+    'statusclass' => $runstatus[$state][1],
+    'isactive' => !$finished,
+    'account' => (string) $import->get('googleaccount'),
+    'launchedby' => $launcher ? fullname($launcher) : '',
+    'startedon' => $startedon,
+    'nsuccess' => $counts['success'],
+    'nerror' => $counts['error'],
+    'nrunning' => $counts['running'],
+    'npending' => $counts['pending'],
+    'ntotal' => $total,
+    'psuccess' => $pct($counts['success']),
+    'perror' => $pct($counts['error']),
+    'prunning' => $pct($counts['running']),
+    'created' => $created,
+];
 
 $renderer = $PAGE->get_renderer('local_tresipuntimportgc');
+$view = new progress_view($run, $courses, $finished, $cronstalled, $importid, $lastlogid);
 
 echo $OUTPUT->header();
-echo $renderer->render_progress_view(new progress_view($run, $courses));
+echo $renderer->render_progress_view($view);
 echo $OUTPUT->footer();

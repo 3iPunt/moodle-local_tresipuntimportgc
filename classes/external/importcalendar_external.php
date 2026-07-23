@@ -24,12 +24,13 @@ namespace local_tresipuntimportgc\external;
 
 use calendar_event;
 use coding_exception;
-use external_api;
-use external_function_parameters;
-use external_single_structure;
-use external_value;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_value;
 use html_writer;
 use invalid_parameter_exception;
+use local_tresipuntimportgc\local\trace_router;
 use local_tresipuntimportgc\providers\google;
 use moodle_exception;
 use stdClass;
@@ -37,10 +38,7 @@ use stdClass;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->libdir . '/externallib.php');
-require_once($CFG->dirroot . '/webservice/lib.php');
-require_once($CFG->dirroot . '/local/tresipuntimportgc/lib.php');
-require_once($CFG->dirroot.'/calendar/lib.php');
+require_once($CFG->dirroot . '/calendar/lib.php');
 
 class importcalendar_external extends external_api {
 
@@ -72,6 +70,9 @@ class importcalendar_external extends external_api {
     public static function importcalendar(string $providerid, int $courseid): array {
         global $USER;
 
+        $syscontext = \context_system::instance();
+        self::validate_context($syscontext);
+        require_capability('local/tresipuntimportgc:import', $syscontext);
         self::validate_parameters(
             self::importcalendar_parameters(), [
                 'providerid' => $providerid,
@@ -81,7 +82,7 @@ class importcalendar_external extends external_api {
         $provider = new google();
         $resevents = $provider->get_calendar_events($providerid);
         if (!$resevents->success) {
-            print_trace('importfileerror', 'danger',
+            trace_router::trace('importfileerror', 'danger',
                 ['name' => $providerid, 'error' => $resevents->error->to_string()]);
             return ['success' => false, 'errors' => $resevents->error->to_string(), 'id' => $courseid];
         }
@@ -92,9 +93,9 @@ class importcalendar_external extends external_api {
         });
 
         if (empty($events)) {
-            print_trace('noteventsfound', 'warning');
+            trace_router::trace('noteventsfound', 'warning');
         } else {
-            print_trace('eventsfound', 'warning', count($events));
+            trace_router::trace('eventsfound', 'warning', count($events));
             foreach ($events as $googleevent) {
                 // TODO template.
                 $summary = html_writer::tag('p', $googleevent->description);

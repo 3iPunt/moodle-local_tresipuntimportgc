@@ -144,14 +144,22 @@ class import extends persistent {
     /**
      * Derives the status of the run from the statuses of its courses.
      *
-     * Discarded courses are terminal but neutral: they do not turn a run into
-     * an error nor prevent it from being completed.
-     *
      * @return string One of the STATUS_* constants of this class.
      */
     public function get_status(): string {
-        $counts = $this->get_status_counts();
+        return self::derive_status($this->get_status_counts());
+    }
 
+    /**
+     * Derives a run status from a map of course status counts.
+     *
+     * Discarded courses are terminal but neutral: they do not turn a run into
+     * an error nor prevent it from being completed.
+     *
+     * @param  array $counts Map course status => count.
+     * @return string One of the STATUS_* constants of this class.
+     */
+    public static function derive_status(array $counts): string {
         $pending = $counts[import_course::STATUS_PENDING] ?? 0;
         $running = $counts[import_course::STATUS_RUNNING] ?? 0;
         $success = $counts[import_course::STATUS_SUCCESS] ?? 0;

@@ -20,9 +20,7 @@ use coding_exception;
 use dml_exception;
 use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\factory\module_assign;
-use local_tresipuntimportgc\factory\module_form;
 use local_tresipuntimportgc\factory\module_label;
-use local_tresipuntimportgc\factory\module_formz;
 use local_tresipuntimportgc\providers\provider;
 
 defined('MOODLE_INTERNAL') || die();
@@ -45,7 +43,7 @@ class gc_mod_coursework_assignment_map extends gc_mod_map {
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function get_mod($module, provider $provider): module {
+    public function get_mod($module, provider $provider): ?module {
         $visible = $module['state'] === 'PUBLISHED';
         $section = $module['topicId'] ?? '';
         $mats = $module['materials'] ?? [];
@@ -54,23 +52,16 @@ class gc_mod_coursework_assignment_map extends gc_mod_map {
             modules here. It is only possible to know what kind of module it belongs to by reading "materials", i.e. if it
             contains "form" it is a quiz if it has answers, or feedback if it does not, and is driveFile is a type resource, etc... */
         if (isset($module['materials'][0])) {
-            $firstkey = array_key_first_compatible($module['materials'][0]);
+            $firstkey = array_key_first($module['materials'][0]);
             if ($firstkey === 'form' && count($module['materials']) === 1) {
-                switch ((int)get_config('local_tresipuntimportgc', 'formsimport')) {
-                    case 0:
-                        return new module_label(
-                            $section, $module['title'], $desc, $visible, reset($mats)
-                        );
-                    case 1:
-                        // TODO create a quiz using the google form api (not included in Moodle!!!). Provisionally the form is embedded in a tag
-                        return new module_form(
-                            $section, $module, $desc, $visible, $provider
-                        );
-                    case 2:
-                        return new module_label(
-                            $section, '', '', 0, reset($mats)
-                        );
+                if ((int) get_config('local_tresipuntimportgc', 'formsimport') === 2) {
+                    // Do not import: skip this module entirely.
+                    return null;
                 }
+                // Embed the original Google Form in a label.
+                return new module_label(
+                    $section, $module['title'], $desc, $visible, reset($mats)
+                );
             }
         }
         return new module_assign(

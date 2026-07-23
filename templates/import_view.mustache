@@ -48,8 +48,6 @@
     {{# isconnect }}
         <div class="d-flex justify-content-center py-4">
             <div class="tipgc-card tipgc-connect-card p-4">
-                <h3 class="tipgc-connect-title">{{# str }} connect_title, local_tresipuntimportgc {{/ str }}</h3>
-                <p class="text-muted">{{# str }} connect_intro, local_tresipuntimportgc {{/ str }}</p>
                 <ol class="tipgc-steps list-unstyled">
                     <li><span class="tipgc-step-num">1</span><span>{{# str }} connect_step1, local_tresipuntimportgc {{/ str }}</span></li>
                     <li><span class="tipgc-step-num">2</span><span>{{# str }} connect_step2, local_tresipuntimportgc {{/ str }}</span></li>
@@ -66,7 +64,7 @@
                     <a class="btn btn-primary btn-lg tipgc-btn-connect" href="{{ authurl }}">
                         {{# str }} connect_button, local_tresipuntimportgc {{/ str }}
                     </a>
-                    <p class="text-muted small mt-3 mb-0">{{# str }} connect_revoke, local_tresipuntimportgc {{/ str }}</p>
+                    <p class="text-muted small mt-3 mb-0 tipgc-revoke-note">{{# str }} connect_revoke, local_tresipuntimportgc {{/ str }}</p>
                 {{/ noconfig }}
             </div>
         </div>
@@ -75,12 +73,14 @@
     {{! ===== Estado: conectado ===== }}
     {{# islist }}
         <div class="d-flex align-items-center justify-content-between flex-wrap mt-3 mb-3">
-            <div class="d-flex align-items-center">
-                <span class="tipgc-avatar" aria-hidden="true">{{ accountinitial }}</span>
-                <div class="ml-2 ms-2">
-                    <div class="tipgc-account-email">{{ accountemail }}</div>
-                    <a href="{{ authurl }}" class="small">{{# str }} changeaccount, local_tresipuntimportgc {{/ str }}</a>
-                </div>
+            {{> local_tresipuntimportgc/components/account_chip }}
+            <div class="d-flex tipgc-topactions">
+                {{# canviewpanel }}
+                    <a class="btn btn-outline-secondary tipgc-btn-panel" href="{{ panelurl }}" target="_blank" rel="noopener">{{# pix }} history, local_tresipuntimportgc {{/ pix }}{{# str }} viewpanel, local_tresipuntimportgc {{/ str }}</a>
+                {{/ canviewpanel }}
+                {{# isadmin }}
+                    <a class="btn btn-outline-secondary" href="{{ settingsurl }}" target="_blank" rel="noopener">{{# pix }} i/settings, core {{/ pix }}{{# str }} settings, core {{/ str }}</a>
+                {{/ isadmin }}
             </div>
         </div>
 
@@ -119,11 +119,12 @@
                 {{# courses }}
                     <div class="tipgc-card tipgc-course mb-2" data-course
                          data-id="{{ id }}" data-name="{{ name }}" data-archived="{{# archived }}1{{/ archived }}{{^ archived }}0{{/ archived }}">
-                        <div class="d-flex align-items-start p-3">
-                            <input type="checkbox" class="tipgc-course-check mt-1" data-action="toggle" aria-label="{{ name }}">
+                        <div class="d-flex align-items-center p-3">
+                            <input type="checkbox" class="tipgc-course-check" data-action="toggle" aria-label="{{ name }}">
+                            <span class="tipgc-class-icon ml-2 ms-2" aria-hidden="true">{{# pix }} classroom, local_tresipuntimportgc {{/ pix }}</span>
                             <div class="flex-grow-1 min-w-0 ml-2 ms-2">
                                 <div class="d-flex align-items-center flex-wrap">
-                                    <a href="{{ link }}" target="_blank" rel="noopener" class="tipgc-course-name">{{ name }}</a>
+                                    <a href="{{ link }}" target="_blank" rel="noopener" class="tipgc-course-name">{{ name }}{{# pix }} i/externallink, core {{/ pix }}</a>
                                     {{# section }}<span class="tipgc-tag ml-2 ms-2">{{ section }}</span>{{/ section }}
                                     {{# archived }}<span class="tipgc-tag tipgc-tag-archived ml-2 ms-2">{{# str }} filter_archived, local_tresipuntimportgc {{/ str }}</span>{{/ archived }}
                                 </div>
@@ -179,7 +180,7 @@
             <div class="tipgc-footer d-flex align-items-center justify-content-between flex-wrap mt-3 p-3">
                 <span data-region="selected-note">{{# str }} nselected, local_tresipuntimportgc, 0 {{/ str }}</span>
                 <div>
-                    <button type="button" class="btn btn-link" data-action="clear">{{# str }} clearselection, local_tresipuntimportgc {{/ str }}</button>
+                    <button type="button" class="btn btn-link" data-action="clear">{{# pix }} clear, local_tresipuntimportgc {{/ pix }}{{# str }} clearselection, local_tresipuntimportgc {{/ str }}</button>
                     <button type="button" class="btn btn-primary" data-action="import" disabled>
                         {{# str }} importcourses_btn, local_tresipuntimportgc {{/ str }}
                     </button>

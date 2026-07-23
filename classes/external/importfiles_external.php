@@ -24,20 +24,17 @@ namespace local_tresipuntimportgc\external;
 
 use coding_exception;
 use context_user;
-use external_api;
-use external_function_parameters;
-use external_single_structure;
-use external_value;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_value;
 use invalid_parameter_exception;
+use local_tresipuntimportgc\local\drive_files;
+use local_tresipuntimportgc\local\trace_router;
 use local_tresipuntimportgc\providers\google;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->libdir . '/externallib.php');
-require_once($CFG->dirroot . '/webservice/lib.php');
-require_once($CFG->dirroot . '/local/tresipuntimportgc/lib.php');
 
 class importfiles_external extends external_api {
 
@@ -69,6 +66,9 @@ class importfiles_external extends external_api {
     public static function importfiles(string $providerid, int $courseid, string $shortname): array {
         global $USER;
 
+        $syscontext = \context_system::instance();
+        self::validate_context($syscontext);
+        require_capability('local/tresipuntimportgc:import', $syscontext);
         self::validate_parameters(
             self::importfiles_parameters(), [
                 'providerid' => $providerid,
@@ -81,22 +81,22 @@ class importfiles_external extends external_api {
 
         $resfolder = $provider->get_teacher_folder($providerid);
         if (!$resfolder->success || $resfolder->data === null) {
-            print_trace('teacherfoldererrorcreated', 'warning');
+            trace_router::trace('teacherfoldererrorcreated', 'warning');
             return ['success' => false, 'errors' => $resfolder->error ? $resfolder->error->to_string() : '', 'id' => $courseid];
         }
         $resfiles = $provider->list_drive_folder($resfolder->data->get_providerid());
         if (!$resfiles->success) {
-            print_trace('importfileerror', 'danger', ['name' => $shortname, 'error' => $resfiles->error->to_string()]);
+            trace_router::trace('importfileerror', 'danger', ['name' => $shortname, 'error' => $resfiles->error->to_string()]);
             return ['success' => false, 'errors' => $resfiles->error->to_string(), 'id' => $courseid];
         }
 
         $files = $resfiles->data;
         $context = context_user::instance($USER->id);
-        print_trace('filesfound', 'info', count($files));
+        trace_router::trace('filesfound', 'info', count($files));
         if (count($files) > 0) {
             get_file_storage()->create_directory($context->id, 'user', 'private', 0, '/' . $shortname . '/');
             foreach ($files as $filemeta) {
-                local_tresipuntimportgc_store_drive_file(
+                drive_files::store(
                     $provider,
                     $filemeta,
                     $context->id,

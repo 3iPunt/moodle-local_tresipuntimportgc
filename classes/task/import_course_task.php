@@ -46,7 +46,6 @@ class import_course_task extends adhoc_task {
      */
     public function execute(): void {
         global $CFG;
-        require_once($CFG->dirroot . '/local/tresipuntimportgc/lib.php');
 
         $data = $this->get_custom_data();
         $course = import_course::get_record(['id' => (int) ($data->importcourseid ?? 0)]);

@@ -91,7 +91,7 @@ class module_label extends module {
             'visible' => $this->visible,
             'showdescription' => true
         ];
-        if (count($this->material) > 0 && array_key_first_compatible($this->material) === 'form') {
+        if (count($this->material) > 0 && array_key_first($this->material) === 'form') {
             $record = $this->add_form($record);
         }
         $res = $this->generator->create_instance($record, $options);

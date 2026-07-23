@@ -46,13 +46,6 @@ abstract class gc_mod_map {
     ];
 
 
-   /* public const GC_MATERIALS = [
-        'driveFile' => gc_material_drivefile_resource_map::class,
-        //'form' => gc_material_form_quiz_map::class,
-        'link' => gc_material_link_url_map::class,
-        //'youtubeVideo' => gc_material_link_url_map::class
-    ];*/
-
     /**
      * Get Description Rich.
      *
@@ -67,24 +60,13 @@ abstract class gc_mod_map {
             (it makes no sense), we have to import everything into Moodle no matter what,
             STUDENTS WANT PRIVACY!!!! */
         foreach ($materials as $mat) {
-            // array_key_first() Not working for version < 7.3 https://www.php.net/manual/es/function.array-key-first.php
-            //$key = array_key_first($mat);
-            /* TODO get materials and update to Moodle filestorage. In description only media files, not docs.
-                Where put materials files?? Only assign allows additional files of any type */
-            $key = array_key_first_compatible($mat);
+            $key = array_key_first($mat);
             if (isset(gc_mat_map::GC_MATS[$key])) {
                 $class = gc_mat_map::GC_MATS[$key];
-                if (!empty($class)) {
-                    /** @var gc_mat_map $item */
-                    $item = new $class;
-                    $html .= $item->get_render($mat[$key]);
-                } else {
-                    // TODO change mtrace() to print_trace()
-                    mtrace('    -- ERROR: GET_MATERIAL_CLASS: ' . json_encode($mat));
-                }
-            }/* else {
-                mtrace('    -- ERROR: GET_MATERIAL_KEY: ' . json_encode($mat));
-            }*/
+                /** @var gc_mat_map $item */
+                $item = new $class;
+                $html .= $item->get_render($mat[$key]);
+            }
         }
         return $html;
     }
@@ -97,6 +79,6 @@ abstract class gc_mod_map {
      * @return module
      * @throws coding_exception
      */
-    abstract public function get_mod($module, provider $provider): module;
+    abstract public function get_mod($module, provider $provider): ?module;
 
 }

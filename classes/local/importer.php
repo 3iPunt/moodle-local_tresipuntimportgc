@@ -25,6 +25,7 @@
 namespace local_tresipuntimportgc\local;
 
 use core\task\manager;
+use local_tresipuntimportgc\event\gc_course_imported;
 use local_tresipuntimportgc\external\course_external;
 use local_tresipuntimportgc\external\importcalendar_external;
 use local_tresipuntimportgc\external\importfiles_external;
@@ -38,10 +39,9 @@ use Throwable;
 /**
  * Queues import runs (one adhoc task per course) and runs single courses.
  *
- * This is the business logic that used to live inside
- * create_page::export_for_template(): here it runs without output buffering,
- * persisting statuses and traces so the progress page and the panel can read
- * them.
+ * This is the business logic that used to live inside the legacy creation
+ * page: here it runs without output buffering, persisting statuses and
+ * traces so the progress page and the panel can read them.
  *
  * @package    local_tresipuntimportgc
  * @copyright  2026 3iPunt (contacte@tresipunt.com)
@@ -137,10 +137,10 @@ class importer {
 
             $shortname = (string) $course->get('shortname');
             if ($shortname === '') {
-                $shortname = str_replace(' ', '_', normalize_str((string) $course->get('fullname')));
+                $shortname = helper::shortname_slug((string) $course->get('fullname'));
             }
             if ($DB->record_exists('course', ['shortname' => $shortname])) {
-                print_trace('shortnamealreadyexist', 'danger', $shortname);
+                trace_router::trace('shortnamealreadyexist', 'danger', $shortname);
                 $course->mark_error();
                 return;
             }
@@ -163,16 +163,17 @@ class importer {
             $courseid = (int) $response['id'];
 
             if ((int) $course->get('importfiles') === 1) {
-                print_trace('importingfiles', 'info');
+                trace_router::trace('importingfiles', 'info');
                 importfiles_external::importfiles((string) $course->get('providerid'), $courseid, $shortname);
             }
             if ((int) $course->get('calendarimport') === 1) {
-                print_trace('importingcalendar', 'info');
+                trace_router::trace('importingcalendar', 'info');
                 importcalendar_external::importcalendar((string) $course->get('providerid'), $courseid);
             }
 
             $course->mark_success($courseid);
-            print_trace('creationcoursecompleted', 'success');
+            trace_router::trace('creationcoursecompleted', 'success');
+            gc_course_imported::create_from_course($course, $courseid)->trigger();
         } catch (Throwable $e) {
             $logger->error($e->getMessage());
             if ($course->get('status') === import_course::STATUS_PENDING) {

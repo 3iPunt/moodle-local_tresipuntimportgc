@@ -142,7 +142,7 @@ class gc_map extends map {
         $materials = [];
         if (isset($module['materials'])) {
             foreach($module['materials'] as $material) {
-                $type = array_key_first_compatible($material);
+                $type = array_key_first($material);
                 if (isset(gc_mod_map::GC_MATERIALS[$type])) {
                     $class = gc_mod_map::GC_MATERIALS[$type];
                     if (!empty($class)) {

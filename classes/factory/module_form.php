@@ -75,7 +75,7 @@ class module_form extends module {
             (isset($module['workType']) && $module['workType'] === 'MULTIPLE_CHOICE_QUESTION')) {
             $this->modname = 'mod_feedback';
         }
-        if (isset($module['materials'][0]) && array_key_first_compatible($module['materials'][0]) === 'form' && count($module['materials']) === 1) {
+        if (isset($module['materials'][0]) && array_key_first($module['materials'][0]) === 'form' && count($module['materials']) === 1) {
             $formurl = $module['materials'][0]['form']['formUrl'];
             // Only forms the connected account can edit are readable via API;
             // forms owned by another teacher will simply not be found.

@@ -52,7 +52,7 @@ class gc_mod_courseworkmaterials_map extends gc_mod_map  {
         // TODO rethink logic, this is rubbish for understanding how it is supposed to work.
         $firstkey = '';
         if (isset($module['materials'][0])) {
-            $firstkey = array_key_first_compatible($module['materials'][0]);
+            $firstkey = array_key_first($module['materials'][0]);
         }
 
         if ($firstkey === 'driveFile' && count($module['materials']) === 1) {

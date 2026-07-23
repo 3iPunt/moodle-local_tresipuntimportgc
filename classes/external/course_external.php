@@ -24,21 +24,17 @@ namespace local_tresipuntimportgc\external;
 
 use coding_exception;
 use core_course_category;
-use external_api;
-use external_function_parameters;
-use external_single_structure;
-use external_value;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_value;
 use invalid_parameter_exception;
 use local_tresipuntimportgc\factory\factory;
+use local_tresipuntimportgc\local\trace_router;
 use local_tresipuntimportgc\providers\google;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->libdir . '/externallib.php');
-require_once($CFG->dirroot . '/webservice/lib.php');
-require_once($CFG->dirroot . '/local/tresipuntimportgc/lib.php');
 
 class course_external extends external_api {
 
@@ -74,7 +70,9 @@ class course_external extends external_api {
         string $providerid, string $fullname, string $shortname, int $category, bool $visible, int $importfiles): array {
         global $CFG;
         require_once($CFG->dirroot . '/course/lib.php');
-        require_once($CFG->dirroot . '/user/externallib.php');
+        $syscontext = \context_system::instance();
+        self::validate_context($syscontext);
+        require_capability('local/tresipuntimportgc:import', $syscontext);
         self::validate_parameters(
             self::create_course_parameters(), [
                 'providerid' => $providerid,
@@ -100,13 +98,13 @@ class course_external extends external_api {
                 $id = $res->success ? $res->data : null;
             } else {
                 $success = false;
-                print_trace('user_can_not_view_category', 'danger', ['category' => $moodlecategory->name, 'course' => $fullname]);
+                trace_router::trace('user_can_not_view_category', 'danger', ['category' => $moodlecategory->name, 'course' => $fullname]);
                 $errors = 'USER_CAN_NOT_VIEW_CATEGORY';
                 $id = null;
             }
         } else {
             $success = false;
-            print_trace('category_no_exist', 'danger', ['categoryid' => $category, 'course' => $fullname]);
+            trace_router::trace('category_no_exist', 'danger', ['categoryid' => $category, 'course' => $fullname]);
             $errors = 'CATEGORY_NO_EXIST';
             $id = null;
         }

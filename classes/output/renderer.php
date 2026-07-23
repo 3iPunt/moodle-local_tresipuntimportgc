@@ -40,19 +40,6 @@ class renderer extends plugin_renderer_base {
     /**
      * Defer to template.
      *
-     * @param import_page $page
-     *
-     * @return string html for the page
-     * @throws moodle_exception
-     */
-    public function render_import_page(import_page $page): string {
-        $data = $page->export_for_template($this);
-        return parent::render_from_template('local_tresipuntimportgc/import_page', $data);
-    }
-
-    /**
-     * Defer to template.
-     *
      * @param import_view $view
      *
      * @return string html for the page
@@ -79,14 +66,14 @@ class renderer extends plugin_renderer_base {
     /**
      * Defer to template.
      *
-     * @param create_page $page
+     * @param panel_view $view
      *
      * @return string html for the page
      * @throws moodle_exception
      */
-    public function render_create_page(create_page $page): string {
-        $data = $page->export_for_template($this);
-        return parent::render_from_template('local_tresipuntimportgc/create_page', $data);
+    public function render_panel_view(panel_view $view): string {
+        $data = $view->export_for_template($this);
+        return parent::render_from_template('local_tresipuntimportgc/panel_view', $data);
     }
 
     /**
