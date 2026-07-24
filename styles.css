@@ -14,6 +14,9 @@
     /* Ancho de trabajo del plugin en todas las pantallas. */
     max-width: 1038px;
     margin: 0 auto;
+    box-shadow: rgba(100, 100, 111, 0.2) 0 7px 29px 0;
+    padding: 50px;
+    border-radius: 20px;
 }
 
 /* Norma: icono + texto siempre centrados en altura (flex, sin baselines). */
@@ -32,7 +35,7 @@
 
 /* Norma: icono de enlace externo tras el texto — gris, separado y centrado. */
 .local-tipgc a .icon:last-child {
-    margin: 0 0 0 -5px;
+    margin: 3px 0 0 7px;
     font-size: 0.7em;
     color: #9a9a9e;
     line-height: 1;
@@ -77,7 +80,7 @@
     display: none;
 }
 .local-tipgc .tipgc-header-title {
-    font-weight: 800;
+    font-weight: 400;
     font-size: 1.9rem;
     letter-spacing: -0.02em;
 }
@@ -237,6 +240,11 @@
     background: #dddddf;
     font-weight: 600;
 }
+.local-tipgc .tipgc-tag-warning {
+    background: #fcf3df;
+    color: #9a6b08;
+    font-weight: 600;
+}
 .local-tipgc .tipgc-btn-edit {
     border: 1px solid rgba(0, 0, 0, 0.125);
     border-radius: 8px;
@@ -254,6 +262,7 @@
 /* Toolbar: buscador + chips. */
 .local-tipgc .tipgc-toolbar {
     gap: 10px;
+    padding: 20px 0;
 }
 .local-tipgc .tipgc-search {
     /* El buscador estira todo el ancho disponible junto a los chips. */
@@ -556,4 +565,79 @@
 .local-tipgc .tipgc-copy-feedback {
     color: #1f9d57;
     min-height: 15px;
+}
+
+/* ============================================================
+   Responsive: tablet y móvil. Mobile-first, apilar en vertical
+   (skill tresipunt-moodle-responsive). Breakpoint principal 720px.
+   ============================================================ */
+@media (max-width: 720px) {
+    /* Aire global: menos padding lateral que el escritorio. */
+    .local-tipgc {
+        padding: 20px 14px;
+        border-radius: 12px;
+    }
+
+    /* C11 — cabecera co-brandada: apilar (logos arriba, título debajo). */
+    .local-tipgc .tipgc-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    /* Acciones superiores del importador: apiladas a ancho completo. */
+    .local-tipgc .tipgc-topactions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .local-tipgc .tipgc-topactions .btn {
+        width: 100%;
+    }
+
+    /* Chips de estado del panel: scroll horizontal, no se aplastan. */
+    .local-tipgc .tipgc-chips {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+    .local-tipgc .tipgc-chip {
+        flex: none;
+    }
+
+    /* Buscador del panel: input a ancho completo, botones debajo. */
+    .local-tipgc .tipgc-searchrow {
+        flex-wrap: wrap;
+    }
+    .local-tipgc .tipgc-search {
+        flex: 1 1 100%;
+        min-width: 0;
+    }
+
+    /* Tabla del panel: scroll horizontal en vez de desbordar la página. */
+    .local-tipgc .tipgc-table-wrap {
+        overflow-x: auto;
+    }
+
+    /* Bloque de conexión (C10): URI y botón apilados; URI que parta. */
+    .local-tipgc .tipgc-uri-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .local-tipgc .tipgc-uri-row .btn {
+        margin-left: 0;
+        margin-top: 8px;
+    }
+    .local-tipgc .tipgc-uri {
+        overflow-wrap: anywhere;
+        white-space: normal;
+    }
+
+    /* Correo de la cuenta conectada: que parta si es largo. */
+    .local-tipgc .tipgc-account-email {
+        overflow-wrap: anywhere;
+    }
+
+    /* Barra inferior fija: pegada al borde en móvil. */
+    .local-tipgc .tipgc-footer {
+        bottom: 0;
+    }
 }

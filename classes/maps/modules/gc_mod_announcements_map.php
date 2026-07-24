@@ -18,7 +18,7 @@ namespace local_tresipuntimportgc\maps\modules;
 
 use coding_exception;
 use local_tresipuntimportgc\factory\module;
-use local_tresipuntimportgc\factory\module_share;
+use local_tresipuntimportgc\factory\module_forum;
 use local_tresipuntimportgc\providers\provider;
 
 defined('MOODLE_INTERNAL') || die();
@@ -43,8 +43,9 @@ class gc_mod_announcements_map extends gc_mod_map  {
         $visible = $module['state'] === 'PUBLISHED';
         $mats = isset($module['materials']) ? $module['materials'] : [];
         $desc = self::get_desc_rich('', $mats);
-        return new module_share(
-            $module['text'], $desc, $visible
+        // Anuncio → discusión en el foro de novedades del curso (E10.7).
+        return new module_forum(
+            $module, $desc, $visible, $provider
         );
     }
 

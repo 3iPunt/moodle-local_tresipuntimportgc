@@ -118,9 +118,73 @@ class module_assign extends module {
             if (count($this->materials) > 0) {
                 $this->add_additional_files($res);
             }
+            $this->import_rubric($res);
             return new response_module(true, $this, null);
         }
         return new response_module(false, null, new error('12000', 'MODULE_NOT_CREATED'));
+    }
+
+    /**
+     * Imports the Classroom rubric of the coursework as a Moodle rubric on the
+     * assignment (E10.3). Criteria×levels map 1:1; the level points become the
+     * rubric scores.
+     *
+     * @param  object $res Generator result (with cmid).
+     * @return void
+     * @throws coding_exception|dml_exception
+     */
+    private function import_rubric($res): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/grade/grading/lib.php');
+
+        if (empty($this->module['courseId']) || empty($this->module['id'])) {
+            return;
+        }
+        $provider = new google();
+        $resrubric = $provider->get_rubric((string) $this->module['courseId'], (string) $this->module['id']);
+        if (!$resrubric->success || empty($resrubric->data)) {
+            return;
+        }
+        $context = context_module::instance($res->cmid);
+        $gradingman = get_grading_manager($context, 'mod_assign', 'submissions');
+        $controller = $gradingman->get_controller('rubric');
+        $controller->update_definition($this->build_rubric_definition($resrubric->data));
+        $gradingman->set_active_method('rubric');
+    }
+
+    /**
+     * Builds a Moodle rubric definition from the Classroom criteria/levels.
+     *
+     * @param  array $criteria Array of {title, description, levels[]}.
+     * @return \stdClass Definition for gradingform_rubric_controller::update_definition().
+     */
+    private function build_rubric_definition(array $criteria): \stdClass {
+        $rubcriteria = [];
+        $ci = 0;
+        foreach ($criteria as $criterion) {
+            $ci++;
+            $levels = [];
+            $li = 0;
+            foreach ($criterion->levels as $level) {
+                $li++;
+                $deftext = trim($level->title
+                    . ($level->description !== '' ? ' — ' . $level->description : ''));
+                $levels['NEWID' . $li] = ['score' => $level->points, 'definition' => $deftext];
+            }
+            $desc = trim($criterion->title
+                . ($criterion->description !== '' ? ' — ' . $criterion->description : ''));
+            $rubcriteria['NEWID' . $ci] = [
+                'sortorder' => $ci,
+                'description' => $desc,
+                'levels' => $levels,
+            ];
+        }
+        return (object) [
+            'name' => get_string('rubric_name', 'local_tresipuntimportgc'),
+            'description_editor' => ['text' => '', 'format' => FORMAT_HTML, 'itemid' => 0],
+            'rubric' => ['criteria' => $rubcriteria],
+            'status' => \gradingform_controller::DEFINITION_STATUS_READY,
+        ];
     }
 
     /**

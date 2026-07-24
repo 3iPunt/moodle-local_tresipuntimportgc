@@ -24,8 +24,9 @@ define([
     'core/str',
     'core/modal_save_cancel',
     'core/modal_events',
-    'core/notification'
-], function(Str, ModalSaveCancel, ModalEvents, Notification) {
+    'core/notification',
+    'core/form-autocomplete'
+], function(Str, ModalSaveCancel, ModalEvents, Notification, FormAutocomplete) {
     'use strict';
 
     var root = null;
@@ -205,6 +206,21 @@ define([
                 refreshFooter();
             }
         });
+        // Al editar el nombre corto, ocultar el aviso de "ya en uso" de esa fila.
+        root.addEventListener('input', function(e) {
+            if (e.target.matches('[data-field="shortname"]')) {
+                var row = e.target.closest('[data-course]');
+                var warn = row.querySelector('[data-region="shortname-warning"]');
+                var help = row.querySelector('[data-region="shortname-warning-help"]');
+                if (warn) {
+                    warn.hidden = true;
+                }
+                if (help) {
+                    help.hidden = true;
+                }
+                e.target.classList.remove('is-invalid');
+            }
+        });
         root.addEventListener('click', function(e) {
             var editbtn = e.target.closest('[data-action="edit"]');
             if (editbtn) {
@@ -222,6 +238,21 @@ define([
         });
     };
 
+    /**
+     * Turns each category select into a server-searched autocomplete, so the
+     * selector scales with any number of categories.
+     */
+    var enhanceCategories = function() {
+        Str.get_string('select_category', 'local_tresipuntimportgc').then(function(placeholder) {
+            root.querySelectorAll('[data-autocomplete-categories]').forEach(function(select) {
+                FormAutocomplete.enhance('#' + select.id, false,
+                    'local_tresipuntimportgc/categories_datasource', placeholder,
+                    false, true, '').catch(Notification.exception);
+            });
+            return placeholder;
+        }).catch(Notification.exception);
+    };
+
     return {
         /**
          * Entry point.
@@ -235,6 +266,7 @@ define([
                 return;
             }
             register();
+            enhanceCategories();
             applyFilters();
         }
     };

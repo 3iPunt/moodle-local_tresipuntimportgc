@@ -52,7 +52,12 @@
                 · <span class="tipgc-mono">{{ run.account }}</span>
             </div>
         </div>
-        <a class="btn btn-primary" href="{{ selectionurl }}">{{# str }} newimport, local_tresipuntimportgc {{/ str }}</a>
+        <div class="d-flex flex-wrap">
+            {{# canviewpanel }}
+                <a class="btn btn-outline-secondary" href="{{ panelurl }}">{{# str }} viewimports, local_tresipuntimportgc {{/ str }}</a>
+            {{/ canviewpanel }}
+            <a class="btn btn-primary {{# canviewpanel }}ml-2 ms-2{{/ canviewpanel }}" href="{{ selectionurl }}">{{# str }} newimport, local_tresipuntimportgc {{/ str }}</a>
+        </div>
     </div>
 
     {{# cronstalled }}

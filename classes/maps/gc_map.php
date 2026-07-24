@@ -21,6 +21,7 @@ use local_tresipuntimportgc\factory\course;
 use local_tresipuntimportgc\factory\folder;
 use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\factory\section;
+use local_tresipuntimportgc\local\run_config;
 use local_tresipuntimportgc\maps\modules\gc_mod_map;
 use local_tresipuntimportgc\providers\provider;
 
@@ -113,26 +114,35 @@ class gc_map extends map {
      * @return module|module[]|null
      */
     public static function module(array $module, provider $provider, string $type = '') {
-        $item = null;
-        if (isset($module['assigneeMode']) && $module['assigneeMode'] === 'ALL_STUDENTS') {
-            if (isset(gc_mod_map::GC_MODS[$type])) {
-                $modtypes = gc_mod_map::GC_MODS[$type];
-                $class = is_array($modtypes) ? $modtypes[$module['workType']] : $modtypes;
-                if (!empty($class)) {
-                    try {
-                        $modmap = new $class;
-                        return $modmap->get_mod($module, $provider);
-                    } catch (Throwable $e) {
-                        // Robustez (§6.5): un Error en la transformación de un
-                        // módulo no debe tumbar la importación del resto.
-                        mtrace('    -- ERROR: GET_MODULE: ' . $module['id'] . ' - ' . $e->getMessage());
-                        return null;
-                    }
-                }
-            } else {
-                mtrace('    -- ERROR: GET_MODULE_TYPE: ' . $module['id'] . ' - ' . $type);
+        // Contenidos dirigidos a estudiantes concretos (E10.9, §6.9): por
+        // defecto no se importan; con el ajuste activo se importan ocultos y con
+        // una nota para el profesor. Aplica a los tres tipos.
+        $individual = isset($module['assigneeMode']) && $module['assigneeMode'] !== 'ALL_STUDENTS';
+        if ($individual) {
+            if ((int) run_config::get('importindividual', 0) !== 1) {
+                return null;
             }
-
+            $module['state'] = 'DRAFT'; // Oculto para los estudiantes.
+            $note = get_string('individual_note', 'local_tresipuntimportgc');
+            $module['description'] = $note . (isset($module['description']) && $module['description'] !== ''
+                ? "\n\n" . $module['description'] : '');
+        }
+        if (isset(gc_mod_map::GC_MODS[$type])) {
+            $modtypes = gc_mod_map::GC_MODS[$type];
+            $class = is_array($modtypes) ? ($modtypes[$module['workType']] ?? null) : $modtypes;
+            if (!empty($class)) {
+                try {
+                    $modmap = new $class;
+                    return $modmap->get_mod($module, $provider);
+                } catch (Throwable $e) {
+                    // Robustez (§6.5): un Error en la transformación de un
+                    // módulo no debe tumbar la importación del resto.
+                    mtrace('    -- ERROR: GET_MODULE: ' . $module['id'] . ' - ' . $e->getMessage());
+                    return null;
+                }
+            }
+        } else {
+            mtrace('    -- ERROR: GET_MODULE_TYPE: ' . $module['id'] . ' - ' . $type);
         }
         return null;
     }

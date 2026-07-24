@@ -134,7 +134,8 @@ $run = (object) [
 ];
 
 $renderer = $PAGE->get_renderer('local_tresipuntimportgc');
-$view = new progress_view($run, $courses, $finished, $cronstalled, $importid, $lastlogid);
+$canviewpanel = has_capability('local/tresipuntimportgc:viewreports', context_system::instance());
+$view = new progress_view($run, $courses, $finished, $cronstalled, $importid, $lastlogid, $canviewpanel);
 
 echo $OUTPUT->header();
 echo $renderer->render_progress_view($view);

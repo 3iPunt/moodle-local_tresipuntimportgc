@@ -78,6 +78,10 @@ class importer {
                 'visible' => empty($config['visible']) ? 0 : 1,
                 'importfiles' => (int) ($config['importfiles'] ?? 0),
                 'calendarimport' => (int) ($config['calendarimport'] ?? 0),
+                'formsimport' => (int) ($config['formsimport']
+                    ?? get_config('local_tresipuntimportgc', 'formsimport')),
+                'importindividual' => (int) ($config['importindividual']
+                    ?? get_config('local_tresipuntimportgc', 'importindividual')),
                 'status' => import_course::STATUS_PENDING,
             ]);
             $course->create();
@@ -137,6 +141,12 @@ class importer {
 
             $course->mark_running();
 
+            // Config efectiva del curso hasta los mapas (formularios, individuales).
+            run_config::set([
+                'formsimport' => (int) $course->get('formsimport'),
+                'importindividual' => (int) $course->get('importindividual'),
+            ]);
+
             $shortname = (string) $course->get('shortname');
             if ($shortname === '') {
                 $shortname = helper::shortname_slug((string) $course->get('fullname'));
@@ -187,6 +197,7 @@ class importer {
             }
         } finally {
             trace_router::set_logger(null);
+            run_config::reset();
             self::finish_run_if_done($import);
         }
     }

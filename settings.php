@@ -29,13 +29,23 @@ $ADMIN->add('courses', new admin_externalpage('local_tresipuntimportgc_import',
     new lang_string('import_page', 'local_tresipuntimportgc'),
     $CFG->wwwroot . '/local/tresipuntimportgc/import.php', ['local/tresipuntimportgc:import']));
 
-$ADMIN->add('courses', new admin_externalpage('local_tresipuntimportgc_panel',
+// Categoría del plugin en Extensiones. Se registra siempre para que el panel
+// aparezca por su capacidad (no solo para administradores del sitio).
+$ADMIN->add('modules', new admin_category('local_tresipuntimportgc_category',
+    new lang_string('pluginname', 'local_tresipuntimportgc')));
+
+// Acceso a importar también desde la categoría del plugin (además de Cursos).
+$ADMIN->add('local_tresipuntimportgc_category', new admin_externalpage('local_tresipuntimportgc_import_menu',
+    new lang_string('import_page', 'local_tresipuntimportgc'),
+    $CFG->wwwroot . '/local/tresipuntimportgc/import.php', ['local/tresipuntimportgc:import']));
+
+// El panel de importaciones: visible para quien tenga la capacidad de consulta.
+$ADMIN->add('local_tresipuntimportgc_category', new admin_externalpage('local_tresipuntimportgc_panel',
     new lang_string('panel_title', 'local_tresipuntimportgc'),
     $CFG->wwwroot . '/local/tresipuntimportgc/panel.php', ['local/tresipuntimportgc:viewreports']));
 
+// Los ajustes del plugin son configuración de sitio: solo administradores.
 if ($hassiteconfig) {
-    $ADMIN->add('modules', new admin_category('local_tresipuntimportgc_category',
-        new lang_string('pluginname', 'local_tresipuntimportgc')));
     $settingspage = new admin_settingpage(
         'local_tresipuntimportgc_config',
         new lang_string('pluginconfig', 'local_tresipuntimportgc'));
@@ -113,6 +123,17 @@ if ($hassiteconfig) {
                 'local_tresipuntimportgc/calendarimport',
                 new lang_string('googlecalendarimport', 'local_tresipuntimportgc'),
                 new lang_string('googlecalendarimport_help', 'local_tresipuntimportgc'), 2, $options));
+
+        // Contenidos dirigidos a estudiantes concretos.
+        $options = [
+            0 => get_string('notimport', 'local_tresipuntimportgc'),
+            1 => get_string('importindividualhidden', 'local_tresipuntimportgc'),
+        ];
+        $settingspage->add(
+            new admin_setting_configselect(
+                'local_tresipuntimportgc/importindividual',
+                new lang_string('importindividual', 'local_tresipuntimportgc'),
+                new lang_string('importindividual_help', 'local_tresipuntimportgc'), 0, $options));
 
         // Bloque C: registro.
         $settingspage->add(

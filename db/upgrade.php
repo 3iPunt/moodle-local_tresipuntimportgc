@@ -131,5 +131,22 @@ function xmldb_local_tresipuntimportgc_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2026072301, 'local', 'tresipuntimportgc');
     }
 
+    if ($oldversion < 2026072400) {
+        // Per-course forms handling and individual-content handling (E9.5/E10.9).
+        $table = new xmldb_table('local_tresipuntimportgc_course');
+        $field = new xmldb_field('formsimport', XMLDB_TYPE_INTEGER, '2', null,
+            XMLDB_NOTNULL, null, '0', 'calendarimport');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('importindividual', XMLDB_TYPE_INTEGER, '2', null,
+            XMLDB_NOTNULL, null, '0', 'formsimport');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026072400, 'local', 'tresipuntimportgc');
+    }
+
     return true;
 }

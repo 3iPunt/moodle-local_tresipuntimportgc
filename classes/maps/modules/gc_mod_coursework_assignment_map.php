@@ -21,6 +21,7 @@ use dml_exception;
 use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\factory\module_assign;
 use local_tresipuntimportgc\factory\module_label;
+use local_tresipuntimportgc\local\run_config;
 use local_tresipuntimportgc\providers\provider;
 
 defined('MOODLE_INTERNAL') || die();
@@ -54,7 +55,7 @@ class gc_mod_coursework_assignment_map extends gc_mod_map {
         if (isset($module['materials'][0])) {
             $firstkey = array_key_first($module['materials'][0]);
             if ($firstkey === 'form' && count($module['materials']) === 1) {
-                if ((int) get_config('local_tresipuntimportgc', 'formsimport') === 2) {
+                if ((int) run_config::get('formsimport', 0) === 2) {
                     // Do not import: skip this module entirely.
                     return null;
                 }

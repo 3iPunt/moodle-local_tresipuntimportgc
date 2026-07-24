@@ -376,6 +376,43 @@ class google extends provider {
         }
     }
 
+    /**
+     * Gets the rubric of a Classroom coursework as criteria with levels.
+     *
+     * @param  string $courseid     Classroom course id.
+     * @param  string $courseworkid Classroom coursework id.
+     * @return response_data data = array of {title, description, levels[]} or null.
+     */
+    public function get_rubric(string $courseid, string $courseworkid): response_data {
+        try {
+            $result = $this->get_classroom()->courses_courseWork_rubrics
+                ->listCoursesCourseWorkRubrics($courseid, $courseworkid);
+            $rubrics = $result->getRubrics() ?? [];
+            if (empty($rubrics)) {
+                return new response_data(true, null);
+            }
+            $criteria = [];
+            foreach ($rubrics[0]->getCriteria() ?? [] as $criterion) {
+                $levels = [];
+                foreach ($criterion->getLevels() ?? [] as $level) {
+                    $levels[] = (object) [
+                        'title' => (string) $level->getTitle(),
+                        'description' => (string) $level->getDescription(),
+                        'points' => (float) $level->getPoints(),
+                    ];
+                }
+                $criteria[] = (object) [
+                    'title' => (string) $criterion->getTitle(),
+                    'description' => (string) $criterion->getDescription(),
+                    'levels' => $levels,
+                ];
+            }
+            return new response_data(true, $criteria);
+        } catch (Throwable $e) {
+            return new response_data(false, null, new error('01070', $e->getMessage()));
+        }
+    }
+
     // Drive.
 
     /**

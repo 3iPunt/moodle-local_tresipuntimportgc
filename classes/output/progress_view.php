@@ -63,6 +63,9 @@ class progress_view implements renderable, templatable {
     /** @var int Highest trace id already rendered (polling bootstrap). */
     private $lastlogid;
 
+    /** @var bool Whether the user can view the imports panel. */
+    private $canviewpanel;
+
     /**
      * Constructor.
      *
@@ -74,13 +77,14 @@ class progress_view implements renderable, templatable {
      * @param int      $lastlogid   Highest trace id already rendered.
      */
     public function __construct(stdClass $run, array $courses, bool $finished,
-            bool $cronstalled, int $importid, int $lastlogid) {
+            bool $cronstalled, int $importid, int $lastlogid, bool $canviewpanel = false) {
         $this->run = $run;
         $this->courses = $courses;
         $this->finished = $finished;
         $this->cronstalled = $cronstalled;
         $this->importid = $importid;
         $this->lastlogid = $lastlogid;
+        $this->canviewpanel = $canviewpanel;
     }
 
     /**
@@ -110,6 +114,8 @@ class progress_view implements renderable, templatable {
         $data->importid = $this->importid;
         $data->lastlogid = $this->lastlogid;
         $data->selectionurl = (new moodle_url('/local/tresipuntimportgc/import.php'))->out(false);
+        $data->panelurl = (new moodle_url('/local/tresipuntimportgc/panel.php'))->out(false);
+        $data->canviewpanel = $this->canviewpanel;
         $data->hascreated = !empty($this->run->created);
         return $data;
     }

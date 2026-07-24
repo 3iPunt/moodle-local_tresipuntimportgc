@@ -77,12 +77,15 @@ abstract class map {
     /**
      * Module.
      *
-     * @param array $module
-     * @param provider $provider
-     * @param string $type
-     * @return module
+     * Returns a single module, an array of modules (one Classroom item that
+     * maps to several Moodle activities, E10.11) or null.
+     *
+     * @param  array $module
+     * @param  provider $provider
+     * @param  string $type
+     * @return module|module[]|null
      */
-    abstract static public function module(array $module, provider $provider, string $type = ''): ?module;
+    abstract static public function module(array $module, provider $provider, string $type = '');
 
     /**
      * Modules.

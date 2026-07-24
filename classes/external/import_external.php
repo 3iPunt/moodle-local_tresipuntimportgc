@@ -25,6 +25,7 @@
 namespace local_tresipuntimportgc\external;
 
 use context_system;
+use core_course_category;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
@@ -241,5 +242,65 @@ class import_external extends external_api {
             'success' => new external_value(PARAM_BOOL, 'Whether the course was discarded'),
             'message' => new external_value(PARAM_TEXT, 'Reason when it was not'),
         ]);
+    }
+
+    /**
+     * search_categories parameters.
+     *
+     * @return external_function_parameters
+     */
+    public static function search_categories_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'query' => new external_value(PARAM_RAW, 'Search text', VALUE_DEFAULT, ''),
+        ]);
+    }
+
+    /**
+     * Searches viewable course categories by text, for the importer autocomplete.
+     *
+     * Server-side search so the selector scales with any number of categories.
+     *
+     * @param  string $query Search text.
+     * @return array
+     */
+    public static function search_categories(string $query = ''): array {
+        global $DB;
+
+        $params = self::validate_parameters(self::search_categories_parameters(), ['query' => $query]);
+        $context = context_system::instance();
+        self::validate_context($context);
+        require_capability('local/tresipuntimportgc:import', $context);
+
+        // Búsqueda en BD con límite: escala con cualquier número de categorías.
+        $search = trim($params['query']);
+        $select = 'visible = 1';
+        $sqlparams = [];
+        if ($search !== '') {
+            $select .= ' AND ' . $DB->sql_like('name', ':q', false);
+            $sqlparams['q'] = '%' . $DB->sql_like_escape($search) . '%';
+        }
+        $records = $DB->get_records_select('course_categories', $select, $sqlparams,
+            'name ASC', 'id, name', 0, 50);
+
+        $results = [];
+        foreach ($records as $record) {
+            $category = core_course_category::get($record->id, IGNORE_MISSING);
+            if ($category && core_course_category::can_view_category($category)) {
+                $results[] = ['id' => (int) $record->id, 'name' => $category->get_nested_name(false)];
+            }
+        }
+        return $results;
+    }
+
+    /**
+     * search_categories returns.
+     *
+     * @return external_multiple_structure
+     */
+    public static function search_categories_returns(): external_multiple_structure {
+        return new external_multiple_structure(new external_single_structure([
+            'id' => new external_value(PARAM_INT, 'Category id'),
+            'name' => new external_value(PARAM_RAW, 'Category full name'),
+        ]));
     }
 }

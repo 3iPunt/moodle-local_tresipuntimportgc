@@ -81,6 +81,15 @@ $functions = [
         'loginrequired' => true,
         'capabilities' => 'local/tresipuntimportgc:import',
     ],
+    'local_tresipuntimportgc_search_categories' => [
+        'classname' => import_external::class,
+        'methodname' => 'search_categories',
+        'description' => 'Searches viewable course categories for the importer selector.',
+        'type' => 'read',
+        'ajax' => true,
+        'loginrequired' => true,
+        'capabilities' => 'local/tresipuntimportgc:import',
+    ],
 ];
 $services = [
     'local_tresipuntimportgc' => [

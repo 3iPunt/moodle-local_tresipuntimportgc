@@ -76,7 +76,7 @@
             {{> local_tresipuntimportgc/components/account_chip }}
             <div class="d-flex tipgc-topactions">
                 {{# canviewpanel }}
-                    <a class="btn btn-outline-secondary tipgc-btn-panel" href="{{ panelurl }}" target="_blank" rel="noopener">{{# pix }} history, local_tresipuntimportgc {{/ pix }}{{# str }} viewpanel, local_tresipuntimportgc {{/ str }}</a>
+                    <a class="btn btn-outline-secondary tipgc-btn-panel" href="{{ panelurl }}" target="_blank" rel="noopener">{{# pix }} history, local_tresipuntimportgc {{/ pix }}{{# str }} viewimports, local_tresipuntimportgc {{/ str }}</a>
                 {{/ canviewpanel }}
                 {{# isadmin }}
                     <a class="btn btn-outline-secondary" href="{{ settingsurl }}" target="_blank" rel="noopener">{{# pix }} i/settings, core {{/ pix }}{{# str }} settings, core {{/ str }}</a>
@@ -127,6 +127,7 @@
                                     <a href="{{ link }}" target="_blank" rel="noopener" class="tipgc-course-name">{{ name }}{{# pix }} i/externallink, core {{/ pix }}</a>
                                     {{# section }}<span class="tipgc-tag ml-2 ms-2">{{ section }}</span>{{/ section }}
                                     {{# archived }}<span class="tipgc-tag tipgc-tag-archived ml-2 ms-2">{{# str }} filter_archived, local_tresipuntimportgc {{/ str }}</span>{{/ archived }}
+                                    {{# shortnameexists }}<span class="tipgc-tag tipgc-tag-warning ml-2 ms-2" data-region="shortname-warning">{{# str }} shortname_in_use, local_tresipuntimportgc {{/ str }}</span>{{/ shortnameexists }}
                                 </div>
                             </div>
                             <button type="button" class="btn tipgc-btn-edit" data-action="edit"
@@ -138,12 +139,12 @@
                             <div class="form-row row">
                                 <div class="col-md-4 mb-2">
                                     <label class="tipgc-label" for="tipgc-short-{{ id }}">{{# str }} uniquename_course, local_tresipuntimportgc {{/ str }}</label>
-                                    <input type="text" class="form-control" id="tipgc-short-{{ id }}" data-field="shortname" value="{{ defaultshortname }}">
+                                    <input type="text" class="form-control{{# shortnameexists }} is-invalid{{/ shortnameexists }}" id="tipgc-short-{{ id }}" data-field="shortname" value="{{ defaultshortname }}">
+                                    {{# shortnameexists }}<small class="text-danger" data-region="shortname-warning-help">{{# str }} shortname_in_use_help, local_tresipuntimportgc {{/ str }}</small>{{/ shortnameexists }}
                                 </div>
                                 <div class="col-md-5 mb-2">
                                     <label class="tipgc-label" for="tipgc-cat-{{ id }}">{{# str }} select_category, local_tresipuntimportgc {{/ str }}</label>
-                                    <select class="form-control custom-select" id="tipgc-cat-{{ id }}" data-field="categoryid">
-                                        {{# categories }}<option value="{{ id }}">{{ name }}</option>{{/ categories }}
+                                    <select class="form-control" id="tipgc-cat-{{ id }}" data-field="categoryid" data-autocomplete-categories>
                                     </select>
                                 </div>
                                 <div class="col-md-3 mb-2 d-flex align-items-end">
@@ -177,7 +178,7 @@
                 </div>
             </div>
 
-            <div class="tipgc-footer d-flex align-items-center justify-content-between flex-wrap mt-3 p-3">
+            <div class="tipgc-footer d-flex align-items-center justify-content-between flex-wrap mt-5 p-3">
                 <span data-region="selected-note">{{# str }} nselected, local_tresipuntimportgc, 0 {{/ str }}</span>
                 <div>
                     <button type="button" class="btn btn-link" data-action="clear">{{# pix }} clear, local_tresipuntimportgc {{/ pix }}{{# str }} clearselection, local_tresipuntimportgc {{/ str }}</button>

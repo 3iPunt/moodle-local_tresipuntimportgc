@@ -93,6 +93,14 @@ class import_course extends persistent {
                 'type' => PARAM_INT,
                 'default' => 0,
             ],
+            'formsimport' => [
+                'type' => PARAM_INT,
+                'default' => 0,
+            ],
+            'importindividual' => [
+                'type' => PARAM_INT,
+                'default' => 0,
+            ],
             'status' => [
                 'type' => PARAM_ALPHA,
                 'default' => self::STATUS_PENDING,

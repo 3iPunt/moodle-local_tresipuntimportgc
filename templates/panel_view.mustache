@@ -62,20 +62,22 @@
 
     {{^ emptysite }}
         <form method="get" action="{{ panelurl }}" class="tipgc-card p-3 mb-3">
-            <div class="d-flex align-items-center flex-wrap tipgc-toolbar">
+            <div class="tipgc-toolbar">
                 <div class="tipgc-chips" role="group">
                     {{# statuschips }}
                         <button type="submit" name="status" value="{{# active }}{{/ active }}{{^ active }}{{ key }}{{/ active }}"
                                 class="tipgc-chip {{# active }}active{{/ active }}">{{ label }}</button>
                     {{/ statuschips }}
                 </div>
-                <input type="text" name="search" value="{{ search }}" class="form-control tipgc-search ml-2 ms-2"
-                       placeholder="{{# str }} panel_searchplaceholder, local_tresipuntimportgc {{/ str }}"
-                       aria-label="{{# str }} panel_searchplaceholder, local_tresipuntimportgc {{/ str }}">
-                <button type="submit" class="btn btn-secondary ml-2 ms-2">{{# str }} search, core {{/ str }}</button>
-                {{# hasfilters }}
-                    <a href="{{ panelurl }}" class="btn btn-link">{{# pix }} clear, local_tresipuntimportgc {{/ pix }}{{# str }} clearselection, local_tresipuntimportgc {{/ str }}</a>
-                {{/ hasfilters }}
+                <div class="d-flex align-items-center tipgc-searchrow mt-2">
+                    <input type="text" name="search" value="{{ search }}" class="form-control tipgc-search"
+                           placeholder="{{# str }} panel_searchplaceholder, local_tresipuntimportgc {{/ str }}"
+                           aria-label="{{# str }} panel_searchplaceholder, local_tresipuntimportgc {{/ str }}">
+                    <button type="submit" class="btn btn-secondary ml-2 ms-2">{{# str }} search, core {{/ str }}</button>
+                    {{# hasfilters }}
+                        <a href="{{ panelurl }}" class="btn btn-link ml-2 ms-2">{{# pix }} clear, local_tresipuntimportgc {{/ pix }}{{# str }} clearselection, local_tresipuntimportgc {{/ str }}</a>
+                    {{/ hasfilters }}
+                </div>
             </div>
         </form>
 

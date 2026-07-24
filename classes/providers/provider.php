@@ -149,6 +149,15 @@ abstract class provider {
      */
     abstract public function get_modules(string $id): response_modules;
 
+    /**
+     * Gets the rubric of a Classroom coursework.
+     *
+     * @param  string $courseid     Classroom course id.
+     * @param  string $courseworkid Classroom coursework id.
+     * @return response_data
+     */
+    abstract public function get_rubric(string $courseid, string $courseworkid): response_data;
+
     // Drive.
 
     /**

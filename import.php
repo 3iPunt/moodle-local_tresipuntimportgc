@@ -29,7 +29,7 @@
 require_once('../../config.php');
 require_once('./lib.php');
 
-global $PAGE, $OUTPUT, $USER;
+global $PAGE, $OUTPUT, $USER, $DB;
 
 use core\output\notification;
 use local_tresipuntimportgc\local\helper;
@@ -123,21 +123,22 @@ if (!$provider->is_configured()) {
     $courses = [];
     foreach ($rescourses->data as $course) {
         $d = $course->providerdata;
+        $slug = helper::shortname_slug($d->name ?? '');
         $courses[] = [
             'id' => $d->id ?? '',
             'name' => $d->name ?? '',
             'section' => $d->section ?? ($d->room ?? ''),
             'archived' => ($d->courseState ?? '') === 'ARCHIVED',
             'link' => $d->alternateLink ?? '',
-            'defaultshortname' => helper::shortname_slug($d->name ?? ''),
+            'defaultshortname' => $slug,
+            // Aviso previo: el nombre corto propuesto ya está en uso (evita que
+            // el curso falle luego en la importación por duplicado).
+            'shortnameexists' => $slug !== '' && $DB->record_exists('course', ['shortname' => $slug]),
         ];
     }
+    // Las categorías se buscan por AJAX en el importador (autocompletado), no
+    // se precargan todas aquí: el selector escala con cualquier volumen.
     $categories = [];
-    foreach (core_course_category::get_all(['returnhidden' => false]) as $category) {
-        if (core_course_category::can_view_category($category)) {
-            $categories[] = ['id' => $category->id, 'name' => $category->get_nested_name(false)];
-        }
-    }
     $allowconfig = (bool) get_config('local_tresipuntimportgc', 'allowconfig');
     $filesdefault = (int) get_config('local_tresipuntimportgc', 'importfiles');
     $calendardefault = (int) get_config('local_tresipuntimportgc', 'calendarimport');
