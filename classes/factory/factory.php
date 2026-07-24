@@ -96,7 +96,10 @@ class factory  {
                     if ($restf->success) {
                         $resfiles = $this->provider->list_drive_folder($restf->data->get_providerid());
                         $files = $resfiles->success ? $resfiles->data : [];
-                        $folder = new module_teacher_folder($restf->data->title, $files, $this->provider);
+                        // Nombre traducido al idioma del usuario que lanza la
+                        // importación (no el nombre interno que trae Google).
+                        $folder = new module_teacher_folder(
+                            get_string('teacher_folder', 'local_tresipuntimportgc'), $files, $this->provider);
                         $folder->create($courseid);
                         trace_router::trace('teacherfoldercreated', 'success', null);
                     } else {

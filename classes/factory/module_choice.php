@@ -78,8 +78,7 @@ class module_choice extends module {
         $record = [
             'course' => $course,
             'name' => $this->title,
-            'intro' => $this->intro,
-            'introformat' => FORMAT_HTML,
+            'introeditor' => $this->intro_editor(),
         ];
         if (!empty($choices)) {
             $record['option'] = array_values($choices);

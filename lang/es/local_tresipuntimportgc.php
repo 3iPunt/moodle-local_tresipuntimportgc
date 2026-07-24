@@ -106,6 +106,7 @@ $string['drivefile'] = 'Archivo GoogleDrive';
 $string['form'] = 'Formulario GoogleDrive';
 $string['link'] = 'Enlace externo';
 $string['teacher_folder'] = 'Carpeta del Profesor';
+$string['teacher_folder_intro'] = 'Archivos de la carpeta del profesor importados desde Google Classroom.';
 $string['uniquename_course'] = 'Nombre corto';
 $string['shortname_in_use'] = 'Nombre corto en uso';
 $string['shortname_in_use_help'] = 'Este nombre corto ya lo usa otro curso; cámbialo antes de importar o el curso fallará.';
@@ -144,7 +145,7 @@ $string['filesfound'] = 'Se han encontrado {$a} archivos';
 $string['importfilesuccess'] = 'El archivo <b>{$a}</b> se ha importado correctamente';
 $string['importfilealreadyexist'] = 'Ya se encuentra un archivo con el nombre <b>{$a}</b> en el área privada de este usuario';
 $string['importfileerror'] = 'El archivo <b>{$a->name}</b> no se ha podido importar: {$a->error}';
-$string['importfileerrorcontent'] = 'El archivo <b>{$a}</b> es un formulario de Google (aún por implementar) o no tiene ningún contenido almacenado en Drive';
+$string['importfileerrorcontent'] = '<b>{$a}</b> es un formulario de Google: no se descarga como archivo (los formularios se incrustan o enlazan según la configuración de formularios).';
 $string['convertdocumentto'] = 'Convirtiendo el archivo <b>{$a->title}</b> a formato <b>{$a->format}</b>';
 
 // Traces importcalendar

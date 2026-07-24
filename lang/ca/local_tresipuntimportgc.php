@@ -105,7 +105,8 @@ $string['view_more'] = 'Veure més';
 $string['drivefile'] = 'Arxiu GoogleDrive';
 $string['form'] = 'Formulario GoogleDrive';
 $string['link'] = 'Enllaç extern';
-$string['teacher_folder'] = "Carpeta de l'Professor";
+$string['teacher_folder'] = 'Carpeta del Professor';
+$string['teacher_folder_intro'] = 'Fitxers de la carpeta del professor importats des de Google Classroom.';
 $string['uniquename_course'] = 'Nom curt';
 $string['shortname_in_use'] = 'Nom curt en ús';
 $string['shortname_in_use_help'] = 'Aquest nom curt ja l\'utilitza un altre curs; canvia\'l abans d\'importar o el curs fallarà.';
@@ -144,7 +145,7 @@ $string['filesfound'] = '{$a} files have been found';
 $string['importfilesuccess'] = 'The file <b>{$a}</b> has been successfully imported';
 $string['importfilealreadyexist'] = 'A file with the name <b>{$a}</b> is already in this user\'s private area';
 $string['importfileerror'] = 'The file <b>{$a->name}</b> could not be imported: {$a->error}';
-$string['importfileerrorcontent'] = 'File <b>{$a}</b> has no content stored in Drive';
+$string['importfileerrorcontent'] = '<b>{$a}</b> és un formulari de Google: no es descarrega com a fitxer (els formularis s\'incrusten o s\'enllacen segons la configuració de formularis).';
 $string['convertdocumentto'] = 'Converting the file <b>{$a->title}</b> to format <b>{$a->format}</b>';
 
 // Traces importcalendar

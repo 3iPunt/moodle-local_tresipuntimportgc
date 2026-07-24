@@ -106,6 +106,7 @@ $string['drivefile'] = 'GoogleDrive File';
 $string['form'] = 'GoogleDrive Form';
 $string['link'] = 'External Link';
 $string['teacher_folder'] = 'Teacher Folder';
+$string['teacher_folder_intro'] = 'Teacher folder files imported from Google Classroom.';
 $string['uniquename_course'] = 'Short name';
 $string['shortname_in_use'] = 'Short name in use';
 $string['shortname_in_use_help'] = 'This short name is already used by another course; change it before importing or the course will fail.';
@@ -144,7 +145,7 @@ $string['filesfound'] = '{$a} files have been found';
 $string['importfilesuccess'] = 'The file <b>{$a}</b> has been successfully imported';
 $string['importfilealreadyexist'] = 'A file with the name <b>{$a}</b> is already in this user\'s private area';
 $string['importfileerror'] = 'The file <b>{$a->name}</b> could not be imported: {$a->error}';
-$string['importfileerrorcontent'] = 'File <b>{$a}</b> has no content stored in Drive';
+$string['importfileerrorcontent'] = '<b>{$a}</b> is a Google Form: it is not downloaded as a file (forms are embedded or linked according to the forms setting).';
 $string['convertdocumentto'] = 'Converting the file <b>{$a->title}</b> to format <b>{$a->format}</b>';
 
 // Traces importcalendar

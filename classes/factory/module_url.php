@@ -78,8 +78,7 @@ class module_url extends module {
             'course' => $course,
             'name' => $this->title,
             'externalurl' => $this->link,
-            'intro' => $this->intro,
-            'introformat' => FORMAT_HTML,
+            'introeditor' => $this->intro_editor(),
             'files' => file_get_unused_draft_itemid(),
         ];
         $options = ['section' => $this->get_section($course_id), 'visible' => $this->visible, 'showdescription' => true];

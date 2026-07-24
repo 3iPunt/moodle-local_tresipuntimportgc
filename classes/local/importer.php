@@ -25,6 +25,7 @@
 namespace local_tresipuntimportgc\local;
 
 use core\task\manager;
+use core_course_category;
 use local_tresipuntimportgc\event\gc_course_imported;
 use local_tresipuntimportgc\external\course_external;
 use local_tresipuntimportgc\external\importcalendar_external;
@@ -74,7 +75,7 @@ class importer {
                 'providerid' => (string) $config['providerid'],
                 'fullname' => (string) $config['fullname'],
                 'shortname' => (string) $config['shortname'],
-                'categoryid' => (int) $config['categoryid'],
+                'categoryid' => self::resolve_categoryid((int) $config['categoryid']),
                 'visible' => empty($config['visible']) ? 0 : 1,
                 'importfiles' => (int) ($config['importfiles'] ?? 0),
                 'calendarimport' => (int) ($config['calendarimport'] ?? 0),
@@ -88,6 +89,24 @@ class importer {
             self::queue_course_task($course, $userid);
         }
         return $import;
+    }
+
+    /**
+     * Resolves the target category id, falling back to the site default.
+     *
+     * Guarantees the course is never queued without a valid category (an empty
+     * or non-existent id would make course creation fail with a cryptic DB
+     * error): if none was chosen, or the chosen one no longer exists, the site
+     * default category is used.
+     *
+     * @param  int $categoryid Category id chosen in the importer (0 if none).
+     * @return int A valid, existing category id.
+     */
+    private static function resolve_categoryid(int $categoryid): int {
+        if ($categoryid > 0 && core_course_category::get($categoryid, IGNORE_MISSING, true)) {
+            return $categoryid;
+        }
+        return (int) core_course_category::get_default()->id;
     }
 
     /**

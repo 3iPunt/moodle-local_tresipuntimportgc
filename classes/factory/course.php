@@ -131,7 +131,9 @@ class course {
             $parts[] = \html_writer::tag('p', s($heading), ['class' => 'lead']);
         }
         if ((string) $this->description !== '') {
-            $parts[] = (string) $this->description;
+            // La descripción de Classroom es texto plano: convertir a HTML
+            // seguro (escapa, saltos de línea y enlaza URLs), como en los módulos.
+            $parts[] = text_to_html((string) $this->description, false, false, true);
         }
         $room = trim((string) ($this->providerdata->room ?? ''));
         if ($room !== '') {

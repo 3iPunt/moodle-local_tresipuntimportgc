@@ -87,8 +87,7 @@ class module_assign extends module {
         $record = [
             'course' => $course,
             'name' => $this->title,
-            'intro' => $this->intro,
-            'introformat' => FORMAT_HTML,
+            'introeditor' => $this->intro_editor(),
             'files' => file_get_unused_draft_itemid(),
         ];
         // Nota máxima del trabajo → calificación por puntos de la tarea (E10.4).

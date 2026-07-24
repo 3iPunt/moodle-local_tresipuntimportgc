@@ -77,8 +77,7 @@ class module_feedback extends module {
         $record = [
             'course' => $course,
             'name' => $this->title,
-            'intro' => $this->intro,
-            'introformat' => FORMAT_HTML,
+            'introeditor' => $this->intro_editor(),
         ];
         if ($availability = self::scheduled_availability($this->module)) {
             $record['availability'] = $availability;

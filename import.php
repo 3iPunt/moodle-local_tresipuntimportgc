@@ -156,10 +156,15 @@ if (!$provider->is_configured()) {
         ['value' => 2, 'text' => get_string('notimport', 'local_tresipuntimportgc'),
             'selected' => $calendardefault !== 1 ? 'selected' : ''],
     ];
+    // Categoría preseleccionada por defecto (la del sitio): así el importador
+    // nunca queda sin categoría y el usuario ve dónde irán los cursos.
+    $defaultcat = core_course_category::get_default();
+    $defaultcategory = ['id' => (int) $defaultcat->id, 'name' => $defaultcat->get_nested_name(false)];
     $view = new import_view('list', $courses, $categories, $allowconfig, $filesoptions,
         $calendaroptions, $provider->get_account_email(), $provider->get_auth_url(),
         $isadmin, $errormsg,
-        has_capability('local/tresipuntimportgc:viewreports', context_system::instance()));
+        has_capability('local/tresipuntimportgc:viewreports', context_system::instance()),
+        $defaultcategory);
 }
 
 $renderer = $PAGE->get_renderer('local_tresipuntimportgc');

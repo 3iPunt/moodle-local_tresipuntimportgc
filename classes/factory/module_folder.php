@@ -80,8 +80,7 @@ class module_folder extends module {
         $record = [
             'course' => $course,
             'name' => $this->title,
-            'intro' => $this->intro,
-            'introformat' => FORMAT_HTML,
+            'introeditor' => $this->intro_editor(),
             'showexpanded' => true,
             'files' => file_get_unused_draft_itemid()
         ];

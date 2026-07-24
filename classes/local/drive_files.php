@@ -56,7 +56,9 @@ class drive_files {
     public static function store(provider $provider, stdClass $filemeta, int $contextid,
             int $userid, string $component, string $filearea, string $filepath, int $itemid = 0): void {
         if ($filemeta->mimetype === 'application/vnd.google-apps.form') {
-            trace_router::trace('importfileerrorcontent', 'error', $filemeta->name);
+            // Un Google Form no tiene binario descargable: se omite (no es un
+            // error, los formularios se tratan aparte según formsimport).
+            trace_router::trace('importfileerrorcontent', 'warning', $filemeta->name);
             return;
         }
         $exports = [

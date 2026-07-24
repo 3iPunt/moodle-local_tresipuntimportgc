@@ -145,4 +145,22 @@ abstract class module  {
         ]);
     }
 
+    /**
+     * Builds the `introeditor` array for module creation.
+     *
+     * The intro must go through `introeditor` (not a plain `intro`) so the
+     * PHPUnit module generator does NOT inject its test default ("Test <mod> N")
+     * when the Classroom description is empty. `add_moduleinfo()` extracts the
+     * final intro/introformat from this array.
+     *
+     * @return array Editor array {text, format, itemid}.
+     */
+    protected function intro_editor(): array {
+        return [
+            'text' => (string) $this->intro,
+            'format' => FORMAT_HTML,
+            'itemid' => file_get_unused_draft_itemid(),
+        ];
+    }
+
 }

@@ -78,6 +78,9 @@ class import_view implements renderable, templatable {
     /** @var bool Whether the current user can open the imports panel. */
     private $canviewpanel;
 
+    /** @var array Default category preselected in the importer ({id, name}). */
+    private $defaultcategory;
+
     /**
      * Constructor.
      *
@@ -92,6 +95,7 @@ class import_view implements renderable, templatable {
      * @param bool        $isadmin            User can reach site settings.
      * @param string      $errormsg           Provider error message, if any.
      * @param bool        $canviewpanel       User can open the imports panel.
+     * @param array       $defaultcategory    Preselected category ({id, name}).
      */
     public function __construct(
         string $state,
@@ -104,7 +108,8 @@ class import_view implements renderable, templatable {
         string $authurl = '',
         bool $isadmin = false,
         string $errormsg = '',
-        bool $canviewpanel = false
+        bool $canviewpanel = false,
+        array $defaultcategory = []
     ) {
         $this->state = $state;
         $this->courses = $courses;
@@ -117,6 +122,7 @@ class import_view implements renderable, templatable {
         $this->isadmin = $isadmin;
         $this->errormsg = $errormsg;
         $this->canviewpanel = $canviewpanel;
+        $this->defaultcategory = $defaultcategory;
     }
 
     /**
@@ -160,6 +166,8 @@ class import_view implements renderable, templatable {
         $data->actionurl = (new moodle_url('/local/tresipuntimportgc/import.php'))->out(false);
         $data->canviewpanel = $this->canviewpanel;
         $data->panelurl = (new moodle_url('/local/tresipuntimportgc/panel.php'))->out(false);
+        $data->defaultcategoryid = (int) ($this->defaultcategory['id'] ?? 0);
+        $data->defaultcategoryname = (string) ($this->defaultcategory['name'] ?? '');
         return $data;
     }
 }
