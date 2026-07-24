@@ -17,10 +17,16 @@
 namespace local_tresipuntimportgc;
 
 use core\task\manager;
+use local_tresipuntimportgc\event\gc_course_imported;
+use local_tresipuntimportgc\factory\course;
 use local_tresipuntimportgc\local\importer;
 use local_tresipuntimportgc\models\import;
 use local_tresipuntimportgc\models\import_course;
 use local_tresipuntimportgc\providers\provider;
+use local_tresipuntimportgc\responses\response_course;
+use local_tresipuntimportgc\responses\response_data;
+use local_tresipuntimportgc\responses\response_modules;
+use local_tresipuntimportgc\responses\response_sections;
 use local_tresipuntimportgc\task\import_course_task;
 
 /**
@@ -79,6 +85,129 @@ final class importer_test extends \advanced_testcase {
         sort($queuedids);
         $this->assertSame([(int) $courses[0]->get('id'), (int) $courses[1]->get('id')],
             $queuedids);
+    }
+
+    /**
+     * End to end (no network): a pending course is imported into a real
+     * Moodle course, traced, marked success and the audit event is fired.
+     *
+     * The provider is faked so the factory creates a genuine Moodle course
+     * (empty sections and modules) without ever reaching Google.
+     */
+    public function test_run_course_creates_moodle_course(): void {
+        $this->resetAfterTest();
+        // Traces also go to the CLI task log under PHPUnit.
+        $this->expectOutputRegex('/Course creation process completed/');
+        $this->setAdminUser();
+        $generator = $this->getDataGenerator()->get_plugin_generator('local_tresipuntimportgc');
+        $admin = get_admin();
+
+        $import = $generator->create_import(['userid' => $admin->id]);
+        $import->set_refresh_token('1//token');
+        $import->update();
+        // importfiles = 3 and calendarimport = 2 keep the run to course creation only.
+        $course = $generator->create_import_course([
+            'importid' => $import->get('id'), 'providerid' => 'gc-1',
+            'fullname' => 'Biology 101', 'shortname' => 'bio101',
+            'categoryid' => 1, 'importfiles' => 3, 'calendarimport' => 2,
+        ]);
+
+        $provider = $this->createMock(provider::class);
+        $provider->method('authenticate_with_refresh_token')
+            ->willReturn(new response_data(true, null, null));
+        $provider->method('get_account_email')->willReturn('prof@example.com');
+        $provider->method('get_refresh_token')->willReturn('1//token');
+        $provider->method('get_course')->willReturn(
+            new response_course(true, new course('gc-1', 'A description', (object) []), null));
+        $provider->method('get_sections')->willReturn(new response_sections(true, []));
+        $provider->method('get_modules')->willReturn(new response_modules(true, []));
+
+        $sink = $this->redirectEvents();
+        importer::run_course($course, $provider);
+        $events = $sink->get_events();
+        $sink->close();
+
+        $reloaded = new import_course($course->get('id'));
+        $this->assertSame(import_course::STATUS_SUCCESS, $reloaded->get('status'));
+        $moodlecourseid = (int) $reloaded->get('courseid');
+        $this->assertGreaterThan(0, $moodlecourseid);
+
+        // The Moodle course really exists with the requested shortname.
+        $moodlecourse = get_course($moodlecourseid);
+        $this->assertSame('bio101', $moodlecourse->shortname);
+        $this->assertSame('Biology 101', $moodlecourse->fullname);
+
+        // The launcher is enrolled as editing teacher.
+        $context = \context_course::instance($moodlecourseid);
+        $this->assertTrue(is_enrolled($context, $admin->id));
+
+        // Traces were persisted and the audit event fired for this course.
+        $this->assertNotEmpty($reloaded->get_logs());
+        $imported = array_filter($events, static function ($e) {
+            return $e instanceof gc_course_imported;
+        });
+        $this->assertCount(1, $imported);
+        $this->assertSame($moodlecourseid, (int) reset($imported)->other['courseid']);
+
+        // The run finished: its token was wiped.
+        $this->assertNull((new import($import->get('id')))->get_refresh_token());
+    }
+
+    /**
+     * A duplicate shortname fails cleanly with an error trace, no exception.
+     */
+    public function test_run_course_duplicate_shortname_marks_error(): void {
+        $this->resetAfterTest();
+        $this->expectOutputRegex('/already in use/');
+        $this->setAdminUser();
+        $generator = $this->getDataGenerator()->get_plugin_generator('local_tresipuntimportgc');
+        $admin = get_admin();
+
+        // A Moodle course already uses the shortname the import will request.
+        $this->getDataGenerator()->create_course(['shortname' => 'taken']);
+
+        $import = $generator->create_import(['userid' => $admin->id]);
+        $import->set_refresh_token('1//token');
+        $import->update();
+        $course = $generator->create_import_course([
+            'importid' => $import->get('id'), 'shortname' => 'taken', 'importfiles' => 3]);
+
+        $provider = $this->createMock(provider::class);
+        $provider->method('authenticate_with_refresh_token')
+            ->willReturn(new response_data(true, null, null));
+
+        importer::run_course($course, $provider);
+
+        $reloaded = new import_course($course->get('id'));
+        $this->assertSame(import_course::STATUS_ERROR, $reloaded->get('status'));
+        $messages = array_map(static fn($l) => $l->get('message'), $reloaded->get_logs());
+        $this->assertNotEmpty(array_filter($messages, static function ($m) {
+            return stripos($m, 'taken') !== false;
+        }));
+    }
+
+    /**
+     * A failed authentication marks the course as error without creating anything.
+     */
+    public function test_run_course_auth_failure_marks_error(): void {
+        $this->resetAfterTest();
+        $generator = $this->getDataGenerator()->get_plugin_generator('local_tresipuntimportgc');
+        $user = $this->getDataGenerator()->create_user();
+
+        $import = $generator->create_import(['userid' => $user->id]);
+        $import->set_refresh_token('1//token');
+        $import->update();
+        $course = $generator->create_import_course(['importid' => $import->get('id')]);
+
+        $provider = $this->createMock(provider::class);
+        $provider->method('authenticate_with_refresh_token')->willReturn(
+            new response_data(false, null,
+                new \local_tresipuntimportgc\responses\error('E', 'bad token')));
+
+        importer::run_course($course, $provider);
+
+        $this->assertSame(import_course::STATUS_ERROR,
+            (new import_course($course->get('id')))->get('status'));
     }
 
     /**

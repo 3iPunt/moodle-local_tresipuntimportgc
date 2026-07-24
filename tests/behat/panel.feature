@@ -36,6 +36,9 @@ Feature: Panel de importaciones
     And I should see "Manager One"
     And I should see "With issues"
     And I should see "View detail"
+    # Privacidad: un manager que no es administrador del sitio no ve la
+    # cuenta de Google de quien lanzó la importación.
+    And I should not see "teacher@example.com"
 
   # El filtro de estado se aplica en servidor vía parámetro GET: si ningún
   # run coincide, se muestra el estado "sin resultados" (distinto del vacío).

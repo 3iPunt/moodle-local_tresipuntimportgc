@@ -49,11 +49,12 @@ class drive_files {
      * @param  string   $component File area component.
      * @param  string   $filearea  File area name.
      * @param  string   $filepath  File path inside the area.
+     * @param  int      $itemid    File area item id (0 for content/private areas).
      * @return void
      * @throws \coding_exception
      */
     public static function store(provider $provider, stdClass $filemeta, int $contextid,
-            int $userid, string $component, string $filearea, string $filepath): void {
+            int $userid, string $component, string $filearea, string $filepath, int $itemid = 0): void {
         if ($filemeta->mimetype === 'application/vnd.google-apps.form') {
             trace_router::trace('importfileerrorcontent', 'error', $filemeta->name);
             return;
@@ -72,7 +73,7 @@ class drive_files {
             'contextid' => $contextid,
             'component' => $component,
             'filearea' => $filearea,
-            'itemid' => 0,
+            'itemid' => $itemid,
             'filepath' => $filepath,
             'userid' => $userid,
         ]);
@@ -96,17 +97,18 @@ class drive_files {
      * @param  string   $component File area component.
      * @param  string   $filearea  File area name.
      * @param  string   $filepath  File path inside the area.
+     * @param  int      $itemid    File area item id (0 for content/private areas).
      * @return void
      * @throws \coding_exception
      */
     public static function import(provider $provider, string $fileid, int $contextid,
-            int $userid, string $component, string $filearea, string $filepath): void {
+            int $userid, string $component, string $filearea, string $filepath, int $itemid = 0): void {
         $meta = $provider->get_drive_file($fileid);
         if (!$meta->success) {
             trace_router::trace('importfileerror', 'danger',
                 ['name' => $fileid, 'error' => $meta->error->to_string()]);
             return;
         }
-        self::store($provider, $meta->data, $contextid, $userid, $component, $filearea, $filepath);
+        self::store($provider, $meta->data, $contextid, $userid, $component, $filearea, $filepath, $itemid);
     }
 }

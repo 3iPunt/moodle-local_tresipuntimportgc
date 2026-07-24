@@ -24,12 +24,14 @@ namespace local_tresipuntimportgc\external;
 
 use calendar_event;
 use coding_exception;
+use context_course;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_single_structure;
 use core_external\external_value;
 use html_writer;
 use invalid_parameter_exception;
+use local_tresipuntimportgc\local\drive_files;
 use local_tresipuntimportgc\local\trace_router;
 use local_tresipuntimportgc\providers\google;
 use moodle_exception;
@@ -68,7 +70,7 @@ class importcalendar_external extends external_api {
      * @throws moodle_exception
      */
     public static function importcalendar(string $providerid, int $courseid): array {
-        global $USER;
+        global $USER, $DB;
 
         $syscontext = \context_system::instance();
         self::validate_context($syscontext);
@@ -105,13 +107,6 @@ class importcalendar_external extends external_api {
                     $summary .= html_writer::link($link,
                         get_string('conference', 'local_tresipuntimportgc'), ['target' => 'blank']);
                 }
-                if (!empty($googleevent->attachments)) {
-                    $summary .= '<hr>';
-                    $summary .= html_writer::tag('h5', get_string('files'));
-                    foreach ($googleevent->attachments as $attachment) {
-                        $summary .= html_writer::link($attachment->url, $attachment->title, ['target' => '_blank']);
-                    }
-                }
                 if ($googleevent->location !== '') {
                     $summary .= '<hr>';
                     $summary .= html_writer::tag('h5', get_string('location', 'moodle'));
@@ -134,7 +129,31 @@ class importcalendar_external extends external_api {
                 $event->timestart = $googleevent->timestart;
                 $event->visible = 1;
                 $event->timeduration = $googleevent->timeduration;
-                calendar_event::create($event);
+                $ev = calendar_event::create($event);
+
+                // Adjuntos → ficheros de Moodle en el área del evento (E10.10):
+                // los de Drive se descargan y se referencian con @@PLUGINFILE@@;
+                // los que no son de Drive quedan como enlace externo.
+                if ($ev && !empty($googleevent->attachments)) {
+                    $coursecontext = context_course::instance($courseid);
+                    $links = [];
+                    foreach ($googleevent->attachments as $attachment) {
+                        if ($attachment->fileid !== '') {
+                            $meta = $provider->get_drive_file($attachment->fileid);
+                            if ($meta->success) {
+                                drive_files::store($provider, $meta->data, $coursecontext->id,
+                                    (int) $USER->id, 'calendar', 'event_description', '/', (int) $ev->id);
+                                $links[] = html_writer::link(
+                                    '@@PLUGINFILE@@/' . rawurlencode($meta->data->name), $meta->data->name);
+                                continue;
+                            }
+                        }
+                        $links[] = html_writer::link($attachment->url, $attachment->title, ['target' => '_blank']);
+                    }
+                    $newdesc = $summary . '<hr>' . html_writer::tag('h5', get_string('files'))
+                        . implode('<br>', $links);
+                    $DB->set_field('event', 'description', $newdesc, ['id' => $ev->id]);
+                }
             }
         }
 

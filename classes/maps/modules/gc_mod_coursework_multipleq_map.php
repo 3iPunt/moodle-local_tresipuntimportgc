@@ -18,8 +18,7 @@ namespace local_tresipuntimportgc\maps\modules;
 
 use coding_exception;
 use local_tresipuntimportgc\factory\module;
-use local_tresipuntimportgc\factory\module_form;
-use local_tresipuntimportgc\factory\module_quiz;
+use local_tresipuntimportgc\factory\module_choice;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -46,8 +45,9 @@ class gc_mod_coursework_multipleq_map extends gc_mod_map  {
         $mats = $module['materials'] ?? [];
         $desc = $module['description'] ?? '';
         $desc = self::get_desc_rich($desc, $mats);
-        return new module_form(
-            $section, $module, $desc, $visible, $provider
+        // Pregunta de opción múltiple → actividad de Elección con sus opciones (E10.1).
+        return new module_choice(
+            $section, $module, $desc, $visible
         );
     }
 

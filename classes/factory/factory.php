@@ -76,6 +76,7 @@ class factory  {
         string $providerid, int $categoryid, string $fullname, string $shortname, bool $visible, int $importfiles
     ): response {
         trace_router::trace('startingcourse', 'light', $fullname);
+        section::reset_map();
         $errors = [];
         $res = $this->provider->get_course($providerid);
         if ($res->success) {
@@ -89,9 +90,14 @@ class factory  {
                 // TODO add cover image if a non-generic Classroom image is associated with it
                 // Create Teacher Resource if config.
                 if ($importfiles === 0) {
+                    // Descargar la carpeta del profesor a una carpeta del curso,
+                    // oculta para estudiantes (E10.8): los ficheros viven en Moodle.
                     $restf = $this->provider->get_teacher_folder($providerid);
                     if ($restf->success) {
-                        $course->create_teacher_folder($restf->data->title, $restf->data->link);
+                        $resfiles = $this->provider->list_drive_folder($restf->data->get_providerid());
+                        $files = $resfiles->success ? $resfiles->data : [];
+                        $folder = new module_teacher_folder($restf->data->title, $files, $this->provider);
+                        $folder->create($courseid);
                         trace_router::trace('teacherfoldercreated', 'success', null);
                     } else {
                         $errors[] = $restf->error;

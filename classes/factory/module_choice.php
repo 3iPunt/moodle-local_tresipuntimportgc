@@ -15,114 +15,87 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class module_resource
+ * Class module_choice
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2026 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_tresipuntimportgc\factory;
 
 use coding_exception;
-use context_module;
 use dml_exception;
-use local_tresipuntimportgc\local\drive_files;
-use local_tresipuntimportgc\providers\google;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response_module;
-use mod_resource_generator;
+use mod_choice_generator;
 
 defined('MOODLE_INTERNAL') || die;
 
 /**
- * Class module_resource
+ * Maps a Classroom MULTIPLE_CHOICE_QUESTION to a Moodle Choice activity,
+ * carrying over the options that already come in the API response (E10.1).
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2026 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class module_resource extends module {
+class module_choice extends module {
 
     /** @var string Mod Name */
-    protected $modname = 'resource';
+    protected $modname = 'choice';
 
-    /** @var mod_resource_generator Generator */
+    /** @var mod_choice_generator Generator */
     protected $generator;
 
-    /** array material */
-    protected $material;
+    /** @var array The Classroom module. */
+    protected $module;
 
     /**
      * constructor.
      *
      * @param string $providersection
-     * @param string $title
+     * @param array  $module
      * @param string $intro
-     * @param bool $visible
-     * @param array $material
+     * @param bool   $visible
      * @throws coding_exception
      */
-    public function __construct(string $providersection, string $title, string $intro, bool $visible, array $material) {
-        parent::__construct('mod_resource', $providersection, $title, $intro, $visible);
-        $this->material = $material;
+    public function __construct(string $providersection, array $module, string $intro, bool $visible) {
+        parent::__construct('mod_choice', $providersection, $module['title'], $intro, $visible);
+        $this->module = $module;
     }
 
     /**
      * Create.
      *
-     * @param int $course_id
+     * @param  int $course_id
      * @return response_module
      * @throws dml_exception
      */
     public function create(int $course_id): response_module {
         $course = get_course($course_id);
+        $choices = $this->module['multipleChoiceQuestion']['choices'] ?? [];
         $record = [
             'course' => $course,
             'name' => $this->title,
             'intro' => $this->intro,
             'introformat' => FORMAT_HTML,
-            'files' => file_get_unused_draft_itemid()
         ];
+        if (!empty($choices)) {
+            $record['option'] = array_values($choices);
+        }
+        if ($availability = self::scheduled_availability($this->module)) {
+            $record['availability'] = $availability;
+        }
         $options = [
             'section' => $this->get_section($course_id),
             'visible' => $this->visible,
-            'showdescription' => false
+            'showdescription' => false,
         ];
         $res = $this->generator->create_instance($record, $options);
         if (isset($res)) {
-            if (count($this->material) > 0) {
-                $this->add_file($res);
-            }
             return new response_module(true, $this, null);
         }
-
-        return new response_module(false, null, new error('12000', 'MODULE_NOT_CREATED'));
+        return new response_module(false, null, new error('18000', 'MODULE_NOT_CREATED'));
     }
-
-    /**
-     * Imports the Drive file of the material into the resource file area.
-     *
-     * @param  object $res Generator result (with cmid).
-     * @return void
-     * @throws coding_exception
-     */
-    private function add_file($res): void {
-        global $USER;
-
-        $context = context_module::instance($res->cmid);
-        if (array_key_first($this->material) === 'driveFile') {
-            drive_files::import(
-                new google(),
-                $this->material['driveFile']['driveFile']['id'],
-                $context->id,
-                (int) $USER->id,
-                'mod_resource',
-                'content',
-                '/'
-            );
-        }
-    }
-
-
 }

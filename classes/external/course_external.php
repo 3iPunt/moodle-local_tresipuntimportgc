@@ -32,6 +32,7 @@ use invalid_parameter_exception;
 use local_tresipuntimportgc\factory\factory;
 use local_tresipuntimportgc\local\trace_router;
 use local_tresipuntimportgc\providers\google;
+use local_tresipuntimportgc\providers\provider;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -61,13 +62,17 @@ class course_external extends external_api {
      * @param int $category
      * @param bool $visible
      * @param int $importfiles
+     * @param provider|null $provider Connected provider (defaults to a new google();
+     *                                injectable so the importer reuses one authenticated
+     *                                provider per run and tests can avoid the network).
      * @return array
      * @throws coding_exception
      * @throws invalid_parameter_exception
      * @throws moodle_exception
      */
     public static function create_course(
-        string $providerid, string $fullname, string $shortname, int $category, bool $visible, int $importfiles): array {
+        string $providerid, string $fullname, string $shortname, int $category, bool $visible,
+        int $importfiles, ?provider $provider = null): array {
         global $CFG;
         require_once($CFG->dirroot . '/course/lib.php');
         $syscontext = \context_system::instance();
@@ -90,7 +95,7 @@ class course_external extends external_api {
         if ($moodlecategory) {
             if (core_course_category::can_view_category($moodlecategory)) {
                 // Factory.
-                $provider = new google();
+                $provider = $provider ?? new google();
                 $factory = new factory($provider);
                 $res = $factory->create_course($providerid, $moodlecategory->id, $fullname, $shortname, $visible, $importfiles);
                 $success = $res->success;

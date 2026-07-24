@@ -16,14 +16,10 @@
 
 namespace local_tresipuntimportgc\maps;
 
-use Exception;
+use Throwable;
 use local_tresipuntimportgc\factory\course;
 use local_tresipuntimportgc\factory\folder;
 use local_tresipuntimportgc\factory\module;
-use local_tresipuntimportgc\factory\module_assign;
-use local_tresipuntimportgc\factory\module_folder;
-use local_tresipuntimportgc\factory\module_label;
-use local_tresipuntimportgc\factory\module_url;
 use local_tresipuntimportgc\factory\section;
 use local_tresipuntimportgc\maps\modules\gc_mod_map;
 use local_tresipuntimportgc\providers\provider;
@@ -111,11 +107,12 @@ class gc_map extends map {
     /**
      * Module.
      *
-     * @param string[] $module
-     * @param string $type
-     * @return module
+     * @param  string[] $module
+     * @param  provider $provider
+     * @param  string $type
+     * @return module|module[]|null
      */
-    public static function module(array $module, provider $provider, string $type = ''): ?module {
+    public static function module(array $module, provider $provider, string $type = '') {
         $item = null;
         if (isset($module['assigneeMode']) && $module['assigneeMode'] === 'ALL_STUDENTS') {
             if (isset(gc_mod_map::GC_MODS[$type])) {
@@ -125,7 +122,9 @@ class gc_map extends map {
                     try {
                         $modmap = new $class;
                         return $modmap->get_mod($module, $provider);
-                    } catch (Exception $e) {
+                    } catch (Throwable $e) {
+                        // Robustez (§6.5): un Error en la transformación de un
+                        // módulo no debe tumbar la importación del resto.
                         mtrace('    -- ERROR: GET_MODULE: ' . $module['id'] . ' - ' . $e->getMessage());
                         return null;
                     }
@@ -138,57 +137,32 @@ class gc_map extends map {
         return null;
     }
 
-    public static function materials(array $module): array {
-        $materials = [];
-        if (isset($module['materials'])) {
-            foreach($module['materials'] as $material) {
-                $type = array_key_first($material);
-                if (isset(gc_mod_map::GC_MATERIALS[$type])) {
-                    $class = gc_mod_map::GC_MATERIALS[$type];
-                    if (!empty($class)) {
-                        try {
-                            $modmap = new $class;
-                            $material['section'] = $module['topicId'] ?? '';
-                            $material['visible'] = $module['state'] === 'PUBLISHED';
-                            $materials[] = $modmap->get_mod($material);
-                        } catch (Exception $e) {
-                            error_log($e->getMessage());
-                            mtrace('    -- ERROR: GET_MODULE OF MATERIAL:  - ' . $e->getMessage());
-                            return $materials;
-                        }
-                    }
-                } else {
-                    mtrace('    -- ERROR: GET_MODULE_TYPE: ' . $module['id'] . ' - ' . $type);
-                }
-            }
-        }
-        return $materials;
-    }
-
     /**
      * Modules.
      *
      * @param array $modules
+     * @param provider $provider
      * @param string $type
-     * @param provider|null $provider
      * @return module[]
      */
     public static function modules(array $modules, provider $provider, string $type = ''): array {
+        // Orden estable por fecha de creación (§6.8): la API los devuelve sin
+        // orden garantizado. Se ordena dentro de cada tipo; los tipos se
+        // agrupan luego al concatenarse en el proveedor.
+        usort($modules, static function ($a, $b) {
+            return strcmp($a['creationTime'] ?? '', $b['creationTime'] ?? '');
+        });
         $data = [];
         foreach ($modules as $module) {
             $m = self::module($module, $provider, $type);
-            /* TODO if it is an assignment and there are files, they will be downloaded and included within it. Otherwise, the files will become Moodle mods. */
-            /*if (($m instanceof module_assign) === false && ($m instanceof module_folder) === false) {
-                // if it is an assignment and there are subjects, they will be downloaded and included within it. Otherwise, the subjects will become Moodle mods.
-                $materials = self::materials($module);
-                foreach ($materials as $material) {
-                    $data[] = $material;
+            // Un ítem puede mapear a varios módulos (materiales combinados, E10.11).
+            if (is_array($m)) {
+                foreach ($m as $sub) {
+                    $data[] = $sub;
                 }
-                if (($m instanceof module_label) === true) {
-                    continue;
-                }
-            }*/
-            $data[] = $m;
+            } else {
+                $data[] = $m;
+            }
         }
         return $data;
     }

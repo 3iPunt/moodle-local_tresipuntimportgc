@@ -108,7 +108,7 @@ class course {
         $data->shortname = $shortname;
         $data->fullname = $fullname;
         $data->visible = $visible;
-        $data->summary = $this->description;
+        $data->summary = $this->build_summary();
         try {
             $new = create_course($data);
             $this->set_id($new->id);
@@ -116,6 +116,29 @@ class course {
         } catch (moodle_exception $e) {
             return new response_course(false, null, new error('11000', $e->getMessage()));
         }
+    }
+
+    /**
+     * Builds the course summary from the Classroom description, plus the
+     * subtitle (descriptionHeading) and room, when present (E10.6).
+     *
+     * @return string HTML summary.
+     */
+    private function build_summary(): string {
+        $parts = [];
+        $heading = trim((string) ($this->providerdata->descriptionHeading ?? ''));
+        if ($heading !== '') {
+            $parts[] = \html_writer::tag('p', s($heading), ['class' => 'lead']);
+        }
+        if ((string) $this->description !== '') {
+            $parts[] = (string) $this->description;
+        }
+        $room = trim((string) ($this->providerdata->room ?? ''));
+        if ($room !== '') {
+            $parts[] = \html_writer::tag('p',
+                get_string('course_room', 'local_tresipuntimportgc', s($room)));
+        }
+        return implode("\n", $parts);
     }
 
     /**

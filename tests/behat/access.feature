@@ -33,13 +33,14 @@ Feature: Control de acceso a las pantallas de importación
     And I should not see "Connect with Google"
 
   # Con credenciales guardadas pero sin sesión de Google iniciada, la
-  # pantalla pasa al estado "conectar": los tres pasos y el botón de Google.
+  # pantalla pasa al estado "conectar": los tres pasos y el botón de Google
+  # (el título de la cabecera es estático; el CTA vive en el cuerpo).
   Scenario: Con credenciales configuradas se ofrece conectar con Google
     Given the following config values are set as admin:
       | clientid  | test-client-id.apps.googleusercontent.com | local_tresipuntimportgc |
       | secretkey | test-secret                               | local_tresipuntimportgc |
     And I log in as "manager1"
     When I visit "/local/tresipuntimportgc/import.php"
-    Then I should see "Import your Google Classroom classes"
-    And I should see "Connect with Google"
+    Then I should see "Connect with Google"
+    And I should see "Connect your Google account and accept the read-only permissions."
     And I should not see "The administrator has not configured the Google connection yet"

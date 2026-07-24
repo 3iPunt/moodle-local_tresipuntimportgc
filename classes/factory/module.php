@@ -123,4 +123,26 @@ abstract class module  {
      */
     abstract public function create(int $course_id): response_module;
 
+    /**
+     * Builds a Moodle availability restriction «available from» the Classroom
+     * scheduled publication time, if present (E10.5).
+     *
+     * @param  array $module The Classroom module.
+     * @return string|null Availability JSON, or null if there is no scheduledTime.
+     */
+    protected static function scheduled_availability(array $module): ?string {
+        if (empty($module['scheduledTime'])) {
+            return null;
+        }
+        $timestamp = strtotime($module['scheduledTime']);
+        if (!$timestamp) {
+            return null;
+        }
+        return json_encode([
+            'op' => '&',
+            'c' => [['type' => 'date', 'd' => '>=', 't' => $timestamp]],
+            'showc' => [true],
+        ]);
+    }
+
 }

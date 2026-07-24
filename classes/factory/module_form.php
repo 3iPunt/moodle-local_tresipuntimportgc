@@ -70,10 +70,10 @@ class module_form extends module {
     public function __construct(string $providersection, array $module, string $intro, bool $visible, google $provider) {
         $this->module = $module;
         $this->provider = $provider;
-        $this->modname = 'mod_quiz';
+        $this->modname = 'quiz';
         if ((isset($module['workType']) && $module['workType'] === 'SHORT_ANSWER_QUESTION') ||
             (isset($module['workType']) && $module['workType'] === 'MULTIPLE_CHOICE_QUESTION')) {
-            $this->modname = 'mod_feedback';
+            $this->modname = 'feedback';
         }
         if (isset($module['materials'][0]) && array_key_first($module['materials'][0]) === 'form' && count($module['materials']) === 1) {
             $formurl = $module['materials'][0]['form']['formUrl'];
@@ -85,7 +85,8 @@ class module_form extends module {
                 // TODO when isquiz, import questions once the Forms API mapping lands.
             }
         }
-        parent::__construct($this->modname, $providersection, $module['title'], $intro, $visible);
+        // modname sin prefijo (traza); el generador necesita el componente con prefijo.
+        parent::__construct('mod_' . $this->modname, $providersection, $module['title'], $intro, $visible);
     }
 
     /**

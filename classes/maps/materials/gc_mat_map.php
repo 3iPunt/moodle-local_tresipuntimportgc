@@ -31,11 +31,17 @@ abstract class gc_mat_map {
 
     const GC_LOGICAL = '';
 
+    /*
+     * Regla «traer frente a enlazar» (§6.4): los ficheros de Drive se importan
+     * al almacenamiento de Moodle desde su propio módulo, no se enlazan aquí;
+     * YouTube y los enlaces externos se mantienen como enlace/embed en la
+     * descripción (límite legal: no se descargan); el formulario se embebe.
+     */
     const GC_MATS = [
-        'youtubeVideo' => gc_mat_youtube_map::class,
-        'link' => gc_mat_link_map::class,
-        //'driveFile' => gc_mat_drivefile_map::class, // drive content is already imported into Moodle, so users can delete the course.
-        'form' => gc_mat_form_map::class // TODO it is necessary to build them in Moodle, so that users can delete them from the classroom.
+        'youtubeVideo' => gc_mat_youtube_map::class, // Enlace/embed a YouTube.
+        'link' => gc_mat_link_map::class,            // Enlace externo.
+        // 'driveFile' NO va aquí: se trae al almacenamiento de Moodle en su módulo.
+        'form' => gc_mat_form_map::class,            // Formulario embebido.
     ];
 
     /**

@@ -500,6 +500,7 @@ class google extends provider {
                     $attachments[] = (object) [
                         'url' => (string) $attachment->getFileUrl(),
                         'title' => (string) $attachment->getTitle(),
+                        'fileid' => (string) $attachment->getFileId(),
                     ];
                 }
                 $events[] = (object) [
@@ -646,7 +647,7 @@ class google extends provider {
      * @return Classroom
      * @throws Exception If there is no usable token in the session.
      */
-    private function get_classroom(): Classroom {
+    protected function get_classroom(): Classroom {
         if ($this->classroom === null) {
             $this->classroom = new Classroom($this->get_authenticated_client());
         }

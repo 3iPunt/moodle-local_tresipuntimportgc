@@ -91,6 +91,14 @@ class module_assign extends module {
             'introformat' => FORMAT_HTML,
             'files' => file_get_unused_draft_itemid(),
         ];
+        // Nota máxima del trabajo → calificación por puntos de la tarea (E10.4).
+        if (isset($this->module['maxPoints']) && (int) $this->module['maxPoints'] > 0) {
+            $record['grade'] = (int) $this->module['maxPoints'];
+        }
+        // Fecha de publicación programada → restricción de acceso (E10.5).
+        if ($availability = self::scheduled_availability($this->module)) {
+            $record['availability'] = $availability;
+        }
         if (isset($this->module['dueDate'])) {
             $hour = 0;
             $minute = 0;

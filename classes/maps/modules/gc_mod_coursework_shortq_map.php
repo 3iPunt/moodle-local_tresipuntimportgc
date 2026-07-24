@@ -18,7 +18,7 @@ namespace local_tresipuntimportgc\maps\modules;
 
 use coding_exception;
 use local_tresipuntimportgc\factory\module;
-use local_tresipuntimportgc\factory\module_form;
+use local_tresipuntimportgc\factory\module_feedback;
 use local_tresipuntimportgc\providers\provider;
 
 defined('MOODLE_INTERNAL') || die();
@@ -45,8 +45,9 @@ class gc_mod_coursework_shortq_map extends gc_mod_map  {
         $section = $module['topicId'] ?? '';
         $mats = $module['materials'] ?? [];
         $desc = self::get_desc_rich($module['description'] ?? '', $mats);
-        return new module_form(
-            $section, $module, $desc, $visible, $provider
+        // Pregunta de respuesta corta → Retroalimentación con el enunciado (E10.1).
+        return new module_feedback(
+            $section, $module, $desc, $visible
         );
     }
 }

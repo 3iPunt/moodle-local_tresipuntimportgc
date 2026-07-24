@@ -27,8 +27,8 @@ require_once('./lib.php');
 
 global $PAGE, $OUTPUT, $DB, $USER;
 
+use local_tresipuntimportgc\local\panel_query;
 use local_tresipuntimportgc\models\import;
-use local_tresipuntimportgc\models\import_course;
 use local_tresipuntimportgc\output\panel_view;
 
 // Parameters.
@@ -63,58 +63,14 @@ $runstatus = [
     import::STATUS_ERROR => ['istatus_error', 'tipgc-badge-error'],
 ];
 
-// One aggregated query: imports + course status counts + launcher name.
-$userfields = \core_user\fields::for_name()->get_sql('u', false, '', '', false)->selects;
-$sql = "SELECT i.id, i.userid, i.googleaccount, i.timecreated, $userfields,
-               COALESCE(SUM(CASE WHEN c.status = :stpending THEN 1 ELSE 0 END), 0) AS npending,
-               COALESCE(SUM(CASE WHEN c.status = :strunning THEN 1 ELSE 0 END), 0) AS nrunning,
-               COALESCE(SUM(CASE WHEN c.status = :stsuccess THEN 1 ELSE 0 END), 0) AS nsuccess,
-               COALESCE(SUM(CASE WHEN c.status = :sterror THEN 1 ELSE 0 END), 0) AS nerror,
-               COALESCE(SUM(CASE WHEN c.status = :stdiscarded THEN 1 ELSE 0 END), 0) AS ndiscarded
-          FROM {local_tresipuntimportgc_import} i
-          JOIN {user} u ON u.id = i.userid
-     LEFT JOIN {local_tresipuntimportgc_course} c ON c.importid = i.id
-      GROUP BY i.id, i.userid, i.googleaccount, i.timecreated, $userfields
-      ORDER BY i.timecreated DESC";
-$params = [
-    'stpending' => import_course::STATUS_PENDING,
-    'strunning' => import_course::STATUS_RUNNING,
-    'stsuccess' => import_course::STATUS_SUCCESS,
-    'sterror' => import_course::STATUS_ERROR,
-    'stdiscarded' => import_course::STATUS_DISCARDED,
-];
-$records = $DB->get_records_sql($sql, $params);
-$emptysite = count($records) === 0;
-
-// Derive status, filter and paginate in PHP (bounded volume: log retention).
-$hasopenruns = false;
-$filtered = [];
-foreach ($records as $record) {
-    $counts = [
-        import_course::STATUS_PENDING => (int) $record->npending,
-        import_course::STATUS_RUNNING => (int) $record->nrunning,
-        import_course::STATUS_SUCCESS => (int) $record->nsuccess,
-        import_course::STATUS_ERROR => (int) $record->nerror,
-        import_course::STATUS_DISCARDED => (int) $record->ndiscarded,
-    ];
-    $record->derivedstatus = import::derive_status($counts);
-    $hasopenruns = $hasopenruns
-        || in_array($record->derivedstatus, [import::STATUS_QUEUED, import::STATUS_RUNNING], true);
-    if ($statusfilter !== '' && $record->derivedstatus !== $statusfilter) {
-        continue;
-    }
-    $record->launchername = fullname($record);
-    if ($search !== ''
-            && stripos($record->launchername . ' ' . $record->googleaccount, $search) === false) {
-        continue;
-    }
-    $filtered[] = $record;
-}
-$total = count($filtered);
-$pageslice = array_slice($filtered, $page * $perpage, $perpage);
+// Aggregate, derive status, filter and paginate (bounded volume: retention).
+$result = panel_query::fetch($statusfilter, $search, $page, $perpage);
+$emptysite = $result->emptysite;
+$hasopenruns = $result->hasopenruns;
+$total = $result->total;
 
 $rows = [];
-foreach ($pageslice as $record) {
+foreach ($result->records as $record) {
     $ntotal = (int) $record->npending + (int) $record->nrunning + (int) $record->nsuccess + (int) $record->nerror;
     $pct = static fn(int $n): float => $ntotal > 0 ? round($n / $ntotal * 100, 2) : 0;
     $rows[] = [

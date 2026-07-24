@@ -107,10 +107,12 @@ class importer {
      * status, so the task is not retried by cron (retrying is a manual action
      * from the panel).
      *
-     * @param  import_course $course Course to import (must be pending).
+     * @param  import_course  $course   Course to import (must be pending).
+     * @param  provider|null  $provider Connected provider (defaults to a new
+     *                                  google(); injectable for tests).
      * @return void
      */
-    public static function run_course(import_course $course): void {
+    public static function run_course(import_course $course, ?provider $provider = null): void {
         global $DB;
 
         if ($course->get('status') !== import_course::STATUS_PENDING) {
@@ -120,7 +122,7 @@ class importer {
         $logger = logger::for_course($course);
         trace_router::set_logger($logger);
         try {
-            $provider = new google();
+            $provider = $provider ?? new google();
             $refreshtoken = $import->get_refresh_token();
             if ($refreshtoken === null) {
                 throw new \moodle_exception('error_client', 'local_tresipuntimportgc');
@@ -151,7 +153,8 @@ class importer {
                 $shortname,
                 (int) $course->get('categoryid'),
                 (bool) $course->get('visible'),
-                (int) $course->get('importfiles')
+                (int) $course->get('importfiles'),
+                $provider
             );
             if (empty($response['success']) || empty($response['id'])) {
                 if (!empty($response['errors'])) {

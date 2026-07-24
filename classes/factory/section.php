@@ -52,6 +52,22 @@ class section  {
     protected $providerid;
 
     /**
+     * @var array<string,int> Correspondencia topicId → número de sección de la
+     * importación en curso. Evita usar el `summary` visible como clave (§6.3).
+     * Se reinicia por curso con reset_map().
+     */
+    private static $sectionmap = [];
+
+    /**
+     * Reinicia la correspondencia topicId↔sección. Llamar al empezar un curso.
+     *
+     * @return void
+     */
+    public static function reset_map(): void {
+        self::$sectionmap = [];
+    }
+
+    /**
      * constructor.
      *
      * @param string $name
@@ -78,16 +94,11 @@ class section  {
      * @throws dml_exception
      */
     public static function get_section(int $courseid, string $providerid) : int {
-        global $DB;
-        $sql = "SELECT * 
-                FROM {course_sections} cs
-                WHERE cs.course = ? 
-                AND cs.summary = ?";
-        $record = $DB->get_records_sql($sql, [$courseid, $DB->sql_compare_text($providerid)]);
-        if (!$record) {
+        if (!isset(self::$sectionmap[$providerid])) {
             mtrace('    -- ERROR: SECTION_NOT_FOUND: ' . $providerid);
+            return 0;
         }
-        return $record ? current($record)->section : 0;
+        return self::$sectionmap[$providerid];
     }
 
     /**
@@ -99,7 +110,10 @@ class section  {
     public function create(int $course_id): response_section {
         try {
             $newsection = course_create_section($course_id, 1000);
-            course_update_section($course_id, $newsection, array('name' => $this->name, 'summary' => $this->providerid));
+            // El nombre del tema va en el name; el topicId ya NO se guarda en el
+            // summary visible (§6.3): la correspondencia vive en $sectionmap.
+            course_update_section($course_id, $newsection, array('name' => $this->name));
+            self::$sectionmap[$this->providerid] = (int) $newsection->section;
             return new response_section(true, $this, null);
         } catch (moodle_exception $e) {
             return new response_section(false, null, new error('16000', $e->getMessage()));

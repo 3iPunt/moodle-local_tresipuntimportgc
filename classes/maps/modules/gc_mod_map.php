@@ -74,11 +74,14 @@ abstract class gc_mod_map {
     /**
      * Get Module.
      *
-     * @param $module
-     * @param provider $provider
-     * @return module
+     * Returns a single module, an array of modules (a Classroom item that maps
+     * to several Moodle activities, e.g. combined materials, E10.11) or null.
+     *
+     * @param  $module
+     * @param  provider $provider
+     * @return module|module[]|null
      * @throws coding_exception
      */
-    abstract public function get_mod($module, provider $provider): ?module;
+    abstract public function get_mod($module, provider $provider);
 
 }
