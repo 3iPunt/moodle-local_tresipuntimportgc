@@ -568,21 +568,65 @@
 }
 
 /* ============================================================
-   Responsive: tablet y móvil. Mobile-first, apilar en vertical
-   (skill tresipunt-moodle-responsive). Breakpoint principal 720px.
+   Separación entre ítems: SIEMPRE con `gap` en el contenedor flex,
+   nunca con utilidades de margen (ml-2/ms-2) en los hijos. El gap no
+   descuadra el centrado ni el apilado en móvil (norma de la skill
+   tresipunt-moodle-responsive).
    ============================================================ */
-@media (max-width: 720px) {
+.local-tipgc .tipgc-titlerow { gap: 8px; }
+.local-tipgc .tipgc-runhead-title { gap: 8px; }
+.local-tipgc .tipgc-runhead-actions { gap: 8px; }
+.local-tipgc .tipgc-course-head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.local-tipgc .tipgc-course-selrow { gap: 10px; }
+.local-tipgc .tipgc-course-tags { gap: 6px 8px; }
+.local-tipgc .tipgc-toolbar { gap: 8px; }
+.local-tipgc .tipgc-searchrow { gap: 8px; }
+.local-tipgc .tipgc-minibar-cell { gap: 8px; }
+.local-tipgc .tipgc-account-chip { gap: 10px; }
+.local-tipgc .tipgc-uri-row { gap: 8px; }
+.local-tipgc .tipgc-testrow { gap: 8px; }
+
+/* ============================================================
+   Responsive: tablet y móvil. Mobile-first, apilar en vertical
+   (skill tresipunt-moodle-responsive). Breakpoint principal 767.98px
+   (incluye tablet en vertical, 768px).
+   ============================================================ */
+@media (max-width: 767.98px) {
     /* Aire global: menos padding lateral que el escritorio. */
     .local-tipgc {
         padding: 20px 14px;
         border-radius: 12px;
     }
 
-    /* C11 — cabecera co-brandada: apilar (logos arriba, título debajo). */
+    /* C11 — cabecera co-brandada: apilar y centrar (logos arriba, título
+       debajo), todo en vertical y centrado. */
     .local-tipgc .tipgc-header {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
+        text-align: center;
         gap: 14px;
+    }
+    .local-tipgc .tipgc-header-brands {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .local-tipgc .tipgc-header-text {
+        align-items: center;
+        text-align: center;
+        width: 100%;
+    }
+    /* Fila título + badge: centrada (la separación la da el gap base). */
+    .local-tipgc .tipgc-header-text > .tipgc-titlerow {
+        justify-content: center;
+    }
+    /* Separar la descripción del título para que no queden pegados. */
+    .local-tipgc .tipgc-header-desc {
+        margin-top: 8px;
     }
 
     /* Acciones superiores del importador: apiladas a ancho completo. */
@@ -594,37 +638,121 @@
         width: 100%;
     }
 
-    /* Chips de estado del panel: scroll horizontal, no se aplastan. */
+    /* Cabecera de la importación: todo centrado en móvil. */
+    .local-tipgc .tipgc-runhead {
+        justify-content: center;
+        text-align: center;
+    }
+    .local-tipgc .tipgc-runhead-info {
+        width: 100%;
+    }
+    .local-tipgc .tipgc-runhead-title {
+        justify-content: center;
+    }
+    /* Acciones de cabecera: apiladas en vertical, a ancho completo. */
+    .local-tipgc .tipgc-runhead-actions {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        margin-top: 12px;
+    }
+    .local-tipgc .tipgc-runhead-actions .btn {
+        width: 100%;
+    }
+
+    /* Botón inferior del panel: a ancho completo, no pegado a la derecha. */
+    .local-tipgc .tipgc-panel-actions {
+        justify-content: stretch;
+    }
+    .local-tipgc .tipgc-panel-actions .btn {
+        width: 100%;
+    }
+
+    /* Fila de cada curso: en columna y centrada (nombre, badge, errores e
+       "Ir al curso" apilados; las acciones debajo). */
+    .local-tipgc .tipgc-course-row {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+    /* En móvil la fila de curso pasa a columna centrada (el gap base sigue). */
+    .local-tipgc .tipgc-course-head {
+        flex-direction: column;
+        gap: 6px;
+    }
+    .local-tipgc .tipgc-course-actions {
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    /* Chips (estado del panel y filtros de logs): scroll horizontal, no se
+       aplastan, y centrados (se anula el ml-auto/ms-auto que los empuja). */
     .local-tipgc .tipgc-chips {
         max-width: 100%;
         overflow-x: auto;
+        justify-content: center;
+        margin-left: auto;
+        margin-right: auto;
     }
     .local-tipgc .tipgc-chip {
         flex: none;
     }
 
-    /* Buscador del panel: input a ancho completo, botones debajo. */
+    /* Buscador del panel: input a ancho completo, botones debajo centrados. */
     .local-tipgc .tipgc-searchrow {
         flex-wrap: wrap;
+        justify-content: center;
     }
     .local-tipgc .tipgc-search {
         flex: 1 1 100%;
         min-width: 0;
     }
 
-    /* Tabla del panel: scroll horizontal en vez de desbordar la página. */
+    /* Tabla del panel: reflow a tarjetas (ocultar cabecera, filas apiladas y
+       centradas), en vez de una tabla que desborda a la derecha. */
     .local-tipgc .tipgc-table-wrap {
-        overflow-x: auto;
+        overflow-x: visible;
+    }
+    .local-tipgc .tipgc-table,
+    .local-tipgc .tipgc-table tbody,
+    .local-tipgc .tipgc-table tr,
+    .local-tipgc .tipgc-table td {
+        display: block;
+        width: 100%;
+    }
+    .local-tipgc .tipgc-table thead {
+        display: none;
+    }
+    .local-tipgc .tipgc-table tr {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 12px 0;
+        text-align: center;
+    }
+    .local-tipgc .tipgc-table td {
+        padding: 4px 12px;
+        text-align: center;
+        white-space: normal;
+    }
+    .local-tipgc .tipgc-table td.text-right,
+    .local-tipgc .tipgc-table td.text-end {
+        text-align: center;
+    }
+    .local-tipgc .tipgc-table .tipgc-minibar-cell {
+        justify-content: center;
+    }
+    .local-tipgc .tipgc-table .btn {
+        width: 100%;
+    }
+    .local-tipgc .tipgc-table-foot {
+        justify-content: center;
+        text-align: center;
+        gap: 8px;
     }
 
-    /* Bloque de conexión (C10): URI y botón apilados; URI que parta. */
+    /* Bloque de conexión (C10): URI y botón apilados (gap base); URI que parta. */
     .local-tipgc .tipgc-uri-row {
         flex-direction: column;
         align-items: stretch;
-    }
-    .local-tipgc .tipgc-uri-row .btn {
-        margin-left: 0;
-        margin-top: 8px;
     }
     .local-tipgc .tipgc-uri {
         overflow-wrap: anywhere;
@@ -636,8 +764,47 @@
         overflow-wrap: anywhere;
     }
 
-    /* Barra inferior fija: pegada al borde en móvil. */
+    /* Importador — fila de cuenta: cuenta arriba, acciones debajo, centrado. */
+    .local-tipgc .tipgc-account-row {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 10px;
+    }
+
+    /* Importador — barra de búsqueda + chips: apiladas (gap base) y centradas. */
+    .local-tipgc .tipgc-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .local-tipgc .tipgc-toolbar .tipgc-search {
+        width: 100%;
+    }
+
+    /* Importador — fila "seleccionar todo" + contador: centrada. */
+    .local-tipgc .tipgc-selectrow {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 6px;
+    }
+
+    /* Barra inferior fija: pegada al borde, apilada y centrada en móvil. */
     .local-tipgc .tipgc-footer {
         bottom: 0;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 10px;
+    }
+    .local-tipgc .tipgc-footer-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        gap: 8px;
+    }
+    .local-tipgc .tipgc-footer-actions .btn {
+        width: 100%;
     }
 }

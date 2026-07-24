@@ -47,10 +47,10 @@
         <img src="{{ logoclassroom }}" alt="Google Classroom" height="42">
     </div>
     <div class="tipgc-header-text d-flex flex-column justify-content-center">
-        <div class="d-flex align-items-center flex-wrap">
+        <div class="tipgc-titlerow d-flex align-items-center flex-wrap">
             <h1 class="tipgc-header-title h2 m-0">{{ title }}</h1>
             {{# hasstatus }}
-                <span class="tipgc-badge {{ statusclass }} ml-2 ms-2">{{ statuslabel }}</span>
+                <span class="tipgc-badge {{ statusclass }}">{{ statuslabel }}</span>
             {{/ hasstatus }}
         </div>
         <p class="tipgc-header-desc m-0">{{ description }}</p>

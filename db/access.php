@@ -26,26 +26,33 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
 
-    // Import course from Google Classroom. By default only the site
-    // administrator has it; it can be granted to other roles, but students and
-    // guests are prohibited.
+    // Import course from Google Classroom. Managers and course creators have it
+    // by default (Goodle: the people who manage are not site admins); students,
+    // guests and teachers are prohibited.
     'local/tresipuntimportgc:import' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
             'student' => CAP_PROHIBIT,
             'guest' => CAP_PROHIBIT,
+            'teacher' => CAP_PROHIBIT,
+            'editingteacher' => CAP_PROHIBIT,
+            'coursecreator' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
         ),
     ),
 
-    // View the imports panel (history, detail and traces). Same policy: only
-    // the site administrator by default.
+    // View the imports panel (history, detail and traces). Same roles.
     'local/tresipuntimportgc:viewreports' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
             'student' => CAP_PROHIBIT,
             'guest' => CAP_PROHIBIT,
+            'teacher' => CAP_PROHIBIT,
+            'editingteacher' => CAP_PROHIBIT,
+            'coursecreator' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
         ),
     ),
 

@@ -41,7 +41,7 @@
         </div>
     </div>
 
-    <div class="d-flex justify-content-end mt-3 mb-3">
+    <div class="tipgc-panel-actions d-flex justify-content-end mt-3 mb-3">
         <a class="btn btn-primary" href="{{ selectionurl }}">{{# str }} newimport, local_tresipuntimportgc {{/ str }}</a>
     </div>
 
@@ -73,9 +73,9 @@
                     <input type="text" name="search" value="{{ search }}" class="form-control tipgc-search"
                            placeholder="{{# str }} panel_searchplaceholder, local_tresipuntimportgc {{/ str }}"
                            aria-label="{{# str }} panel_searchplaceholder, local_tresipuntimportgc {{/ str }}">
-                    <button type="submit" class="btn btn-secondary ml-2 ms-2">{{# str }} search, core {{/ str }}</button>
+                    <button type="submit" class="btn btn-secondary">{{# str }} search, core {{/ str }}</button>
                     {{# hasfilters }}
-                        <a href="{{ panelurl }}" class="btn btn-link ml-2 ms-2">{{# pix }} clear, local_tresipuntimportgc {{/ pix }}{{# str }} clearselection, local_tresipuntimportgc {{/ str }}</a>
+                        <a href="{{ panelurl }}" class="btn btn-link">{{# pix }} clear, local_tresipuntimportgc {{/ pix }}{{# str }} clearselection, local_tresipuntimportgc {{/ str }}</a>
                     {{/ hasfilters }}
                 </div>
             </div>
@@ -116,7 +116,7 @@
                                             <div class="tipgc-progressbar-seg tipgc-seg-error" style="width: {{ perror }}%"></div>
                                             <div class="tipgc-progressbar-seg tipgc-seg-running" style="width: {{ prunning }}%"></div>
                                         </div>
-                                        <span class="tipgc-mono ml-2 ms-2">{{ ratio }}</span>
+                                        <span class="tipgc-mono">{{ ratio }}</span>
                                     </div>
                                 </td>
                                 <td><span class="tipgc-badge {{ statusclass }}">{{ statuslabel }}</span></td>

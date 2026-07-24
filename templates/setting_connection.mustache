@@ -46,17 +46,17 @@
         <label class="tipgc-label" for="tipgc-redirecturi">{{# str }} redirecturi, local_tresipuntimportgc {{/ str }}</label>
         <div class="d-flex tipgc-uri-row">
             <code id="tipgc-redirecturi" class="tipgc-uri flex-grow-1">{{ redirecturi }}</code>
-            <button type="button" class="btn btn-outline-secondary btn-sm ml-2 ms-2"
+            <button type="button" class="btn btn-outline-secondary btn-sm"
                     data-action="tipgc-copy-uri" data-uri="{{ redirecturi }}">
                 {{# str }} copyuri, local_tresipuntimportgc {{/ str }}
             </button>
         </div>
         <div class="small mt-1 tipgc-copy-feedback" data-region="copy-feedback" aria-live="polite"></div>
-        <div class="mt-2">
+        <div class="tipgc-testrow d-flex align-items-center flex-wrap mt-2">
             <a class="btn btn-outline-secondary btn-sm" href="{{ testurl }}">
                 {{# str }} testconnection, local_tresipuntimportgc {{/ str }}
             </a>
-            <span class="text-muted small ml-2 ms-2">{{# str }} testconnection_note, local_tresipuntimportgc {{/ str }}</span>
+            <span class="text-muted small">{{# str }} testconnection_note, local_tresipuntimportgc {{/ str }}</span>
         </div>
     </div>
 </div>

@@ -41,22 +41,22 @@
 <div class="local-tipgc" data-region="tipgc-progress" data-importid="{{ importid }}" data-lastlogid="{{ lastlogid }}">
     {{#header}}{{> local_tresipuntimportgc/components/page_header }}{{/header}}
 
-    <div class="d-flex align-items-center justify-content-between flex-wrap mt-3 mb-3">
-        <div>
-            <div class="d-flex align-items-center flex-wrap">
+    <div class="tipgc-runhead d-flex align-items-center justify-content-between flex-wrap mt-3 mb-3">
+        <div class="tipgc-runhead-info">
+            <div class="tipgc-runhead-title d-flex align-items-center flex-wrap">
                 <h2 class="tipgc-run-title m-0">{{ runtitle }}</h2>
-                <span class="tipgc-badge {{ run.statusclass }} ml-2 ms-2">{{# run.isactive }}<span class="tipgc-badge-spin" aria-hidden="true"></span>{{/ run.isactive }}{{ run.statuslabel }}</span>
+                <span class="tipgc-badge {{ run.statusclass }}">{{# run.isactive }}<span class="tipgc-badge-spin" aria-hidden="true"></span>{{/ run.isactive }}{{ run.statuslabel }}</span>
             </div>
             <div class="text-muted small mt-1">
                 {{# str }} launchedby, local_tresipuntimportgc, {{ run.launchedby }} {{/ str }}
                 · <span class="tipgc-mono">{{ run.account }}</span>
             </div>
         </div>
-        <div class="d-flex flex-wrap">
+        <div class="tipgc-runhead-actions d-flex flex-wrap">
             {{# canviewpanel }}
                 <a class="btn btn-outline-secondary" href="{{ panelurl }}">{{# str }} viewimports, local_tresipuntimportgc {{/ str }}</a>
             {{/ canviewpanel }}
-            <a class="btn btn-primary {{# canviewpanel }}ml-2 ms-2{{/ canviewpanel }}" href="{{ selectionurl }}">{{# str }} newimport, local_tresipuntimportgc {{/ str }}</a>
+            <a class="btn btn-primary" href="{{ selectionurl }}">{{# str }} newimport, local_tresipuntimportgc {{/ str }}</a>
         </div>
     </div>
 
@@ -93,14 +93,14 @@
     <div class="tipgc-courses" data-region="courses">
         {{# courses }}
             <div class="tipgc-card tipgc-course mb-2" data-importcourse="{{ id }}" data-status="{{ status }}">
-                <div class="d-flex align-items-center flex-wrap p-3">
-                    <div class="flex-grow-1 min-w-0">
+                <div class="tipgc-course-row d-flex align-items-center flex-wrap p-3">
+                    <div class="tipgc-course-head flex-grow-1 min-w-0">
                         <span class="tipgc-course-name">{{ fullname }}</span>
-                        <span class="tipgc-badge {{ statusclass }} ml-2 ms-2" data-region="badge">{{ statuslabel }}</span>
-                        <span class="tipgc-error-count ml-2 ms-2 {{^ haserrors }}d-none{{/ haserrors }}" data-region="error-count">
+                        <span class="tipgc-badge {{ statusclass }}" data-region="badge">{{ statuslabel }}</span>
+                        <span class="tipgc-error-count {{^ haserrors }}d-none{{/ haserrors }}" data-region="error-count">
                             <span data-region="error-count-n">{{ errorcount }}</span> {{# str }} witherrors, local_tresipuntimportgc {{/ str }}
                         </span>
-                        <a href="{{ courseurl }}" target="_blank" rel="noopener" class="ml-2 ms-2 small {{^ courseurl }}d-none{{/ courseurl }}" data-region="course-link">{{# str }} gotocourse, local_tresipuntimportgc {{/ str }}</a>
+                        <a href="{{ courseurl }}" target="_blank" rel="noopener" class="small {{^ courseurl }}d-none{{/ courseurl }}" data-region="course-link">{{# str }} gotocourse, local_tresipuntimportgc {{/ str }}</a>
                     </div>
                     <div class="d-flex align-items-center tipgc-course-actions">
                         <button type="button" class="btn btn-outline-secondary btn-sm {{^ canretry }}d-none{{/ canretry }}"
@@ -114,7 +114,7 @@
                     </div>
                 </div>
                 <div class="tipgc-logs-wrap px-3 pb-3 {{^ haslogs }}d-none{{/ haslogs }}" data-region="logs-wrap">
-                    <div class="d-flex align-items-center mb-1">
+                    <div class="d-flex align-items-center mb-2">
                         <div class="tipgc-chips ml-auto ms-auto" role="group">
                             <button type="button" class="tipgc-chip active" data-logfilter="all">{{# str }} log_all, local_tresipuntimportgc {{/ str }}</button>
                             <button type="button" class="tipgc-chip" data-logfilter="warning">{{# str }} log_warnings, local_tresipuntimportgc {{/ str }}</button>
