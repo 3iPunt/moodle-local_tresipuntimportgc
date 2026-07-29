@@ -4,7 +4,7 @@
   <img src="pix/icon.svg" alt="" height="60">
 </p>
 
-<h1 align="center">Importación de cursos desde Google Classroom</h1>
+<h1 align="center">Import courses from Google Classroom</h1>
 
 <p align="center">
   <img src="https://img.shields.io/badge/version-2.0.0-informational" alt="Version">
@@ -14,161 +14,161 @@
   <a href="https://tresipunt.com"><img src="https://img.shields.io/badge/made%20by-Tresipunt-F84015" alt="Made by Tresipunt"></a>
 </p>
 
-<p align="center"><b>Convierte tus clases de Google Classroom en cursos de Moodle, con su contenido dentro de Moodle.</b></p>
+<p align="center"><b>Turn your Google Classroom classes into Moodle courses, with the content inside Moodle.</b></p>
 
-Plugin local que importa una clase de Google Classroom como un curso de Moodle:
-secciones, materiales y trabajos, anuncios, la carpeta del profesor y el
-calendario. Cada curso se importa en su propia tarea en segundo plano, con una
-página de progreso y un panel de historial. No modifica el núcleo de
-Moodle ni el tema.
+<p align="center"><b>🇬🇧 English</b> · <a href="README.es.md">🇪🇸 Español</a></p>
+
+Local plugin that imports a Google Classroom class as a Moodle course: sections,
+materials and coursework, announcements, the teacher folder and the calendar.
+Each course is imported by its own background task, with a live progress page and
+a history panel. It does not modify Moodle core or the theme.
 
 ---
 
-## ✨ Qué hace
+## ✨ What it does
 
-- **Importa la clase como curso** — nombre, subtítulo y aula en el resumen; los
-  *temas* de Classroom se convierten en secciones, en su orden original.
-- **Trae el contenido a Moodle** — los ficheros de Drive se descargan al curso
-  (o se enlazan, según ajuste); los enlaces y vídeos quedan como recursos URL.
-- **Mapea trabajos y materiales a actividades** — pregunta de opción múltiple →
-  Consulta; pregunta corta → Retroalimentación; tarea con rúbrica → Tarea con su
-  rúbrica; formulario de Google → etiqueta incrustada.
-- **Anuncios → foro de novedades**; **carpeta del profesor →** carpeta oculta
-  cuyos ficheros viven en Moodle; **calendario →** eventos del curso.
-- **Publicación programada** — respeta la fecha de publicación de Classroom como
-  restricción de acceso «disponible desde».
-- **Seguimiento** — página de progreso en vivo (con reintento y descarte) y
-  panel de historial con filtros y detalle.
+- **Imports the class as a course** — name, section and room in the summary;
+  Classroom *topics* become course sections, in their original order.
+- **Brings the content into Moodle** — Drive files are downloaded into the course
+  (or linked, per setting); links and videos become URL resources.
+- **Maps coursework and materials to activities** — multiple-choice question →
+  Choice; short question → Feedback; assignment with a rubric → Assignment with
+  its rubric; Google Form → label with the form embedded.
+- **Announcements → announcements forum**; **teacher folder →** hidden folder
+  whose files live in Moodle; **calendar →** course events.
+- **Scheduled publication** — the Classroom publication date is kept as an
+  "available from" access restriction.
+- **Tracking** — live progress page (with retry and discard) and a history panel
+  with filters and detail.
 
-## 🔄 Qué se importa (mapeo)
+## 🔄 What is imported (mapping)
 
 | Google Classroom | Moodle |
 |---|---|
-| Clase | Curso (nombre, subtítulo y aula en el resumen) |
-| Temas | Secciones del curso (en su orden) |
-| Fichero de Drive adjunto | Fichero traído al curso (o enlace, según ajuste) |
-| Enlace / vídeo de YouTube | Recurso URL |
-| Pregunta de opción múltiple | Consulta |
-| Pregunta corta (sin calificación) | Retroalimentación |
-| Tarea (con rúbrica) | Tarea (con su rúbrica) |
-| Formulario de Google | Etiqueta con el formulario incrustado |
-| Anuncios | Debates en el foro de novedades |
-| Carpeta del profesor | Carpeta oculta con los ficheros dentro de Moodle |
-| Calendario | Eventos del curso |
-| Publicación programada | Restricción de acceso «disponible desde» |
+| Class | Course (name, section and room in the summary) |
+| Topics | Course sections (in order) |
+| Attached Drive file | File brought into the course (or a link, per setting) |
+| Link / YouTube video | URL resource |
+| Multiple-choice question | Choice |
+| Short question (ungraded) | Feedback |
+| Assignment (with rubric) | Assignment (with its rubric) |
+| Google Form | Label with the form embedded |
+| Announcements | Discussions in the announcements forum |
+| Teacher folder | Hidden folder with the files stored in Moodle |
+| Calendar | Course events |
+| Scheduled publication | "Available from" access restriction |
 
-**Aún no se importa** (previsto para próximas versiones):
+**Not imported yet** (planned for future releases):
 
-- Entregas, notas y comentarios de los estudiantes.
-- Matrículas: otros profesores y los estudiantes de la clase (hoy solo se
-  matricula al usuario que importa como profesor).
-- Las **preguntas** de los formularios de Google (hoy el formulario se incrusta;
-  no se convierte en cuestionario/retroalimentación con sus preguntas).
-- Enlaces de Google Meet como actividad de videoconferencia (hoy quedan como
-  enlace).
+- Student submissions, grades and comments.
+- Enrolments: co-teachers and the students of the class (currently only the
+  importing user is enrolled, as a teacher).
+- The **questions** inside Google Forms (the form is embedded; it is not turned
+  into a quiz or feedback activity with its questions).
+- Google Meet links as a videoconference activity (currently kept as a link).
 
-> La imagen de portada de la clase y la descarga de vídeos de YouTube no son
-> posibles por límites de la API de Google.
+> The class cover image and downloading YouTube videos are not possible due to
+> Google API limits.
 
-## ⚙️ Cómo funciona
+## ⚙️ How it works
 
-- Conecta una cuenta de Google por OAuth 2.0 y lee la clase con las APIs de
-  Classroom, Drive, Calendar y Forms.
-- Cada curso se importa en una **tarea programada** independiente; el estado y
-  las trazas se guardan para la página de progreso y el panel.
-- El contenido se **trae a Moodle** (no se enlaza a Google) siempre que es
-  posible, para no depender de la cuenta de Google tras la importación.
-- No toca cursos existentes salvo el que crea; se desactiva quitando las
-  capacidades o desinstalando el plugin.
+- Connects a Google account over OAuth 2.0 and reads the class with the
+  Classroom, Drive, Calendar and Forms APIs.
+- Each course is imported by its own **scheduled (adhoc) task**; status and
+  traces are stored for the progress page and the panel.
+- Content is **brought into Moodle** (not linked to Google) whenever possible, so
+  the course does not depend on the Google account after the import.
+- It never touches existing courses other than the one it creates; it is disabled
+  by removing the capabilities or uninstalling the plugin.
 
-## 📋 Requisitos
+## 📋 Requirements
 
-| Requisito | Versión |
+| Requirement | Version |
 |---|---|
-| Moodle | 4.5 LTS o 5.1 |
-| PHP | 8.1 o superior |
-| Otros plugins | No requiere |
-| Cron de Moodle | Necesario — las importaciones corren como tareas en segundo plano |
-| Servicios Google | Proyecto de Google Cloud con las APIs de Classroom, Drive, Calendar y Forms, y un cliente OAuth 2.0 de tipo *aplicación web* |
+| Moodle | 4.5 LTS or 5.1 |
+| PHP | 8.1 or later |
+| Other plugins | None |
+| Moodle cron | Required — imports run as background tasks |
+| Google services | A Google Cloud project with the Classroom, Drive, Calendar and Forms APIs enabled, and an OAuth 2.0 *web application* client |
 
-> Cada sitio usa **su propio cliente OAuth**; los pasos, más abajo en *Ajustes*.
+> Every site uses **its own OAuth client**; the steps are below, under *Settings*.
 
-## 🚀 Instalación
+## 🚀 Installation
 
-1. Copiar el código en `<MOODLE_ROOT>/local/tresipuntimportgc/`.
-2. Completar la instalación desde **Administración del sitio › Notificaciones**
-   (o por CLI: `php admin/cli/upgrade.php --non-interactive`).
-3. Purgar las cachés (**Administración del sitio › Desarrollo › Purgar cachés**
-   o `php admin/cli/purge_caches.php`).
+1. Copy the code into `<MOODLE_ROOT>/local/tresipuntimportgc/`.
+2. Complete the installation from **Site administration › Notifications**
+   (or on the CLI: `php admin/cli/upgrade.php --non-interactive`).
+3. Purge the caches (**Site administration › Development › Purge caches**
+   or `php admin/cli/purge_caches.php`).
 
-## 🔧 Ajustes
+## 🔧 Settings
 
-### Dar acceso a Google (una vez por sitio)
+### Giving access to Google (once per site)
 
-El plugin necesita **un cliente OAuth del propio sitio**: el scope de Drive es
-*restricted*, y una aplicación compartida entre organizaciones obligaría a pasar
-una evaluación de seguridad anual de pago. Con un proyecto propio y audiencia
-*Interna* no hace falta ninguna verificación de Google.
+The plugin needs **an OAuth client of the site itself**: the Drive scope is
+*restricted*, and an application shared between organisations would have to pass
+a paid annual security assessment. With your own project and an *Internal*
+audience, no verification from Google is needed.
 
-1. En [console.cloud.google.com](https://console.cloud.google.com), con una cuenta
-   de **Google Workspace**, crear un **proyecto**.
-2. **APIs y servicios › Biblioteca**: habilitar **Classroom**, **Drive**,
-   **Calendar** y **Forms**. Solo esas cuatro.
-3. **Google Auth Platform**: completar nombre y correos de la aplicación y poner la
-   **audiencia en «Interna»**.
-4. Pestaña **Clients › Create client › Aplicación web**. En *URIs de redirección
-   autorizados*, pegar **exactamente** la que muestra el bloque de conexión de los
-   ajustes del plugin (Google exige coincidencia literal: `https`, sin barra final).
-   ⚠️ El **secreto solo se muestra al crear el cliente**.
-5. Pegar **ID de cliente** y **secreto** en los ajustes y pulsar **Probar conexión**
-   antes de dejar importar a nadie.
+1. At [console.cloud.google.com](https://console.cloud.google.com), signed in
+   with a **Google Workspace** account, create a **project**.
+2. **APIs & Services › Library**: enable **Classroom**, **Drive**, **Calendar**
+   and **Forms**. Only those four.
+3. **Google Auth Platform**: fill in the application name and support emails, and
+   set the **audience to "Internal"**.
+4. **Clients › Create client › Web application** tab. Under *Authorised redirect
+   URIs*, paste **exactly** the one shown in the connection block of the plugin
+   settings (Google requires a literal match: `https`, no trailing slash).
+   ⚠️ The **client secret is only shown when the client is created**.
+5. Paste the **client ID** and **secret** into the settings and use **test
+   connection** before letting anyone import.
 
-| Si algo falla | Suele ser |
+| If something fails | It is usually |
 |---|---|
-| `redirect_uri_mismatch` | La URI no coincide con la del bloque de conexión: `http` en vez de `https`, barra final de más, o un host distinto del `wwwroot` |
-| «Esta app no está verificada» | La audiencia quedó *Externa* sin publicar: pasarla a **Interna**, o añadir la cuenta como usuario de prueba |
-| «API … is disabled» | Falta habilitar una de las cuatro APIs (paso 2); el mensaje dice cuál |
-| Faltan clases en el listado | La cuenta conectada no es profesora en ellas, o son de otro Workspace. Las archivadas sí salen |
-| Las importaciones no arrancan | El cron de Moodle no está en marcha |
+| `redirect_uri_mismatch` | The URI does not match the one in the connection block: `http` instead of `https`, a trailing slash, or a host other than the `wwwroot` |
+| "This app is not verified" | The audience was left *External* and unpublished: switch it to **Internal**, or add the account as a test user |
+| "API … is disabled" | One of the four APIs is not enabled (step 2); the message says which one |
+| Classes missing from the list | The connected account is not a teacher in them, or they belong to another Workspace. Archived ones do show up |
+| Imports never start | Moodle cron is not running |
 
-### Opciones
+### Options
 
-En **Administración del sitio › Extensiones › Extensiones locales › Importación
-de cursos desde Google Classroom**:
+In **Site administration › Plugins › Local plugins › Import courses from Google
+Classroom**:
 
-| Ajuste | Efecto |
+| Setting | Effect |
 |---|---|
-| **ID de cliente / Secreto** | Credenciales del cliente OAuth de Google. La URI de redirección a registrar en Google se muestra, copiable, en el bloque de conexión. |
-| **Probar conexión** | Lanza el flujo OAuth real para validar las credenciales. |
-| **Ficheros de Drive** | Qué hacer con los ficheros adjuntos: traerlos a Moodle, enlazarlos o no importarlos. |
-| **Calendario / Formularios / Contenido individual** | Comportamiento por defecto de esos elementos en la importación. |
-| **Retención y tamaño de página del panel** | Días que se conserva el historial y filas por página. |
+| **Client ID / secret** | Credentials of the Google OAuth client. The redirect URI to register in Google is shown, ready to copy, in the connection block. |
+| **Test connection** | Runs the real OAuth flow to validate the credentials. |
+| **Drive files** | What to do with attached files: bring them into Moodle, link them, or skip them. |
+| **Calendar / Forms / Individual content** | Default behaviour of those elements during the import. |
+| **Log retention and panel page size** | Days the history is kept and rows per page. |
 
-Para importar: **Administración del sitio › Cursos › Importar cursos desde
-Google Classroom** (también bajo la categoría del plugin en *Extensiones*).
-Requiere la capacidad `local/tresipuntimportgc:import` (por defecto, gestores y
-creadores de cursos).
+To import: **Site administration › Courses › Import courses from Google
+Classroom** (also under the plugin category in *Plugins*). Requires the
+`local/tresipuntimportgc:import` capability (by default, managers and course
+creators).
 
-## 🗑️ Desinstalación
+## 🗑️ Uninstalling
 
-Al desinstalar se eliminan las tablas del plugin (historial de importaciones y
-trazas) y sus ajustes. Los cursos ya importados **permanecen** como cualquier
-otro curso de Moodle.
+Uninstalling removes the plugin tables (import history and traces) and its
+settings. Courses that were already imported **remain**, like any other Moodle
+course.
 
-## 🛠️ Desarrollo (opcional)
+## 🛠️ Development (optional)
 
 ```bash
-# Tests unitarios
+# Unit tests
 vendor/bin/phpunit --testsuite local_tresipuntimportgc_testsuite
 
-# Tests de aceptación
+# Acceptance tests
 vendor/bin/behat --tags @local_tresipuntimportgc
 ```
 
-Tras tocar `amd/src/*.js`, recompilar con `grunt amd`. La librería
-`google/apiclient` v2 va vendorizada en `.extlib/`.
+After changing `amd/src/*.js`, rebuild with `grunt amd`. The `google/apiclient`
+v2 library is vendored under `.extlib/`.
 
-## 📄 Licencia
+## 📄 Licence
 
 [GNU GPL v3 or later](https://www.gnu.org/copyleft/gpl.html) — 2026 [Tresipunt](https://tresipunt.com) (contacte@tresipunt.com)
 
