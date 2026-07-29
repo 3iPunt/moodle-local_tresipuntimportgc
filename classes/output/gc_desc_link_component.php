@@ -18,14 +18,12 @@
  * Class gc_desc_link_component
  *
  * @package    local_tresipuntimportgc
- * @copyright  2021 Tresipunt
+ * @copyright  2021 3iPunt (contacte@tresipunt.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_tresipuntimportgc\output;
 
-use Google_Client;
-use Google_Service_Classroom;
 use local_tresipuntimportgc\gprovider;
 use local_tresipuntimportgc\providers\provider;
 use renderable;
@@ -35,14 +33,11 @@ use templatable;
 
 defined('MOODLE_INTERNAL') || die;
 global $CFG;
-require_once($CFG->libdir . '/google/src/Google/autoload.php');
-require_once($CFG->libdir . '/google/lib.php');
-require_once($CFG->libdir . '/google/src/Google/Service/Drive.php');
 /**
  * Class gc_desc_link_component
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright  2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class gc_desc_link_component implements renderable, templatable {

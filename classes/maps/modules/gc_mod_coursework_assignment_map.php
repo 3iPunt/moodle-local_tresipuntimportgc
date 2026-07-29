@@ -20,18 +20,15 @@ use coding_exception;
 use dml_exception;
 use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\factory\module_assign;
-use local_tresipuntimportgc\factory\module_form;
 use local_tresipuntimportgc\factory\module_label;
-use local_tresipuntimportgc\factory\module_formz;
-use local_tresipuntimportgc\providers\google;
-
-defined('MOODLE_INTERNAL') || die();
+use local_tresipuntimportgc\local\run_config;
+use local_tresipuntimportgc\providers\provider;
 
 /**
  * Class gc_mod_coursework_assignment_map
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class gc_mod_coursework_assignment_map extends gc_mod_map {
@@ -40,37 +37,32 @@ class gc_mod_coursework_assignment_map extends gc_mod_map {
      * Get Module.
      *
      * @param $module
-     * @param google $provider
+     * @param provider $provider
      * @return module
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function get_mod($module, google $provider): module {
+    public function get_mod($module, provider $provider): ?module {
         $visible = $module['state'] === 'PUBLISHED';
         $section = $module['topicId'] ?? '';
         $mats = $module['materials'] ?? [];
         $desc = isset($module['description']) ? self::get_desc_rich($module['description'], $mats) : self::get_desc_rich('', $mats);
-        /* TODO what is mapped as module_assign can also be a form with answers (quiz), so it is impossible to isolate the
-            modules here. It is only possible to know what kind of module it belongs to by reading "materials", i.e. if it
-            contains "form" it is a quiz if it has answers, or feedback if it does not, and is driveFile is a type resource, etc... */
+        /* TODO what is mapped as module_assign can also be a form with answers
+            (quiz), so the modules cannot be told apart here. The only way to know
+            which kind it is, is by reading "materials": a "form" is a quiz when it
+            has answers and a feedback when it does not, a driveFile is a resource,
+            and so on. */
         if (isset($module['materials'][0])) {
-            $firstkey = array_key_first_compatible($module['materials'][0]);
+            $firstkey = array_key_first($module['materials'][0]);
             if ($firstkey === 'form' && count($module['materials']) === 1) {
-                switch ((int)get_config('local_tresipuntimportgc', 'formsimport')) {
-                    case 0:
-                        return new module_label(
-                            $section, $module['title'], $desc, $visible, reset($mats)
-                        );
-                    case 1:
-                        // TODO create a quiz using the google form api (not included in Moodle!!!). Provisionally the form is embedded in a tag
-                        return new module_form(
-                            $section, $module, $desc, $visible, $provider
-                        );
-                    case 2:
-                        return new module_label(
-                            $section, '', '', 0, reset($mats)
-                        );
+                if ((int) run_config::get('formsimport', 0) === 2) {
+                    // Do not import: skip this module entirely.
+                    return null;
                 }
+                // Embed the original Google Form in a label.
+                return new module_label(
+                    $section, $module['title'], $desc, $visible, reset($mats)
+                );
             }
         }
         return new module_assign(

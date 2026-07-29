@@ -18,7 +18,7 @@
  * Class module_assign
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,15 +27,13 @@ namespace local_tresipuntimportgc\factory;
 use coding_exception;
 use context_module;
 use dml_exception;
-use Exception;
-use Google_Exception;
-use Google_Http_Request;
-use Google_Service_Drive;
+use local_tresipuntimportgc\local\drive_files;
 use local_tresipuntimportgc\providers\google;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response_module;
 use mod_assign_generator;
 use moodle_exception;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -46,7 +44,7 @@ require_once($CFG->dirroot . '/mod/assign/locallib.php');
  * Class module_assign
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class module_assign extends module {
@@ -70,7 +68,6 @@ class module_assign extends module {
      * @param array $module
      * @param string $intro
      * @param bool $visible
-     * @throws coding_exception
      */
     public function __construct(string $providersection, array $module, string $intro, bool $visible) {
         parent::__construct('mod_assign', $providersection, $module['title'], $intro, $visible);
@@ -81,21 +78,27 @@ class module_assign extends module {
     /**
      * Create.
      *
-     * @param int $course_id
+     * @param int $courseid
      * @return response_module
-     * @throws Google_Exception
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function create(int $course_id): response_module {
-        $course = get_course($course_id);
+    public function create(int $courseid): response_module {
+        $course = get_course($courseid);
         $record = [
             'course' => $course,
             'name' => $this->title,
-            'intro' => $this->intro,
-            'introformat' => FORMAT_HTML,
+            'introeditor' => $this->intro_editor(),
             'files' => file_get_unused_draft_itemid(),
         ];
+        // Nota máxima del trabajo → calificación por puntos de la tarea (E10.4).
+        if (isset($this->module['maxPoints']) && (int) $this->module['maxPoints'] > 0) {
+            $record['grade'] = (int) $this->module['maxPoints'];
+        }
+        // Fecha de publicación programada → restricción de acceso (E10.5).
+        if ($availability = self::scheduled_availability($this->module)) {
+            $record['availability'] = $availability;
+        }
         if (isset($this->module['dueDate'])) {
             $hour = 0;
             $minute = 0;
@@ -103,10 +106,12 @@ class module_assign extends module {
                 $hour = $this->module['dueTime']['hours'];
                 $minute = $this->module['dueTime']['minutes'] ?? 0;
             }
-            $record['duedate'] = mktime($hour, $minute, 0, $this->module['dueDate']['month'], $this->module['dueDate']['day'], $this->module['dueDate']['year']);
+            $duedate = $this->module['dueDate'];
+            $record['duedate'] = mktime($hour, $minute, 0,
+                $duedate['month'], $duedate['day'], $duedate['year']);
         }
         $options = [
-            'section' => $this->get_section($course_id),
+            'section' => $this->get_section($courseid),
             'visible' => $this->visible,
             'showdescription' => false
         ];
@@ -115,42 +120,99 @@ class module_assign extends module {
             if (count($this->materials) > 0) {
                 $this->add_additional_files($res);
             }
+            $this->import_rubric($res);
             return new response_module(true, $this, null);
         }
         return new response_module(false, null, new error('12000', 'MODULE_NOT_CREATED'));
     }
 
     /**
-     * @param $res
-     * @throws Google_Exception
-     * @throws moodle_exception
+     * Imports the Classroom rubric of the coursework as a Moodle rubric on the
+     * assignment (E10.3). Criteria×levels map 1:1; the level points become the
+     * rubric scores.
+     *
+     * @param  object $res Generator result (with cmid).
+     * @return void
+     * @throws coding_exception|dml_exception|moodle_exception
      */
-    private function add_additional_files($res) {
-        global $USER;
-        $context = context_module::instance($res->cmid);
-        $fs = get_file_storage();
+    private function import_rubric($res): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/grade/grading/lib.php');
+
+        if (empty($this->module['courseId']) || empty($this->module['id'])) {
+            return;
+        }
         $provider = new google();
-        $gdrvieclient = $provider->get_client();
-        $tokenjson = json_decode($gdrvieclient->getAccessToken(), true);
-        $service = new Google_Service_Drive($gdrvieclient);
+        $resrubric = $provider->get_rubric((string) $this->module['courseId'], (string) $this->module['id']);
+        if (!$resrubric->success || empty($resrubric->data)) {
+            return;
+        }
+        $context = context_module::instance($res->cmid);
+        $gradingman = get_grading_manager($context, 'mod_assign', 'submissions');
+        $controller = $gradingman->get_controller('rubric');
+        $controller->update_definition($this->build_rubric_definition($resrubric->data));
+        $gradingman->set_active_method('rubric');
+    }
+
+    /**
+     * Builds a Moodle rubric definition from the Classroom criteria/levels.
+     *
+     * @param array $criteria Array of {title, description, levels[]}.
+     * @return stdClass Definition for gradingform_rubric_controller::update_definition().
+     * @throws coding_exception
+     */
+    private function build_rubric_definition(array $criteria): stdClass {
+        $rubcriteria = [];
+        $ci = 0;
+        foreach ($criteria as $criterion) {
+            $ci++;
+            $levels = [];
+            $li = 0;
+            foreach ($criterion->levels as $level) {
+                $li++;
+                $deftext = trim($level->title
+                    . ($level->description !== '' ? ' — ' . $level->description : ''));
+                $levels['NEWID' . $li] = ['score' => $level->points, 'definition' => $deftext];
+            }
+            $desc = trim($criterion->title
+                . ($criterion->description !== '' ? ' — ' . $criterion->description : ''));
+            $rubcriteria['NEWID' . $ci] = [
+                'sortorder' => $ci,
+                'description' => $desc,
+                'levels' => $levels,
+            ];
+        }
+        return (object) [
+            'name' => get_string('rubric_name', 'local_tresipuntimportgc'),
+            'description_editor' => ['text' => '', 'format' => FORMAT_HTML, 'itemid' => 0],
+            'rubric' => ['criteria' => $rubcriteria],
+            'status' => \gradingform_controller::DEFINITION_STATUS_READY,
+        ];
+    }
+
+    /**
+     * Imports the Drive files of the materials as assignment intro attachments.
+     *
+     * @param object $res Generator result (with cmid).
+     * @return void
+     * @throws coding_exception
+     */
+    private function add_additional_files(object $res): void {
+        global $USER;
+
+        $context = context_module::instance($res->cmid);
+        $provider = new google();
         foreach ($this->materials as $material) {
-            if (array_key_first_compatible($material) === 'driveFile') {
-                try {
-                    $file = $service->files->get($material['driveFile']['driveFile']['id']);
-                    import_file(
-                        $fs,
-                        $file,
-                        $service,
-                        $context->id,
-                        (int)$USER->id,
-                        $tokenjson['access_token'],
-                        'mod_assign',
-                        ASSIGN_INTROATTACHMENT_FILEAREA,
-                        '/'
-                    );
-                } catch (Exception $e) {
-                    print "An error occurred: " . $e->getMessage();
-                }
+            if (array_key_first($material) === 'driveFile') {
+                drive_files::import(
+                    $provider,
+                    $material['driveFile']['driveFile']['id'],
+                    $context->id,
+                    (int) $USER->id,
+                    'mod_assign',
+                    ASSIGN_INTROATTACHMENT_FILEAREA,
+                    '/'
+                );
             }
         }
     }

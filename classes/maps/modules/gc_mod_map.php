@@ -19,7 +19,7 @@ namespace local_tresipuntimportgc\maps\modules;
 use coding_exception;
 use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\maps\materials\gc_mat_map;
-use local_tresipuntimportgc\providers\google;
+use local_tresipuntimportgc\providers\provider;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/local/tresipuntimportgc/classes/maps/materials/gc
  * Class gc_mod_map
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class gc_mod_map {
@@ -46,13 +46,6 @@ abstract class gc_mod_map {
     ];
 
 
-   /* public const GC_MATERIALS = [
-        'driveFile' => gc_material_drivefile_resource_map::class,
-        //'form' => gc_material_form_quiz_map::class,
-        'link' => gc_material_link_url_map::class,
-        //'youtubeVideo' => gc_material_link_url_map::class
-    ];*/
-
     /**
      * Get Description Rich.
      *
@@ -60,31 +53,23 @@ abstract class gc_mod_map {
      * @param string[][][] $materials
      * @return string
      */
-    static public function get_desc_rich(string $desc = '', array $materials = []): string {
-        $html = nl2br($desc);
+    public static function get_desc_rich(string $desc = '', array $materials = []): string {
+        // La descripción de Classroom es texto plano (la API no da HTML): se
+        // convierte de forma segura (escapa HTML, saltos de línea a <br> y
+        // enlaza URLs) antes de concatenar el HTML de los materiales.
+        $html = $desc === '' ? '' : text_to_html($desc, false, false, true);
         /* TODO IMPORTANT The initial purpose of this plugin is to invite the user to DELETE their Classroom account
              AND ALL CONTENT from Drive related to the course, WE CANNOT LINK ANYTHING from Google in Moodle
             (it makes no sense), we have to import everything into Moodle no matter what,
             STUDENTS WANT PRIVACY!!!! */
         foreach ($materials as $mat) {
-            // array_key_first() Not working for version < 7.3 https://www.php.net/manual/es/function.array-key-first.php
-            //$key = array_key_first($mat);
-            /* TODO get materials and update to Moodle filestorage. In description only media files, not docs.
-                Where put materials files?? Only assign allows additional files of any type */
-            $key = array_key_first_compatible($mat);
+            $key = array_key_first($mat);
             if (isset(gc_mat_map::GC_MATS[$key])) {
                 $class = gc_mat_map::GC_MATS[$key];
-                if (!empty($class)) {
-                    /** @var gc_mat_map $item */
-                    $item = new $class;
-                    $html .= $item->get_render($mat[$key]);
-                } else {
-                    // TODO change mtrace() to print_trace()
-                    mtrace('    -- ERROR: GET_MATERIAL_CLASS: ' . json_encode($mat));
-                }
-            }/* else {
-                mtrace('    -- ERROR: GET_MATERIAL_KEY: ' . json_encode($mat));
-            }*/
+                /** @var gc_mat_map $item */
+                $item = new $class;
+                $html .= $item->get_render($mat[$key]);
+            }
         }
         return $html;
     }
@@ -92,11 +77,14 @@ abstract class gc_mod_map {
     /**
      * Get Module.
      *
-     * @param $module
-     * @param google $provider
-     * @return module
+     * Returns a single module, an array of modules (a Classroom item that maps
+     * to several Moodle activities, e.g. combined materials, E10.11) or null.
+     *
+     * @param  $module
+     * @param  provider $provider
+     * @return module|module[]|null
      * @throws coding_exception
      */
-    abstract public function get_mod($module, google $provider): module;
+    abstract public function get_mod($module, provider $provider);
 
 }

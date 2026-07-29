@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/tresipuntimportgc/db" VERSION="2026072400" COMMENT="XMLDB file for Moodle local/tresipuntimportgc"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="local_tresipuntimportgc_import" COMMENT="One import run: a set of Google Classroom courses queued together by a user.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User who launched the import."/>
+        <FIELD NAME="googleaccount" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Email of the Google account used to import."/>
+        <FIELD NAME="refreshtoken" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Encrypted Google refresh token; wiped when the run finishes."/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="local_tresipuntimportgc_course" COMMENT="One Classroom course inside an import run, with its configuration and status.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="importid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Import run this course belongs to."/>
+        <FIELD NAME="providerid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Google Classroom course id."/>
+        <FIELD NAME="fullname" TYPE="char" LENGTH="254" NOTNULL="true" SEQUENCE="false" COMMENT="Full name for the Moodle course."/>
+        <FIELD NAME="shortname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Short name for the Moodle course."/>
+        <FIELD NAME="categoryid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Target course category."/>
+        <FIELD NAME="visible" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Course visibility for students."/>
+        <FIELD NAME="importfiles" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Drive files handling applied to this course."/>
+        <FIELD NAME="calendarimport" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Calendar handling applied to this course."/>
+        <FIELD NAME="formsimport" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Google Forms handling applied to this course."/>
+        <FIELD NAME="importindividual" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Handling of content assigned to individual students for this course."/>
+        <FIELD NAME="status" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="pending" SEQUENCE="false" COMMENT="pending, running, success, error or discarded."/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Resulting Moodle course id, once created."/>
+        <FIELD NAME="timestarted" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="When the import of this course started."/>
+        <FIELD NAME="timefinished" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="When the import of this course finished."/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="importid" TYPE="foreign" FIELDS="importid" REFTABLE="local_tresipuntimportgc_import" REFFIELDS="id"/>
+        <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
+        <KEY NAME="usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="status" UNIQUE="false" FIELDS="status"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_tresipuntimportgc_log" COMMENT="Trace lines of each imported course (info, warning, error).">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="importcourseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Import course this trace belongs to."/>
+        <FIELD NAME="level" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="info" SEQUENCE="false" COMMENT="info, warning or error."/>
+        <FIELD NAME="message" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Localised trace message."/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="importcourseid" TYPE="foreign" FIELDS="importcourseid" REFTABLE="local_tresipuntimportgc_course" REFFIELDS="id"/>
+        <KEY NAME="usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>

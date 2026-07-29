@@ -1,0 +1,160 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+  @template local_tresipuntimportgc/progress_view
+
+  Import run progress: live mode (AJAX polling against import_get_status)
+  and historic mode (finished runs, no polling).
+
+  Context variables required for this template:
+  * header - context for components/page_header
+  * run - summary (account, launchedby, startedon, counts, created...)
+  * courses - per-course rows
+  * live, finished, cronstalled - state flags
+  * importid, lastlogid - polling bootstrap
+  * selectionurl, hascreated
+
+  Example context (json):
+  {
+    "header": {}, "run": {"account": "a@b.c", "launchedby": "User",
+    "startedon": "23/07/2026", "nsuccess": 0, "nerror": 0, "nrunning": 0,
+    "npending": 0, "ntotal": 0, "psuccess": 0, "perror": 0, "prunning": 0,
+    "created": []}, "courses": [], "live": false, "finished": true,
+    "cronstalled": false, "importid": 1, "lastlogid": 0, "selectionurl": "#",
+    "hascreated": false
+  }
+}}
+<div class="local-tipgc" data-region="tipgc-progress" data-importid="{{ importid }}" data-lastlogid="{{ lastlogid }}">
+    {{#header}}{{> local_tresipuntimportgc/components/page_header }}{{/header}}
+
+    <div class="tipgc-runhead d-flex align-items-center justify-content-between flex-wrap mt-3 mb-3">
+        <div class="tipgc-runhead-info">
+            <div class="tipgc-runhead-title d-flex align-items-center flex-wrap">
+                <h2 class="tipgc-run-title m-0">{{ runtitle }}</h2>
+                <span class="tipgc-badge {{ run.statusclass }}">{{# run.isactive }}<span class="tipgc-badge-spin" aria-hidden="true"></span>{{/ run.isactive }}{{ run.statuslabel }}</span>
+            </div>
+            <div class="text-muted small mt-1">
+                {{# str }} launchedby, local_tresipuntimportgc, {{ run.launchedby }} {{/ str }}
+                {{# run.account }} · <span class="tipgc-mono">{{ run.account }}</span>{{/ run.account }}
+            </div>
+        </div>
+        <div class="tipgc-runhead-actions d-flex flex-wrap">
+            {{# canviewpanel }}
+                <a class="btn btn-outline-secondary" href="{{ panelurl }}">{{# str }} viewimports, local_tresipuntimportgc {{/ str }}</a>
+            {{/ canviewpanel }}
+            <a class="btn btn-primary" href="{{ selectionurl }}">{{# str }} newimport, local_tresipuntimportgc {{/ str }}</a>
+        </div>
+    </div>
+
+    {{# cronstalled }}
+        <div class="alert alert-warning d-flex" role="alert">
+            <div>
+                <strong>{{# str }} cron_title, local_tresipuntimportgc {{/ str }}</strong><br>
+                {{# str }} cron_desc, local_tresipuntimportgc {{/ str }}
+            </div>
+        </div>
+    {{/ cronstalled }}
+
+    <div class="tipgc-card p-3 mb-3">
+        <div class="tipgc-progressbar" role="progressbar" aria-label="{{# str }} progress_desc, local_tresipuntimportgc {{/ str }}">
+            <div class="tipgc-progressbar-seg tipgc-seg-success" data-region="seg-success" style="width: {{ run.psuccess }}%"></div>
+            <div class="tipgc-progressbar-seg tipgc-seg-error" data-region="seg-error" style="width: {{ run.perror }}%"></div>
+            <div class="tipgc-progressbar-seg tipgc-seg-running" data-region="seg-running" style="width: {{ run.prunning }}%"></div>
+        </div>
+        <div class="d-flex flex-wrap align-items-center mt-2 tipgc-counters">
+            <span class="tipgc-counter"><span class="tipgc-dot tipgc-seg-success"></span><span data-region="count-success">{{ run.nsuccess }}</span>&nbsp;{{# str }} bar_success, local_tresipuntimportgc {{/ str }}</span>
+            <span class="tipgc-counter"><span class="tipgc-dot tipgc-seg-error"></span><span data-region="count-error">{{ run.nerror }}</span>&nbsp;{{# str }} bar_error, local_tresipuntimportgc {{/ str }}</span>
+            <span class="tipgc-counter"><span class="tipgc-dot tipgc-seg-running"></span><span data-region="count-running">{{ run.nrunning }}</span>&nbsp;{{# str }} bar_running, local_tresipuntimportgc {{/ str }}</span>
+            <span class="tipgc-counter"><span class="tipgc-dot tipgc-seg-pending"></span><span data-region="count-pending">{{ run.npending }}</span>&nbsp;{{# str }} bar_pending, local_tresipuntimportgc {{/ str }}</span>
+            <span class="ml-auto ms-auto text-muted small">{{# str }} bar_total, local_tresipuntimportgc, {{ run.ntotal }} {{/ str }}</span>
+        </div>
+        {{# live }}
+            <div class="mt-2 small tipgc-refresh-note" data-region="refresh-note" aria-live="polite"></div>
+        {{/ live }}
+        {{# finished }}
+            <div class="mt-2 small text-muted">{{# str }} run_finished, local_tresipuntimportgc {{/ str }}</div>
+        {{/ finished }}
+    </div>
+
+    <div class="tipgc-courses" data-region="courses">
+        {{# courses }}
+            <div class="tipgc-card tipgc-course mb-2" data-importcourse="{{ id }}" data-status="{{ status }}">
+                <div class="tipgc-course-row d-flex align-items-center flex-wrap p-3">
+                    <div class="tipgc-course-head flex-grow-1 min-w-0">
+                        <span class="tipgc-course-name">{{ fullname }}</span>
+                        <span class="tipgc-badge {{ statusclass }}" data-region="badge">{{ statuslabel }}</span>
+                        <span class="tipgc-error-count {{^ haserrors }}d-none{{/ haserrors }}" data-region="error-count">
+                            <span data-region="error-count-n">{{ errorcount }}</span> {{# str }} witherrors, local_tresipuntimportgc {{/ str }}
+                        </span>
+                        <a href="{{ courseurl }}" target="_blank" rel="noopener" class="small {{^ courseurl }}d-none{{/ courseurl }}" data-region="course-link">{{# str }} gotocourse, local_tresipuntimportgc {{/ str }}</a>
+                    </div>
+                    <div class="d-flex align-items-center tipgc-course-actions">
+                        <button type="button" class="btn btn-outline-secondary btn-sm {{^ canretry }}d-none{{/ canretry }}"
+                                data-action="retry" data-id="{{ id }}" data-name="{{ fullname }}">
+                            {{# str }} retry, local_tresipuntimportgc {{/ str }}
+                        </button>
+                        <button type="button" class="btn btn-link btn-sm text-muted {{^ candiscard }}d-none{{/ candiscard }}"
+                                data-action="discard" data-id="{{ id }}" data-name="{{ fullname }}">
+                            {{# str }} discard, local_tresipuntimportgc {{/ str }}
+                        </button>
+                    </div>
+                </div>
+                <div class="tipgc-logs-wrap px-3 pb-3 {{^ haslogs }}d-none{{/ haslogs }}" data-region="logs-wrap">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="tipgc-chips ml-auto ms-auto" role="group">
+                            <button type="button" class="tipgc-chip active" data-logfilter="all">{{# str }} log_all, local_tresipuntimportgc {{/ str }}</button>
+                            <button type="button" class="tipgc-chip" data-logfilter="warning">{{# str }} log_warnings, local_tresipuntimportgc {{/ str }}</button>
+                            <button type="button" class="tipgc-chip" data-logfilter="error">{{# str }} log_errors, local_tresipuntimportgc {{/ str }}</button>
+                        </div>
+                    </div>
+                    <div class="tipgc-log-lines" data-region="logs" role="log" aria-live="polite">
+                        {{# logs }}
+                            <div class="tipgc-log-line tipgc-log-{{ level }}" data-level="{{ level }}">
+                                <span class="tipgc-mono tipgc-log-time">{{ time }}</span>
+                                <span class="tipgc-log-msg">{{{ message }}}</span>
+                            </div>
+                        {{/ logs }}
+                    </div>
+                </div>
+            </div>
+        {{/ courses }}
+    </div>
+
+    {{# finished }}
+        <div class="tipgc-card p-4 mt-3">
+            <h3 class="tipgc-summary-title">{{# str }} summary_title, local_tresipuntimportgc {{/ str }}</h3>
+            <div class="d-flex flex-wrap tipgc-summary-stats mt-3 mb-3">
+                <div class="tipgc-stat"><div class="tipgc-stat-n tipgc-stat-success">{{ run.nsuccess }}</div><div class="tipgc-stat-l">{{# str }} bar_success, local_tresipuntimportgc {{/ str }}</div></div>
+                <div class="tipgc-stat"><div class="tipgc-stat-n tipgc-stat-error">{{ run.nerror }}</div><div class="tipgc-stat-l">{{# str }} bar_error, local_tresipuntimportgc {{/ str }}</div></div>
+            </div>
+            {{# hascreated }}
+                <div class="tipgc-label mb-2">{{# str }} createdcourses, local_tresipuntimportgc {{/ str }}</div>
+                <div class="d-flex flex-wrap tipgc-created mb-3">
+                    {{# run.created }}
+                        <a href="{{ url }}" target="_blank" rel="noopener" class="tipgc-created-chip">{{ name }}{{# pix }} i/externallink, core {{/ pix }}</a>
+                    {{/ run.created }}
+                </div>
+            {{/ hascreated }}
+            <a class="btn btn-primary" href="{{ selectionurl }}">{{# str }} newimport, local_tresipuntimportgc {{/ str }}</a>
+        </div>
+    {{/ finished }}
+</div>
+{{#js}}
+require(['local_tresipuntimportgc/progress'], function(Progress) {
+    Progress.init('[data-region="tipgc-progress"]', {{# live }}true{{/ live }}{{^ live }}false{{/ live }});
+});
+{{/js}}

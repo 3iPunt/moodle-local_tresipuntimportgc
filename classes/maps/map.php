@@ -21,15 +21,13 @@ use local_tresipuntimportgc\factory\course;
 use local_tresipuntimportgc\factory\folder;
 use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\factory\section;
-use local_tresipuntimportgc\providers\google;
-
-defined('MOODLE_INTERNAL') || die();
+use local_tresipuntimportgc\providers\provider;
 
 /**
  * Class gclassroom_map
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class map {
@@ -37,10 +35,10 @@ abstract class map {
     /**
      * Course.
      *
-     * @param object $course
+     * @param array $course
      * @return course
      */
-    abstract static public function course(object $course): course;
+    abstract public static function course(array $course): course;
 
     /**
      * Courses.
@@ -48,7 +46,7 @@ abstract class map {
      * @param array $courses
      * @return course[]
      */
-    abstract static public function courses(array $courses): array;
+    abstract public static function courses(array $courses): array;
 
     /**
      * Teacher Folder.
@@ -56,7 +54,7 @@ abstract class map {
      * @param string[] $folder
      * @return folder|null
      */
-    abstract static public function teacher_folder(array $folder): ?folder;
+    abstract public static function teacher_folder(array $folder): ?folder;
 
     /**
      * Section.
@@ -64,7 +62,7 @@ abstract class map {
      * @param string[] $section
      * @return section|null
      */
-    abstract static public function section(array $section): ?section;
+    abstract public static function section(array $section): ?section;
 
     /**
      * Sections.
@@ -72,26 +70,29 @@ abstract class map {
      * @param array $sections
      * @return section[]
      */
-    abstract static public function sections(array $sections): array;
+    abstract public static function sections(array $sections): array;
 
     /**
      * Module.
      *
-     * @param array $module
-     * @param google $provider
-     * @param string $type
-     * @return module
+     * Returns a single module, an array of modules (one Classroom item that
+     * maps to several Moodle activities, E10.11) or null.
+     *
+     * @param  array $module
+     * @param  provider $provider
+     * @param  string $type
+     * @return module|module[]|null
      */
-    abstract static public function module(array $module, google $provider, string $type = ''): ?module;
+    abstract public static function module(array $module, provider $provider, string $type = '');
 
     /**
      * Modules.
      *
      * @param array $modules
-     * @param google $provider
+     * @param provider $provider
      * @param string $type
      * @return module[]
      */
-    abstract static public function modules(array $modules, google $provider, string $type = ''): array;
+    abstract public static function modules(array $modules, provider $provider, string $type = ''): array;
 
 }

@@ -1,0 +1,203 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+  @template local_tresipuntimportgc/import_view
+
+  Course selection screen. Three states: site connection missing (noconfig),
+  user not connected (isconnect) and connected listing (islist).
+
+  Context variables required for this template:
+  * header - context for components/page_header
+  * isconnect, noconfig, islist, isempty, haserror - state flags
+  * authurl, settingsurl, isadmin, accountemail, accountinitial, errormsg
+  * courses - list of course rows
+  * categories - list of {id, name}
+  * allowconfig - per-course advanced options enabled
+  * importfilesoptions, calendaroptions - lists of {value, text, selected}
+  * sesskey, actionurl
+
+  Example context (json):
+  {
+    "header": {}, "isconnect": false, "noconfig": false, "islist": true,
+    "isempty": false, "haserror": false, "authurl": "#", "settingsurl": "#",
+    "isadmin": false, "accountemail": "user@example.com", "accountinitial": "U",
+    "errormsg": "", "courses": [], "categories": [], "allowconfig": true,
+    "importfilesoptions": [], "calendaroptions": [], "sesskey": "x",
+    "actionurl": "#"
+  }
+}}
+<div class="local-tipgc" data-region="tipgc-import">
+
+    {{#header}}{{> local_tresipuntimportgc/components/page_header }}{{/header}}
+
+    {{! ===== Estado: sin conectar ===== }}
+    {{# isconnect }}
+        <div class="d-flex justify-content-center py-4">
+            <div class="tipgc-card tipgc-connect-card p-4">
+                <ol class="tipgc-steps list-unstyled">
+                    <li><span class="tipgc-step-num">1</span><span>{{# str }} connect_step1, local_tresipuntimportgc {{/ str }}</span></li>
+                    <li><span class="tipgc-step-num">2</span><span>{{# str }} connect_step2, local_tresipuntimportgc {{/ str }}</span></li>
+                    <li><span class="tipgc-step-num">3</span><span>{{# str }} connect_step3, local_tresipuntimportgc {{/ str }}</span></li>
+                </ol>
+                {{# noconfig }}
+                    <div class="alert alert-warning" role="alert">
+                        <strong>{{# str }} noconfig_title, local_tresipuntimportgc {{/ str }}</strong><br>
+                        {{# str }} noconfig_desc, local_tresipuntimportgc {{/ str }}
+                        {{# isadmin }}<a href="{{ settingsurl }}">{{# str }} gotosettings, local_tresipuntimportgc {{/ str }}</a>{{/ isadmin }}
+                    </div>
+                {{/ noconfig }}
+                {{^ noconfig }}
+                    <a class="btn btn-primary btn-lg tipgc-btn-connect" href="{{ authurl }}">
+                        {{# str }} connect_button, local_tresipuntimportgc {{/ str }}
+                    </a>
+                    <p class="text-muted small mt-3 mb-0 tipgc-revoke-note">{{# str }} connect_revoke, local_tresipuntimportgc {{/ str }}</p>
+                {{/ noconfig }}
+            </div>
+        </div>
+    {{/ isconnect }}
+
+    {{! ===== Estado: conectado ===== }}
+    {{# islist }}
+        <div class="tipgc-account-row d-flex align-items-center justify-content-between flex-wrap mt-3 mb-3">
+            {{> local_tresipuntimportgc/components/account_chip }}
+            <div class="d-flex tipgc-topactions">
+                {{# canviewpanel }}
+                    <a class="btn btn-outline-secondary tipgc-btn-panel" href="{{ panelurl }}" target="_blank" rel="noopener">{{# pix }} history, local_tresipuntimportgc {{/ pix }}{{# str }} viewimports, local_tresipuntimportgc {{/ str }}</a>
+                {{/ canviewpanel }}
+                {{# isadmin }}
+                    <a class="btn btn-outline-secondary" href="{{ settingsurl }}" target="_blank" rel="noopener">{{# pix }} i/settings, core {{/ pix }}{{# str }} settings, core {{/ str }}</a>
+                {{/ isadmin }}
+            </div>
+        </div>
+
+        {{# haserror }}
+            <div class="alert alert-danger" role="alert">{{ errormsg }}</div>
+        {{/ haserror }}
+
+        {{# isempty }}
+            <div class="tipgc-card tipgc-empty text-center p-5">
+                <h4>{{# str }} noclasses_title, local_tresipuntimportgc {{/ str }}</h4>
+                <p class="text-muted">{{# str }} noclasses_desc, local_tresipuntimportgc {{/ str }}</p>
+                <a class="btn btn-secondary" href="{{ authurl }}">{{# str }} changeaccount, local_tresipuntimportgc {{/ str }}</a>
+            </div>
+        {{/ isempty }}
+
+        {{^ isempty }}{{^ haserror }}
+            <div class="tipgc-toolbar d-flex align-items-center flex-wrap mb-2">
+                <input type="text" class="form-control tipgc-search" data-action="search"
+                       placeholder="{{# str }} searchplaceholder, local_tresipuntimportgc {{/ str }}"
+                       aria-label="{{# str }} searchplaceholder, local_tresipuntimportgc {{/ str }}">
+                <div class="tipgc-chips" role="group">
+                    <button type="button" class="tipgc-chip active" data-filter="all">{{# str }} filter_all, local_tresipuntimportgc {{/ str }}</button>
+                    <button type="button" class="tipgc-chip" data-filter="active">{{# str }} filter_active, local_tresipuntimportgc {{/ str }}</button>
+                    <button type="button" class="tipgc-chip" data-filter="archived">{{# str }} filter_archived, local_tresipuntimportgc {{/ str }}</button>
+                </div>
+            </div>
+            <div class="tipgc-selectrow d-flex align-items-center justify-content-between mb-3">
+                <label class="m-0 tipgc-selectall">
+                    <input type="checkbox" data-action="selectall">
+                    {{# str }} selectallcourses, local_tresipuntimportgc {{/ str }}
+                </label>
+                <span class="text-muted small" data-region="count-note"></span>
+            </div>
+
+            <div class="tipgc-courses" data-region="courses">
+                {{# courses }}
+                    <div class="tipgc-card tipgc-course mb-2" data-course
+                         data-id="{{ id }}" data-name="{{ name }}" data-archived="{{# archived }}1{{/ archived }}{{^ archived }}0{{/ archived }}">
+                        <div class="tipgc-course-selrow d-flex align-items-center p-3">
+                            <input type="checkbox" class="tipgc-course-check" data-action="toggle" aria-label="{{ name }}">
+                            <span class="tipgc-class-icon" aria-hidden="true">{{# pix }} classroom, local_tresipuntimportgc {{/ pix }}</span>
+                            <div class="flex-grow-1 min-w-0">
+                                <div class="tipgc-course-tags d-flex align-items-center flex-wrap">
+                                    <a href="{{ link }}" target="_blank" rel="noopener" class="tipgc-course-name">{{ name }}{{# pix }} i/externallink, core {{/ pix }}</a>
+                                    {{# section }}<span class="tipgc-tag">{{ section }}</span>{{/ section }}
+                                    {{# archived }}<span class="tipgc-tag tipgc-tag-archived">{{# str }} filter_archived, local_tresipuntimportgc {{/ str }}</span>{{/ archived }}
+                                    {{# shortnameexists }}<span class="tipgc-tag tipgc-tag-warning" data-region="shortname-warning">{{# str }} shortname_in_use, local_tresipuntimportgc {{/ str }}</span>{{/ shortnameexists }}
+                                </div>
+                            </div>
+                            <button type="button" class="btn tipgc-btn-edit" data-action="edit"
+                                    aria-expanded="false" aria-label="{{# str }} editcourses, local_tresipuntimportgc {{/ str }}">
+                                {{# pix }} t/editinline, core {{/ pix }}
+                            </button>
+                        </div>
+                        <div class="tipgc-course-edit p-3" data-region="edit" hidden>
+                            <div class="form-row row">
+                                <div class="col-md-4 mb-2">
+                                    <label class="tipgc-label" for="tipgc-short-{{ id }}">{{# str }} uniquename_course, local_tresipuntimportgc {{/ str }}</label>
+                                    <input type="text" class="form-control{{# shortnameexists }} is-invalid{{/ shortnameexists }}" id="tipgc-short-{{ id }}" data-field="shortname" value="{{ defaultshortname }}">
+                                    {{# shortnameexists }}<small class="text-danger" data-region="shortname-warning-help">{{# str }} shortname_in_use_help, local_tresipuntimportgc {{/ str }}</small>{{/ shortnameexists }}
+                                </div>
+                                <div class="col-md-5 mb-2">
+                                    <label class="tipgc-label" for="tipgc-cat-{{ id }}">{{# str }} select_category, local_tresipuntimportgc {{/ str }}</label>
+                                    <select class="form-control" id="tipgc-cat-{{ id }}" data-field="categoryid" data-autocomplete-categories>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-2 d-flex align-items-end">
+                                    <label class="m-0"><input type="checkbox" data-field="visible" checked> {{# str }} course_visible, local_tresipuntimportgc {{/ str }}</label>
+                                </div>
+                            </div>
+                            {{# allowconfig }}
+                                <div class="tipgc-advanced mt-2 pt-2">
+                                    <div class="tipgc-label mb-2">{{# str }} advanced, core {{/ str }}</div>
+                                    <div class="form-row row">
+                                        <div class="col-md-6 mb-2">
+                                            <label class="tipgc-label" for="tipgc-files-{{ id }}">{{# str }} importfiles, local_tresipuntimportgc {{/ str }}</label>
+                                            <select class="form-control custom-select" id="tipgc-files-{{ id }}" data-field="importfiles">
+                                                {{# importfilesoptions }}<option value="{{ value }}" {{ selected }}>{{ text }}</option>{{/ importfilesoptions }}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label class="tipgc-label" for="tipgc-cal-{{ id }}">{{# str }} googlecalendarimport, local_tresipuntimportgc {{/ str }}</label>
+                                            <select class="form-control custom-select" id="tipgc-cal-{{ id }}" data-field="calendarimport">
+                                                {{# calendaroptions }}<option value="{{ value }}" {{ selected }}>{{ text }}</option>{{/ calendaroptions }}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            {{/ allowconfig }}
+                        </div>
+                    </div>
+                {{/ courses }}
+                <div class="tipgc-card tipgc-empty text-center p-4" data-region="noresults" hidden>
+                    {{# str }} nofilterresults, local_tresipuntimportgc {{/ str }}
+                </div>
+            </div>
+
+            <div class="tipgc-footer d-flex align-items-center justify-content-between flex-wrap mt-5 p-3">
+                <span data-region="selected-note">{{# str }} nselected, local_tresipuntimportgc, 0 {{/ str }}</span>
+                <div class="tipgc-footer-actions">
+                    <button type="button" class="btn btn-link" data-action="clear">{{# pix }} clear, local_tresipuntimportgc {{/ pix }}{{# str }} clearselection, local_tresipuntimportgc {{/ str }}</button>
+                    <button type="button" class="btn btn-primary" data-action="import" disabled>
+                        {{# str }} importcourses_btn, local_tresipuntimportgc {{/ str }}
+                    </button>
+                </div>
+            </div>
+
+            <form method="post" action="{{ actionurl }}" data-region="import-form" class="d-none">
+                <input type="hidden" name="sesskey" value="{{ sesskey }}">
+                <input type="hidden" name="action" value="import">
+                <input type="hidden" name="courses" value="" data-region="courses-payload">
+            </form>
+        {{/ haserror }}{{/ isempty }}
+    {{/ islist }}
+</div>
+{{#js}}
+require(['local_tresipuntimportgc/selection'], function(Selection) {
+    Selection.init('[data-region="tipgc-import"]');
+});
+{{/js}}

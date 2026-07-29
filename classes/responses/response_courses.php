@@ -18,7 +18,7 @@
  * response_courses
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -26,13 +26,11 @@ namespace local_tresipuntimportgc\responses;
 
 use local_tresipuntimportgc\factory\course;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * response_courses
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class response_courses extends response {

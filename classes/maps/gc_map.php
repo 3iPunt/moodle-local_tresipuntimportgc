@@ -16,41 +16,33 @@
 
 namespace local_tresipuntimportgc\maps;
 
-use Exception;
-use Google_Service_Classroom_Course;
+use Throwable;
 use local_tresipuntimportgc\factory\course;
 use local_tresipuntimportgc\factory\folder;
 use local_tresipuntimportgc\factory\module;
-use local_tresipuntimportgc\factory\module_assign;
-use local_tresipuntimportgc\factory\module_folder;
-use local_tresipuntimportgc\factory\module_label;
-use local_tresipuntimportgc\factory\module_url;
 use local_tresipuntimportgc\factory\section;
+use local_tresipuntimportgc\local\run_config;
 use local_tresipuntimportgc\maps\modules\gc_mod_map;
-use local_tresipuntimportgc\providers\google;
-
-defined('MOODLE_INTERNAL') || die();
+use local_tresipuntimportgc\providers\provider;
 
 /**
  * Class Google Classroom Map.
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class gc_map extends map {
 
     /**
-     * Courses.
+     * Course.
      *
-     * @param object $course
+     * @param array $course Course data as a plain associative array.
      * @return course
      */
-    public static function course(object $course): course {
-        /** @var Google_Service_Classroom_Course $gcourse */
-        $gcourse = $course;
-        $des = $gcourse->getDescription() ? $gcourse->getDescription() : '';
-        return new course($gcourse->getId(), $des, $gcourse);
+    public static function course(array $course): course {
+        $des = $course['description'] ?? '';
+        return new course($course['id'], $des, (object) $course);
     }
 
     /**
@@ -114,84 +106,71 @@ class gc_map extends map {
     /**
      * Module.
      *
-     * @param string[] $module
-     * @param string $type
-     * @return module
+     * @param  string[] $module
+     * @param  provider $provider
+     * @param  string $type
+     * @return module|module[]|null
      */
-    public static function module(array $module, google $provider, string $type = ''): ?module {
-        $item = null;
-        if (isset($module['assigneeMode']) && $module['assigneeMode'] === 'ALL_STUDENTS') {
-            if (isset(gc_mod_map::GC_MODS[$type])) {
-                $modtypes = gc_mod_map::GC_MODS[$type];
-                $class = is_array($modtypes) ? $modtypes[$module['workType']] : $modtypes;
-                if (!empty($class)) {
-                    try {
-                        $modmap = new $class;
-                        return $modmap->get_mod($module, $provider);
-                    } catch (Exception $e) {
-                        mtrace('    -- ERROR: GET_MODULE: ' . $module['id'] . ' - ' . $e->getMessage());
-                        return null;
-                    }
-                }
-            } else {
-                mtrace('    -- ERROR: GET_MODULE_TYPE: ' . $module['id'] . ' - ' . $type);
+    public static function module(array $module, provider $provider, string $type = '') {
+        // Contenidos dirigidos a estudiantes concretos (E10.9, §6.9): por
+        // defecto no se importan; con el ajuste activo se importan ocultos y con
+        // una nota para el profesor. Aplica a los tres tipos.
+        $individual = isset($module['assigneeMode']) && $module['assigneeMode'] !== 'ALL_STUDENTS';
+        if ($individual) {
+            if ((int) run_config::get('importindividual', 0) !== 1) {
+                return null;
             }
-
+            $module['state'] = 'DRAFT'; // Oculto para los estudiantes.
+            $note = get_string('individual_note', 'local_tresipuntimportgc');
+            $module['description'] = $note . (isset($module['description']) && $module['description'] !== ''
+                ? "\n\n" . $module['description'] : '');
+        }
+        if (isset(gc_mod_map::GC_MODS[$type])) {
+            $modtypes = gc_mod_map::GC_MODS[$type];
+            $class = is_array($modtypes) ? ($modtypes[$module['workType']] ?? null) : $modtypes;
+            if (!empty($class)) {
+                try {
+                    $modmap = new $class;
+                    return $modmap->get_mod($module, $provider);
+                } catch (Throwable $e) {
+                    // Robustez (§6.5): un Error en la transformación de un
+                    // módulo no debe tumbar la importación del resto.
+                    mtrace('    -- ERROR: GET_MODULE: ' . $module['id'] . ' - ' . $e->getMessage());
+                    return null;
+                }
+            }
+        } else {
+            mtrace('    -- ERROR: GET_MODULE_TYPE: ' . $module['id'] . ' - ' . $type);
         }
         return null;
-    }
-
-    public static function materials(array $module): array {
-        $materials = [];
-        if (isset($module['materials'])) {
-            foreach($module['materials'] as $material) {
-                $type = array_key_first_compatible($material);
-                if (isset(gc_mod_map::GC_MATERIALS[$type])) {
-                    $class = gc_mod_map::GC_MATERIALS[$type];
-                    if (!empty($class)) {
-                        try {
-                            $modmap = new $class;
-                            $material['section'] = $module['topicId'] ?? '';
-                            $material['visible'] = $module['state'] === 'PUBLISHED';
-                            $materials[] = $modmap->get_mod($material);
-                        } catch (Exception $e) {
-                            error_log($e->getMessage());
-                            mtrace('    -- ERROR: GET_MODULE OF MATERIAL:  - ' . $e->getMessage());
-                            return $materials;
-                        }
-                    }
-                } else {
-                    mtrace('    -- ERROR: GET_MODULE_TYPE: ' . $module['id'] . ' - ' . $type);
-                }
-            }
-        }
-        return $materials;
     }
 
     /**
      * Modules.
      *
      * @param array $modules
+     * @param provider $provider
      * @param string $type
-     * @param google|null $provider
      * @return module[]
      */
-    public static function modules(array $modules, google $provider, string $type = ''): array {
+    public static function modules(array $modules, provider $provider, string $type = ''): array {
+        // Orden estable por fecha de creación (§6.8): la API los devuelve sin
+        // orden garantizado. Se ordena dentro de cada tipo; los tipos se
+        // agrupan luego al concatenarse en el proveedor.
+        usort($modules, static function ($a, $b) {
+            return strcmp($a['creationTime'] ?? '', $b['creationTime'] ?? '');
+        });
         $data = [];
         foreach ($modules as $module) {
             $m = self::module($module, $provider, $type);
-            /* TODO if it is an assignment and there are files, they will be downloaded and included within it. Otherwise, the files will become Moodle mods. */
-            /*if (($m instanceof module_assign) === false && ($m instanceof module_folder) === false) {
-                // if it is an assignment and there are subjects, they will be downloaded and included within it. Otherwise, the subjects will become Moodle mods.
-                $materials = self::materials($module);
-                foreach ($materials as $material) {
-                    $data[] = $material;
+            // Un ítem puede mapear a varios módulos (materiales combinados, E10.11).
+            if (is_array($m)) {
+                foreach ($m as $sub) {
+                    $data[] = $sub;
                 }
-                if (($m instanceof module_label) === true) {
-                    continue;
-                }
-            }*/
-            $data[] = $m;
+            } else {
+                $data[] = $m;
+            }
         }
         return $data;
     }

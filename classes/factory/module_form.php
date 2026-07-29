@@ -18,7 +18,7 @@
  * Class module_quiz
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -26,8 +26,6 @@ namespace local_tresipuntimportgc\factory;
 
 use coding_exception;
 use dml_exception;
-use Google_Service_Drive;
-use Google_Service_Forms_Form;
 use local_tresipuntimportgc\providers\google;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response_module;
@@ -42,7 +40,7 @@ require_once($CFG->dirroot . '/mod/quiz/lib.php');
  * Class module_quiz
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class module_form extends module {
@@ -72,50 +70,40 @@ class module_form extends module {
     public function __construct(string $providersection, array $module, string $intro, bool $visible, google $provider) {
         $this->module = $module;
         $this->provider = $provider;
-        $this->modname = 'mod_quiz';
+        $this->modname = 'quiz';
         if ((isset($module['workType']) && $module['workType'] === 'SHORT_ANSWER_QUESTION') ||
             (isset($module['workType']) && $module['workType'] === 'MULTIPLE_CHOICE_QUESTION')) {
-            $this->modname = 'mod_feedback';
+            $this->modname = 'feedback';
         }
-        if (isset($module['materials'][0]) && array_key_first_compatible($module['materials'][0]) === 'form' && count($module['materials']) === 1) {
-            // TODO find out how to get the id of the form to be able to make the request
+        if (isset($module['materials'][0]) && count($module['materials']) === 1
+                && array_key_first($module['materials'][0]) === 'form') {
             $formurl = $module['materials'][0]['form']['formUrl'];
-            $gdrvieclient = $this->provider->get_client();
-            $service = new Google_Service_Drive($gdrvieclient);
-            $allforms = $service->files->listFiles(['q' => "mimeType = 'application/vnd.google-apps.form'"]);
-            foreach($allforms->getItems() as $form) {
-                $dataform = $this->provider->get_form($form['id']);
-                if (assert($dataform instanceof Google_Service_Forms_Form) && $dataform->getResponderUri() === $formurl) {
-                    $currentform = $dataform;
-                    break;
-                }
+            // Only forms the connected account can edit are readable via API;
+            // forms owned by another teacher will simply not be found.
+            $resform = $this->provider->get_form_by_url($formurl);
+            if ($resform->success && $resform->data !== null) {
+                $this->intro = $resform->data->description;
+                // TODO when isquiz, import questions once the Forms API mapping lands.
             }
-            if (isset($currentform)) {
-                $this->intro = $currentform->getInfo()->description;
-                if ((int)$currentform->getSettings()->getQuizSettings()->getIsQuiz() === 1) {
-                    // TODO start logic.
-                }
-            }
-            // TODO the user is not the author of the form, so it cannot be imported (trace??).
-            //print_object($currentform);
         }
-        parent::__construct($this->modname, $providersection, $module['title'], $intro, $visible);
+        // El modname va sin prefijo (para la traza); el generador necesita el
+        // componente con prefijo.
+        parent::__construct('mod_' . $this->modname, $providersection, $module['title'], $intro, $visible);
     }
 
     /**
      * Create.
      *
-     * @param int $course_id
+     * @param int $courseid
      * @return response_module
      * @throws dml_exception
      */
-    public function create(int $course_id): response_module {
-        $course = get_course($course_id);
+    public function create(int $courseid): response_module {
+        $course = get_course($courseid);
         $record = [
             'course' => $course,
             'name' => $this->title,
-            'intro' => $this->intro,
-            'introformat' => FORMAT_HTML,
+            'introeditor' => $this->intro_editor(),
             'files' => file_get_unused_draft_itemid(),
             'timeopen'               => 0,
             'timeclose'              => 0,
@@ -156,7 +144,7 @@ class module_form extends module {
             'questionsperpage'       => 1,
             'shuffleanswers'         => 1,
             'sumgrades'              => 10, // TODO Dinamyc from questions.
-            'grade'                  => 10, // ¿?
+            'grade'                  => 10, // TODO derive from the questions too.
             'timecreated'            => time(),
             'timemodified'           => time(),
             'timelimit'              => 0,
@@ -178,13 +166,16 @@ class module_form extends module {
                 $hour = $this->module['dueTime']['hours'];
                 $minute = $this->module['dueTime']['minutes'] ?? 0;
             }
-            $record['timeclose'] = mktime($hour, $minute, 0, $this->module['dueDate']['month'], $this->module['dueDate']['day'], $this->module['dueDate']['year']);
+            $duedate = $this->module['dueDate'];
+            $record['timeclose'] = mktime($hour, $minute, 0,
+                $duedate['month'], $duedate['day'], $duedate['year']);
         }
-        $options = ['section' => $this->get_section($course_id), 'visible' => $this->visible, 'showdescription' => false];
+        $options = ['section' => $this->get_section($courseid), 'visible' => $this->visible, 'showdescription' => false];
         $res = $this->generator->create_instance($record, $options);
         if (isset($res)) {
-            // TODO add questions to questions bank, and associate questions to this quiz. See Etrasa proyect for get code.
-            // Need the questions to come to the builder, as well as if there is additional configuration, such as grading, multi-answering, etc.
+            // TODO add the questions to the question bank and link them to this
+            // quiz. The builder also needs the extra configuration that comes
+            // with them: grading, multiple answers, and so on.
             return new response_module(true, $this, null);
         }
         return new response_module(false, null, new error('13000', 'MODULE_NOT_CREATED'));

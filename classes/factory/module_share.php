@@ -18,7 +18,7 @@
  * Class module_share
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,13 +32,11 @@ use mod_url_generator;
 use moodle_exception;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Class module_share
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class module_share extends module {
@@ -68,31 +66,31 @@ class module_share extends module {
     /**
      * Create.
      *
-     * @param int $course_id
+     * @param int $courseid
      * @return response_module
      * @throws moodle_exception
      */
-    public function create(int $course_id): response_module {
+    public function create(int $courseid): response_module {
         global $USER;
         $plugins = core_component::get_plugin_list('mod');
         if (array_key_exists($this->get_modname(), $plugins)) {
 
-            $comment_name = preg_replace("/[\r\n|\n|\r]+/", " ", $this->title);
-            $name = fullname($USER) . ': ' . substr(trim($comment_name), 0, 200);
-            $draftid_editor = file_get_submitted_draft_itemid('introeditor');
+            $commentname = preg_replace("/[\r\n|\n|\r]+/", " ", $this->title);
+            $name = fullname($USER) . ': ' . substr(trim($commentname), 0, 200);
+            $draftideditor = file_get_submitted_draft_itemid('introeditor');
 
             if (!empty($this->desc)) {
-                $comment_name .= $this->desc;
+                $commentname .= $this->desc;
             }
 
             $moduleinfo = new stdClass();
             $moduleinfo->modulename = $this->get_modname();
             $moduleinfo->section = 0;
             $moduleinfo->showdescription = true;
-            $moduleinfo->course = $course_id;
+            $moduleinfo->course = $courseid;
             $moduleinfo->teacher = $USER->id;
             $moduleinfo->name = $name;
-            $moduleinfo->introeditor = array('text'=> $comment_name, 'format'=> FORMAT_HTML, 'itemid'=>$draftid_editor);;
+            $moduleinfo->introeditor = array('text' => $commentname, 'format' => FORMAT_HTML, 'itemid' => $draftideditor);;
             $moduleinfo->visible = true;
             $cm = create_module($moduleinfo);
             if (isset($cm)) {

@@ -1,0 +1,149 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Import run progress page: live polling mode and historic mode.
+ *
+ * @package    local_tresipuntimportgc
+ * @copyright  2026 3iPunt (contacte@tresipunt.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+require_once(__DIR__ . '/../../config.php');
+require_once('./lib.php');
+
+global $PAGE, $OUTPUT, $DB;
+
+use local_tresipuntimportgc\models\import;
+use local_tresipuntimportgc\models\import_course;
+use local_tresipuntimportgc\output\progress_view;
+
+// Parameters.
+$importid = required_param('id', PARAM_INT);
+
+// Security.
+require_login();
+require_capability('local/tresipuntimportgc:import', context_system::instance());
+
+$import = new import($importid);
+// Solo la propia ejecución, salvo que se tenga la capacidad de consulta: una
+// ejecución lleva la cuenta de Google de quien la lanzó.
+$import->require_can_access();
+
+// Page setup.
+$startedon = userdate($import->get('timecreated'), get_string('strftimedatetimeshort', 'langconfig'));
+$title = get_string('progress_title', 'local_tresipuntimportgc', $startedon);
+$PAGE->set_context(context_system::instance());
+$PAGE->set_url('/local/tresipuntimportgc/progress.php', ['id' => $importid]);
+$PAGE->set_title($title);
+$PAGE->set_heading('');
+
+// Status maps (view stays dumb).
+$coursestatus = [
+    import_course::STATUS_PENDING => ['status_pending', 'tipgc-badge-pending'],
+    import_course::STATUS_RUNNING => ['status_running', 'tipgc-badge-running'],
+    import_course::STATUS_SUCCESS => ['status_success', 'tipgc-badge-success'],
+    import_course::STATUS_ERROR => ['status_error', 'tipgc-badge-error'],
+    import_course::STATUS_DISCARDED => ['status_discarded', 'tipgc-badge-pending'],
+];
+$runstatus = [
+    import::STATUS_QUEUED => ['istatus_queued', 'tipgc-badge-pending'],
+    import::STATUS_RUNNING => ['istatus_running', 'tipgc-badge-running'],
+    import::STATUS_COMPLETED => ['istatus_completed', 'tipgc-badge-success'],
+    import::STATUS_PARTIAL => ['istatus_partial', 'tipgc-badge-warning'],
+    import::STATUS_ERROR => ['istatus_error', 'tipgc-badge-error'],
+];
+
+$state = $import->get_status();
+$finished = in_array($state, [import::STATUS_COMPLETED, import::STATUS_PARTIAL, import::STATUS_ERROR], true);
+
+// Cron health: the queue does not move if scheduled tasks are not running.
+$lastcron = (int) get_config('core', 'lastcronstart');
+$cronstalled = !$finished && (time() - $lastcron > 600);
+
+$counts = ['pending' => 0, 'running' => 0, 'success' => 0, 'error' => 0, 'discarded' => 0];
+$created = [];
+$courses = [];
+$lastlogid = 0;
+foreach ($import->get_courses() as $course) {
+    $status = $course->get('status');
+    $counts[$status]++;
+    $logs = [];
+    $errorcount = 0;
+    foreach ($course->get_logs() as $log) {
+        $lastlogid = max($lastlogid, (int) $log->get('id'));
+        $errorcount += $log->get('level') === 'error' ? 1 : 0;
+        $logs[] = [
+            'time' => userdate($log->get('timecreated'), get_string('strftimetime24', 'langconfig')),
+            'level' => $log->get('level'),
+            'message' => format_text($log->get('message'), FORMAT_HTML, ['context' => context_system::instance()]),
+        ];
+    }
+    $courseurl = $course->get('courseid')
+        ? (new moodle_url('/course/view.php', ['id' => $course->get('courseid')]))->out(false) : '';
+    if ($status === import_course::STATUS_SUCCESS) {
+        $created[] = ['name' => format_string($course->get('fullname')), 'url' => $courseurl];
+    }
+    $courses[] = [
+        'id' => (int) $course->get('id'),
+        'status' => $status,
+        'fullname' => format_string($course->get('fullname')),
+        'statuslabel' => get_string($coursestatus[$status][0], 'local_tresipuntimportgc'),
+        'statusclass' => $coursestatus[$status][1],
+        'courseurl' => $courseurl,
+        'canretry' => $status === import_course::STATUS_ERROR,
+        'candiscard' => $status === import_course::STATUS_PENDING,
+        'haserrors' => $errorcount > 0,
+        'errorcount' => $errorcount,
+        'haslogs' => count($logs) > 0,
+        'logs' => $logs,
+    ];
+}
+$total = $counts['pending'] + $counts['running'] + $counts['success'] + $counts['error'];
+$pct = static function (int $n) use ($total): float {
+    return $total > 0 ? round($n / $total * 100, 2) : 0;
+};
+
+$launcher = $DB->get_record('user', ['id' => $import->get('userid')]);
+// La cuenta de Google solo se muestra si es la propia o si se administra el
+// sitio (mismo criterio que la columna de cuenta del panel).
+$showaccount = $import->is_owned_by()
+    || has_capability('moodle/site:config', context_system::instance());
+$run = (object) [
+    'statuslabel' => get_string($runstatus[$state][0], 'local_tresipuntimportgc'),
+    'statusclass' => $runstatus[$state][1],
+    'isactive' => !$finished,
+    'account' => $showaccount ? (string) $import->get('googleaccount') : '',
+    'launchedby' => $launcher ? fullname($launcher) : '',
+    'startedon' => $startedon,
+    'nsuccess' => $counts['success'],
+    'nerror' => $counts['error'],
+    'nrunning' => $counts['running'],
+    'npending' => $counts['pending'],
+    'ntotal' => $total,
+    'psuccess' => $pct($counts['success']),
+    'perror' => $pct($counts['error']),
+    'prunning' => $pct($counts['running']),
+    'created' => $created,
+];
+
+$renderer = $PAGE->get_renderer('local_tresipuntimportgc');
+$canviewpanel = has_capability('local/tresipuntimportgc:viewreports', context_system::instance());
+$view = new progress_view($run, $courses, $finished, $cronstalled, $importid, $lastlogid, $canviewpanel);
+
+echo $OUTPUT->header();
+echo $renderer->render_progress_view($view);
+echo $OUTPUT->footer();

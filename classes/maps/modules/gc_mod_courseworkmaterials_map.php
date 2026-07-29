@@ -18,33 +18,29 @@ namespace local_tresipuntimportgc\maps\modules;
 
 use coding_exception;
 use local_tresipuntimportgc\factory\module;
-use local_tresipuntimportgc\factory\module_folder;
-use local_tresipuntimportgc\factory\module_form;
 use local_tresipuntimportgc\factory\module_label;
 use local_tresipuntimportgc\factory\module_resource;
 use local_tresipuntimportgc\factory\module_url;
-use local_tresipuntimportgc\providers\google;
-
-defined('MOODLE_INTERNAL') || die();
+use local_tresipuntimportgc\providers\provider;
 
 /**
  * Class gc_mod_courseworkmaterials_map
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class gc_mod_courseworkmaterials_map extends gc_mod_map  {
+class gc_mod_courseworkmaterials_map extends gc_mod_map {
 
     /**
      * Get Module.
      *
      * @param $module
-     * @param google $provider
+     * @param provider $provider
      * @return module
      * @throws coding_exception
      */
-    public function get_mod($module, google $provider): module {
+    public function get_mod($module, provider $provider) {
         $visible = $module['state'] === 'PUBLISHED';
         $section = $module['topicId'] ?? '';
         $mats = $module['materials'] ?? [];
@@ -52,7 +48,7 @@ class gc_mod_courseworkmaterials_map extends gc_mod_map  {
         // TODO rethink logic, this is rubbish for understanding how it is supposed to work.
         $firstkey = '';
         if (isset($module['materials'][0])) {
-            $firstkey = array_key_first_compatible($module['materials'][0]);
+            $firstkey = array_key_first($module['materials'][0]);
         }
 
         if ($firstkey === 'driveFile' && count($module['materials']) === 1) {
@@ -61,13 +57,11 @@ class gc_mod_courseworkmaterials_map extends gc_mod_map  {
             );
         }
         if ($firstkey === 'form' && count($module['materials']) === 1) {
-            // TODO create a quiz using the google form api (not included in Moodle!!!). Provisionally the form is embedded in a tag
-            return new module_form(
-                $section, $module['title'], $desc, $visible, $provider
+            // Formulario adjunto → embed en etiqueta (E10.2); nunca un quiz vacío.
+            // La conversión a cuestionario con preguntas es futura (Forms API).
+            return new module_label(
+                $section, $module['title'], $desc, $visible, reset($module['materials'])
             );
-            /*return new module_label(
-                $section, $module['title'], $desc, $visible, reset($mats)
-            );*/
         }
         if ($firstkey === 'link' && count($module['materials']) === 1) {
             return new module_url(
@@ -75,9 +69,28 @@ class gc_mod_courseworkmaterials_map extends gc_mod_map  {
             );
         }
         if (isset($module['materials']) && count($module['materials']) > 1) {
-            return new module_folder(
-                $section, $module['title'], $desc, $visible, $module['materials']
-            );
+            // Materiales combinados → un recurso por material (E10.11): los
+            // ficheros a Moodle, los enlaces/vídeos como URL, el formulario embebido.
+            $mods = [];
+            foreach ($module['materials'] as $material) {
+                $key = array_key_first($material);
+                if ($key === 'driveFile') {
+                    $title = $material['driveFile']['driveFile']['title'] ?? $module['title'];
+                    $mods[] = new module_resource($section, $title, '', $visible, $material);
+                } else if ($key === 'link') {
+                    $title = $material['link']['title'] ?? $module['title'];
+                    $mods[] = new module_url($section, $title, '', $visible, $material['link']['url'] ?? '');
+                } else if ($key === 'youtubeVideo') {
+                    $title = $material['youtubeVideo']['title'] ?? $module['title'];
+                    $mods[] = new module_url($section, $title, '', $visible,
+                        $material['youtubeVideo']['alternateLink'] ?? '');
+                } else if ($key === 'form') {
+                    $mods[] = new module_label($section, $module['title'], $desc, $visible, $material);
+                }
+            }
+            // Si nada encajó, cae a etiqueta con el conjunto (comportamiento previo).
+            return $mods !== [] ? $mods
+                : new module_label($section, $module['title'], $desc, $visible, $module['materials']);
         }
         if (!empty($mats)) {
             $mats = reset($mats);

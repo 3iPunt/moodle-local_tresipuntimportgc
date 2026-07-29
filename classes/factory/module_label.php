@@ -18,7 +18,7 @@
  * Class module_label
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -33,13 +33,11 @@ use mod_label_generator;
 use moodle_exception;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Class module_label
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class module_label extends module {
@@ -71,27 +69,26 @@ class module_label extends module {
     /**
      * Create.
      *
-     * @param int $course_id
+     * @param int $courseid
      * @return response_module
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function create(int $course_id): response_module {
-        $course = get_course($course_id);
+    public function create(int $courseid): response_module {
+        $course = get_course($courseid);
         $record = [
             'course' => $course,
             'name' => $this->title,
-            'intro' => $this->intro,
-            'introformat' => FORMAT_HTML,
+            'introeditor' => $this->intro_editor(),
             'files' => file_get_unused_draft_itemid(),
         ];
         $options = [
-            'section' => $this->get_section($course_id),
+            'section' => $this->get_section($courseid),
             'visible' => $this->visible,
             'showdescription' => true
         ];
-        if (count($this->material) > 0 && array_key_first_compatible($this->material) === 'form') {
+        if (count($this->material) > 0 && array_key_first($this->material) === 'form') {
             $record = $this->add_form($record);
         }
         $res = $this->generator->create_instance($record, $options);
@@ -108,7 +105,9 @@ class module_label extends module {
      */
     private function add_form(array $res): array {
         $res['intro'] = html_writer::tag('h4', $this->title, ['class' => 'card-title']);
-        $res['intro'] .= html_writer::tag('h6', get_string('form', 'local_tresipuntimportgc'), ['class' => 'card-subtitle mb-2 text-muted']);
+        $res['intro'] .= html_writer::tag('h6',
+            get_string('form', 'local_tresipuntimportgc'),
+            ['class' => 'card-subtitle mb-2 text-muted']);
         $res['intro'] .= html_writer::tag('iframe', get_string('loading'), [
             'src' => $this->material['form']['formUrl'],
             'width' => '640',

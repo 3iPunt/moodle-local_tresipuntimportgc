@@ -17,38 +17,36 @@
 /**
  * @package     local_tresipuntimportgc
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @copyright   3iPunt <https://www.tresipunt.com/>
+ * @copyright   2026 3iPunt (contacte@tresipunt.com)
  */
 
 namespace local_tresipuntimportgc\external;
 
 use calendar_event;
 use coding_exception;
-use external_api;
-use external_function_parameters;
-use external_single_structure;
-use external_value;
-use Google_Exception;
-use Google_Service_Calendar;
-use Google_Service_Calendar_Event;
+use context_course;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_value;
 use html_writer;
 use invalid_parameter_exception;
+use local_tresipuntimportgc\local\drive_files;
+use local_tresipuntimportgc\local\trace_router;
 use local_tresipuntimportgc\providers\google;
 use moodle_exception;
-use ReflectionException;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->libdir . '/externallib.php');
-require_once($CFG->dirroot . '/webservice/lib.php');
-require_once($CFG->dirroot . '/local/tresipuntimportgc/lib.php');
-require_once($CFG->dirroot.'/calendar/lib.php');
+require_once($CFG->dirroot . '/calendar/lib.php');
 
 class importcalendar_external extends external_api {
 
     /**
+     * Import Calendard Parameters.
+     *
      * @return external_function_parameters
      */
     public static function importcalendar_parameters(): external_function_parameters {
@@ -61,96 +59,75 @@ class importcalendar_external extends external_api {
     }
 
     /**
-     * @param string $providerid
-     * @param int $courseid
+     * Imports the course calendar events into the Moodle course calendar.
+     *
+     * Only events not linked to Classroom content are imported: content
+     * events are already covered when their module is created.
+     *
+     * @param  string $providerid Classroom course id.
+     * @param  int    $courseid   Moodle course id.
      * @return array
-     * @throws Google_Exception
-     * @throws ReflectionException
      * @throws coding_exception
      * @throws invalid_parameter_exception
      * @throws moodle_exception
      */
     public static function importcalendar(string $providerid, int $courseid): array {
-        global $CFG, $USER;
-        require_once($CFG->dirroot . '/course/lib.php');
-        require_once($CFG->dirroot . '/user/externallib.php');
-        self::validate_parameters(
+        global $USER, $DB;
+
+        $syscontext = \context_system::instance();
+        self::validate_context($syscontext);
+        require_capability('local/tresipuntimportgc:import', $syscontext);
+        $params = self::validate_parameters(
             self::importcalendar_parameters(), [
                 'providerid' => $providerid,
                 'courseid' => $courseid
             ]
         );
+        $providerid = $params['providerid'];
+        $courseid = $params['courseid'];
         $provider = new google();
-        $courseclassroom = $provider->get_course($providerid);
-        // Needs the same client as for the first login, if a new client or provider with other scopes is created, it skips it because it is already logged in.
-        $gdrvieclient = $provider->get_client();
-        $tokenjson = json_decode($gdrvieclient->getAccessToken(), true);
-        $service = new Google_Service_Calendar($gdrvieclient);
-        $calendarid = accessProtected($courseclassroom->data->providerdata, 'modelData')['calendarId'];
-        $optParams = array(
-            'maxResults' => 100,
-            'orderBy' => 'startTime',
-            'singleEvents' => true,
-            'timeMin' => date('c'),
-        );
-        $results = $service->events->listEvents($calendarid, $optParams);
-        /** @var Google_Service_Calendar_Event[] $googleevents */
-        $googleevents = $results->getItems();
-        if (empty($googleevents)) {
-            print_trace('noteventsfound', 'warning');
-        } else {
-            // First we discard here the events related to course contents, as their calendar event is already created when creating the mod.
-            foreach ($googleevents as $key => $googleevent) {
-                // There is no other way to distinguish classroom calendar events from those created manually in the same calendar.
-                if (strripos($googleevent->getDescription(), 'https://classroom.google.com') !== false) {
-                    unset($googleevents[$key]);
-                }
-            }
-            print_trace('eventsfound', 'warning', count($googleevents));
-            foreach ($googleevents as $googleevent) {
-                $start = $googleevent->getStart()->dateTime;
-                if (empty($start)) {
-                    $start = $googleevent->getStart()->date;
-                }
-                $end = $googleevent->getEnd()->dateTime;
-                if (empty($end)) {
-                    $end = $googleevent->getEnd()->date;
-                }
-                $start = strtotime($start);
-                $end = strtotime($end);
+        $resevents = $provider->get_calendar_events($providerid);
+        if (!$resevents->success) {
+            trace_router::trace('importfileerror', 'danger',
+                ['name' => $providerid, 'error' => $resevents->error->to_string()]);
+            return ['success' => false, 'errors' => $resevents->error->to_string(), 'id' => $courseid];
+        }
 
-                $modeldata = accessProtected($googleevent, 'modelData');
+        // Discard the events tied to course contents.
+        $events = array_filter($resevents->data, static function ($event) {
+            return !$event->isclassroom;
+        });
+
+        if (empty($events)) {
+            trace_router::trace('noteventsfound', 'warning');
+        } else {
+            trace_router::trace('eventsfound', 'warning', count($events));
+            foreach ($events as $googleevent) {
                 // TODO template.
-                $summary = html_writer::tag('p', $googleevent->getDescription());
+                // La descripción de Google es texto plano: mismo tratamiento que
+                // en los módulos y el resumen del curso (escapa, respeta saltos
+                // y enlaza URLs).
+                $summary = text_to_html((string) $googleevent->description, false, false, true);
                 // TODO replace link to Meet Conference for a Zoom, BigBlue, etc resource.
-                if (isset($modeldata['conferenceData']['entryPoints']) && count($modeldata['conferenceData']['entryPoints']) > 0) {
-                    foreach($modeldata['conferenceData']['entryPoints'] as $entrypoint) {
-                        if ($entrypoint['entryPointType'] === 'video') {
-                            $summary.= '<hr>';
-                            $summary .= html_writer::link($entrypoint['uri'], get_string('conference', 'local_tresipuntimportgc'), ['target' => 'blank']);
-                        }
-                    }
-                }
-                // TODO replace files of event link for.... ???
-                if (isset($modeldata['attachments']) && count($modeldata['attachments']) > 0) {
-                    $summary.= '<hr>';
-                    $summary .= html_writer::tag('h5', get_string('files'));
-                    foreach($modeldata['attachments'] as $attachment) {
-                        $summary .= html_writer::link($attachment['fileUrl'], $attachment['title'], ['target' => '_blank']);
-                    }
+                foreach ($googleevent->conferencelinks as $link) {
+                    $summary .= '<hr>';
+                    $summary .= html_writer::link($link,
+                        get_string('conference', 'local_tresipuntimportgc'), ['target' => '_blank']);
                 }
                 if ($googleevent->location !== '') {
-                    $summary.= '<hr>';
+                    $summary .= '<hr>';
                     $summary .= html_writer::tag('h5', get_string('location', 'moodle'));
-                    $summary .= html_writer::tag('p', $googleevent->location);
-                    $summary.= '<br>';
+                    $summary .= html_writer::tag('p', s($googleevent->location));
+                    $summary .= '<br>';
                 }
 
+                // La llamada a calendar_event::create() usa su $checkcapability
+                // por defecto (true), así que la capacidad de crear eventos SÍ
+                // se comprueba: no hay ninguna propiedad que lo desactive.
                 $event = new stdClass();
                 $event->eventtype = 'course';
-                $event->checkcapability  = false; // user must have event creation permissions
                 $event->type = CALENDAR_EVENT_COURSE;
-                $event->name = $googleevent->getSummary();
+                $event->name = $googleevent->title;
                 $event->description = $summary;
                 $event->format = FORMAT_HTML;
                 $event->courseid = $courseid;
@@ -158,22 +135,47 @@ class importcalendar_external extends external_api {
                 $event->userid = $USER->id;
                 $event->modulename = '0';
                 $event->instance = 0;
-                $event->timestart = $start;
+                $event->timestart = $googleevent->timestart;
                 $event->visible = 1;
-                $event->timeduration = $end - $start;
-                calendar_event::create($event);
+                $event->timeduration = $googleevent->timeduration;
+                $ev = calendar_event::create($event);
+
+                // Adjuntos → ficheros de Moodle en el área del evento (E10.10):
+                // los de Drive se descargan y se referencian con @@PLUGINFILE@@;
+                // los que no son de Drive quedan como enlace externo.
+                if ($ev && !empty($googleevent->attachments)) {
+                    $coursecontext = context_course::instance($courseid);
+                    $links = [];
+                    foreach ($googleevent->attachments as $attachment) {
+                        if ($attachment->fileid !== '') {
+                            $meta = $provider->get_drive_file($attachment->fileid);
+                            if ($meta->success) {
+                                drive_files::store($provider, $meta->data, $coursecontext->id,
+                                    (int) $USER->id, 'calendar', 'event_description', '/', (int) $ev->id);
+                                $links[] = html_writer::link(
+                                    '@@PLUGINFILE@@/' . rawurlencode($meta->data->name), $meta->data->name);
+                                continue;
+                            }
+                        }
+                        $links[] = html_writer::link($attachment->url, $attachment->title, ['target' => '_blank']);
+                    }
+                    $newdesc = $summary . '<hr>' . html_writer::tag('h5', get_string('files'))
+                        . implode('<br>', $links);
+                    $DB->set_field('event', 'description', $newdesc, ['id' => $ev->id]);
+                }
             }
         }
-        $errors = [];
 
-        // TODO response
         return [
             'success' => true,
-            'errors' => $errors,
+            'errors' => '',
             'id' => $courseid
         ];
     }
-        /**
+
+    /**
+     * Import Calendar Returns.
+     *
      * @return external_single_structure
      */
     public static function importcalendar_returns(): external_single_structure {

@@ -18,14 +18,13 @@
  * Class course
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_tresipuntimportgc\factory;
 
 use coding_exception;
-use course_modinfo;
 use dml_exception;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response;
@@ -43,7 +42,7 @@ require_once($CFG->dirroot . '/lib/modinfolib.php');
  * Class course
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class course {
@@ -87,7 +86,7 @@ class course {
      *
      * @param int $id
      */
-    public function set_id(int $id) {
+    public function set_id(int $id): void {
         $this->id = $id;
     }
 
@@ -108,7 +107,7 @@ class course {
         $data->shortname = $shortname;
         $data->fullname = $fullname;
         $data->visible = $visible;
-        $data->summary = $this->description;
+        $data->summary = $this->build_summary();
         try {
             $new = create_course($data);
             $this->set_id($new->id);
@@ -116,6 +115,32 @@ class course {
         } catch (moodle_exception $e) {
             return new response_course(false, null, new error('11000', $e->getMessage()));
         }
+    }
+
+    /**
+     * Builds the course summary from the Classroom description, plus the
+     * subtitle (descriptionHeading) and room, when present (E10.6).
+     *
+     * @return string HTML summary.
+     * @throws coding_exception
+     */
+    private function build_summary(): string {
+        $parts = [];
+        $heading = trim((string) ($this->providerdata->descriptionHeading ?? ''));
+        if ($heading !== '') {
+            $parts[] = \html_writer::tag('p', s($heading), ['class' => 'lead']);
+        }
+        if ((string) $this->description !== '') {
+            // La descripción de Classroom es texto plano: convertir a HTML
+            // seguro (escapa, saltos de línea y enlaza URLs), como en los módulos.
+            $parts[] = text_to_html((string) $this->description, false, false, true);
+        }
+        $room = trim((string) ($this->providerdata->room ?? ''));
+        if ($room !== '') {
+            $parts[] = \html_writer::tag('p',
+                get_string('course_room', 'local_tresipuntimportgc', s($room)));
+        }
+        return implode("\n", $parts);
     }
 
     /**
@@ -150,11 +175,11 @@ class course {
         global $USER, $DB;
         if (!is_null($this->get_id())) {
             try {
-                $plugin_instance = $DB->get_record("enrol",
-                    array('courseid' => $this->get_id(), 'enrol'=>'manual'));
+                $plugininstance = $DB->get_record("enrol",
+                    array('courseid' => $this->get_id(), 'enrol' => 'manual'));
                 $plugin = enrol_get_plugin('manual');
                 $roleid = $DB->get_field('role', 'id', array('shortname' => 'editingteacher'));
-                $plugin->enrol_user($plugin_instance, $USER->id, $roleid);
+                $plugin->enrol_user($plugininstance, $USER->id, $roleid);
                 return new response(true, '');
             } catch (moodle_exception $e) {
                 return new response(false, '', new error('11021', $e->getMessage()));
@@ -172,24 +197,22 @@ class course {
      */
     public function clean_sections_intro(): response {
         global $DB;
-        if (!is_null($this->get_id())) {
-            $course = get_course($this->get_id());
-            /** @var course_modinfo $modinfo */
-            $modinfo = get_fast_modinfo($course->id);
-            $sections = $modinfo->get_section_info_all();
-            foreach ($sections as $section) {
-                $updatesection = new stdClass();
-                $updatesection->id = $section->id;
-                $updatesection->summary = '';
-                $DB->update_record('course_sections', $updatesection);
-                course_modinfo::clear_instance_cache($course);
-                rebuild_course_cache($course->id);
-            }
-            return new response(true, '');
-        } else {
+        if (is_null($this->get_id())) {
             return new response(false, null, new error('11030', 'COURSE NOT CREATED'));
         }
+        $courseid = (int) $this->get_id();
 
+        // One statement for every section, and the course cache touched once.
+        // Doing it section by section rebuilt the whole course cache N times.
+        $DB->set_field('course_sections', 'summary', '', ['course' => $courseid]);
+
+        // Clear only: the course has just been imported and nobody is looking at
+        // it yet, so invalidating is enough — the cache is rebuilt on first
+        // access. rebuild_course_cache() already clears the static instance
+        // cache, so no separate call is needed.
+        rebuild_course_cache($courseid, true);
+
+        return new response(true, '');
     }
 
 }

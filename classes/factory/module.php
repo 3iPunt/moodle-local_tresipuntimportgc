@@ -18,7 +18,7 @@
  * Class module
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,23 +27,25 @@ namespace local_tresipuntimportgc\factory;
 use coding_exception;
 use dml_exception;
 use local_tresipuntimportgc\responses\response_module;
+use moodle_exception;
 use phpunit_util;
 use testing_data_generator;
 
+// El guard va ANTES del cambio de estado global: este fichero tiene efectos
+// secundarios (require_once), así que sí lo necesita.
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
-
 require_once($CFG->dirroot . '/lib/phpunit/classes/util.php');
-
-defined('MOODLE_INTERNAL') || die;
 
 /**
  * Class module
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class module  {
+abstract class module {
 
     /** @var string Mod Name */
     protected $modname = '';
@@ -52,7 +54,7 @@ abstract class module  {
     protected $generator;
 
     /** @var string Provider Section */
-    protected $provider_section;
+    protected $providersection;
 
     /** @var string Title */
     protected $title;
@@ -71,7 +73,6 @@ abstract class module  {
      * @param string $title
      * @param string $intro
      * @param bool $visible
-     * @throws coding_exception
      */
     public function __construct(string $component, string $providersection, string $title, string $intro, bool $visible) {
         $generator = phpunit_util::get_data_generator();
@@ -79,7 +80,7 @@ abstract class module  {
         $this->title = $title;
         $this->intro = $intro;
         $this->visible = $visible;
-        $this->provider_section = $providersection;
+        $this->providersection = $providersection;
     }
 
     /**
@@ -103,24 +104,65 @@ abstract class module  {
     /**
      * Get Section.
      *
-     * @param int $course_id
+     * @param int $courseid
      * @return int
      * @throws dml_exception
      */
-    public function get_section(int $course_id): int {
-        if ($this->provider_section === '') {
+    public function get_section(int $courseid): int {
+        if ($this->providersection === '') {
             return 0;
         } else {
-            return section::get_section($course_id, $this->provider_section);
+            return section::get_section($courseid, $this->providersection);
         }
     }
 
     /**
      * Create.
      *
-     * @param int $course_id
+     * @param int $courseid
      * @return response_module
      */
-    abstract public function create(int $course_id): response_module;
+    abstract public function create(int $courseid): response_module;
+
+    /**
+     * Builds a Moodle availability restriction «available from» the Classroom
+     * scheduled publication time, if present (E10.5).
+     *
+     * @param  array $module The Classroom module.
+     * @return string|null Availability JSON, or null if there is no scheduledTime.
+     */
+    protected static function scheduled_availability(array $module): ?string {
+        if (empty($module['scheduledTime'])) {
+            return null;
+        }
+        $timestamp = strtotime($module['scheduledTime']);
+        if (!$timestamp) {
+            return null;
+        }
+        return json_encode([
+            'op' => '&',
+            'c' => [['type' => 'date', 'd' => '>=', 't' => $timestamp]],
+            'showc' => [true],
+        ]);
+    }
+
+    /**
+     * Builds the `introeditor` array for module creation.
+     *
+     * The intro must go through `introeditor` (not a plain `intro`) so the
+     * PHPUnit module generator does NOT inject its test default ("Test <mod> N")
+     * when the Classroom description is empty. `add_moduleinfo()` extracts the
+     * final intro/introformat from this array.
+     *
+     * @return array Editor array {text, format, itemid}.
+     * @throws moodle_exception
+     */
+    protected function intro_editor(): array {
+        return [
+            'text' => (string) $this->intro,
+            'format' => FORMAT_HTML,
+            'itemid' => file_get_unused_draft_itemid(),
+        ];
+    }
 
 }

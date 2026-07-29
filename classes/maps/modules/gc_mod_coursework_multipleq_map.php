@@ -18,19 +18,16 @@ namespace local_tresipuntimportgc\maps\modules;
 
 use coding_exception;
 use local_tresipuntimportgc\factory\module;
-use local_tresipuntimportgc\factory\module_form;
-use local_tresipuntimportgc\factory\module_quiz;
-
-defined('MOODLE_INTERNAL') || die();
+use local_tresipuntimportgc\factory\module_choice;
 
 /**
  * Class gc_mod_coursework_multipleq_map
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class gc_mod_coursework_multipleq_map extends gc_mod_map  {
+class gc_mod_coursework_multipleq_map extends gc_mod_map {
 
     /**
      * Get Module.
@@ -46,8 +43,9 @@ class gc_mod_coursework_multipleq_map extends gc_mod_map  {
         $mats = $module['materials'] ?? [];
         $desc = $module['description'] ?? '';
         $desc = self::get_desc_rich($desc, $mats);
-        return new module_form(
-            $section, $module, $desc, $visible, $provider
+        // Pregunta de opción múltiple → actividad de Elección con sus opciones (E10.1).
+        return new module_choice(
+            $section, $module, $desc, $visible
         );
     }
 

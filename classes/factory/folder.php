@@ -18,22 +18,20 @@
  * Class folder
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_tresipuntimportgc\factory;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Class folder
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class folder  {
+class folder {
 
     /** @var string ID course Provider */
     protected $providerid;
@@ -55,6 +53,15 @@ class folder  {
         $this->providerid = $providerid;
         $this->title = $title;
         $this->link = $link;
+    }
+
+    /**
+     * Provider (Drive) id of the folder.
+     *
+     * @return string
+     */
+    public function get_providerid(): string {
+        return $this->providerid;
     }
 
 }

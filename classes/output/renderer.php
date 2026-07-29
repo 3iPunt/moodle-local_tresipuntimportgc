@@ -18,12 +18,10 @@
  * Class renderer
  *
  * @package    local_tresipuntimportgc
- * @copyright  2021 Tresipunt
+ * @copyright  2021 3iPunt (contacte@tresipunt.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace local_tresipuntimportgc\output;
-
-defined('MOODLE_INTERNAL') || die;
 
 use moodle_exception;
 use plugin_renderer_base;
@@ -32,7 +30,7 @@ use plugin_renderer_base;
  * Class renderer
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright  2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class renderer extends plugin_renderer_base {
@@ -40,27 +38,40 @@ class renderer extends plugin_renderer_base {
     /**
      * Defer to template.
      *
-     * @param import_page $page
+     * @param import_view $view
      *
      * @return string html for the page
      * @throws moodle_exception
      */
-    public function render_import_page(import_page $page): string {
-        $data = $page->export_for_template($this);
-        return parent::render_from_template('local_tresipuntimportgc/import_page', $data);
+    public function render_import_view(import_view $view): string {
+        $data = $view->export_for_template($this);
+        return parent::render_from_template('local_tresipuntimportgc/import_view', $data);
     }
 
     /**
      * Defer to template.
      *
-     * @param create_page $page
+     * @param progress_view $view
      *
      * @return string html for the page
      * @throws moodle_exception
      */
-    public function render_create_page(create_page $page): string {
-        $data = $page->export_for_template($this);
-        return parent::render_from_template('local_tresipuntimportgc/create_page', $data);
+    public function render_progress_view(progress_view $view): string {
+        $data = $view->export_for_template($this);
+        return parent::render_from_template('local_tresipuntimportgc/progress_view', $data);
+    }
+
+    /**
+     * Defer to template.
+     *
+     * @param panel_view $view
+     *
+     * @return string html for the page
+     * @throws moodle_exception
+     */
+    public function render_panel_view(panel_view $view): string {
+        $data = $view->export_for_template($this);
+        return parent::render_from_template('local_tresipuntimportgc/panel_view', $data);
     }
 
     /**

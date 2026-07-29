@@ -19,16 +19,14 @@ namespace local_tresipuntimportgc\maps\materials;
 use coding_exception;
 use local_tresipuntimportgc\output\gc_desc_drivefile_component;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class gc_mat_drivefile_map
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class gc_mat_drivefile_map extends gc_mat_map  {
+class gc_mat_drivefile_map extends gc_mat_map {
 
     /**
      * Get Render.

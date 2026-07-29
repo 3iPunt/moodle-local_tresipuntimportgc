@@ -18,19 +18,17 @@ namespace local_tresipuntimportgc\maps\modules;
 
 use coding_exception;
 use local_tresipuntimportgc\factory\module;
-use local_tresipuntimportgc\factory\module_share;
-use local_tresipuntimportgc\providers\google;
-
-defined('MOODLE_INTERNAL') || die();
+use local_tresipuntimportgc\factory\module_forum;
+use local_tresipuntimportgc\providers\provider;
 
 /**
  * Class gc_mod_announcements_map
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class gc_mod_announcements_map extends gc_mod_map  {
+class gc_mod_announcements_map extends gc_mod_map {
 
     /**
      * Get Module.
@@ -39,12 +37,13 @@ class gc_mod_announcements_map extends gc_mod_map  {
      * @return module
      * @throws coding_exception
      */
-    public function get_mod($module, google $provider): module {
+    public function get_mod($module, provider $provider): module {
         $visible = $module['state'] === 'PUBLISHED';
         $mats = isset($module['materials']) ? $module['materials'] : [];
         $desc = self::get_desc_rich('', $mats);
-        return new module_share(
-            $module['text'], $desc, $visible
+        // Anuncio → discusión en el foro de novedades del curso (E10.7).
+        return new module_forum(
+            $module, $desc, $visible, $provider
         );
     }
 
