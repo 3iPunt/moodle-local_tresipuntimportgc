@@ -21,8 +21,6 @@ use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\factory\module_feedback;
 use local_tresipuntimportgc\providers\provider;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class gc_mod_coursework_shortq_map
  *

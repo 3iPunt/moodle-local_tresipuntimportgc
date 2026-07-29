@@ -32,8 +32,6 @@ use mod_url_generator;
 use moodle_exception;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Class module_share
  *

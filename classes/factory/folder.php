@@ -24,8 +24,6 @@
 
 namespace local_tresipuntimportgc\factory;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Class folder
  *

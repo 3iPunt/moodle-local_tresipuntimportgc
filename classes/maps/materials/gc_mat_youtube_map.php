@@ -21,8 +21,6 @@ use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\factory\module_share;
 use local_tresipuntimportgc\output\gc_desc_youtube_component;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class gc_mat_youtube_map
  *

@@ -34,11 +34,11 @@ use local_tresipuntimportgc\local\trace_router;
 use local_tresipuntimportgc\providers\google;
 use moodle_exception;
 
-defined('MOODLE_INTERNAL') || die();
-
 class importfiles_external extends external_api {
 
     /**
+     * Import Files Parameters.
+     *
      * @return external_function_parameters
      */
     public static function importfiles_parameters(): external_function_parameters {
@@ -113,9 +113,12 @@ class importfiles_external extends external_api {
             'id' => $courseid
         ];
     }
-        /**
-         * @return external_single_structure
-         */
+
+    /**
+     * Imporet Files Returns.
+     *
+     * @return external_single_structure
+     */
     public static function importfiles_returns(): external_single_structure {
         return new external_single_structure(
             array(

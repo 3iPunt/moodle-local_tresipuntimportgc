@@ -86,7 +86,7 @@ class course {
      *
      * @param int $id
      */
-    public function set_id(int $id) {
+    public function set_id(int $id): void {
         $this->id = $id;
     }
 
@@ -122,6 +122,7 @@ class course {
      * subtitle (descriptionHeading) and room, when present (E10.6).
      *
      * @return string HTML summary.
+     * @throws coding_exception
      */
     private function build_summary(): string {
         $parts = [];

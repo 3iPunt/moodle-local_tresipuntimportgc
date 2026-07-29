@@ -18,8 +18,6 @@ namespace local_tresipuntimportgc\maps\materials;
 
 use renderer_base;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class gc_mod_map
  *

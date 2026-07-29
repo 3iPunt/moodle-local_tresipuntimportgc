@@ -45,6 +45,8 @@ require_once($CFG->dirroot . '/calendar/lib.php');
 class importcalendar_external extends external_api {
 
     /**
+     * Import Calendard Parameters.
+     *
      * @return external_function_parameters
      */
     public static function importcalendar_parameters(): external_function_parameters {
@@ -100,23 +102,28 @@ class importcalendar_external extends external_api {
             trace_router::trace('eventsfound', 'warning', count($events));
             foreach ($events as $googleevent) {
                 // TODO template.
-                $summary = html_writer::tag('p', $googleevent->description);
+                // La descripción de Google es texto plano: mismo tratamiento que
+                // en los módulos y el resumen del curso (escapa, respeta saltos
+                // y enlaza URLs).
+                $summary = text_to_html((string) $googleevent->description, false, false, true);
                 // TODO replace link to Meet Conference for a Zoom, BigBlue, etc resource.
                 foreach ($googleevent->conferencelinks as $link) {
                     $summary .= '<hr>';
                     $summary .= html_writer::link($link,
-                        get_string('conference', 'local_tresipuntimportgc'), ['target' => 'blank']);
+                        get_string('conference', 'local_tresipuntimportgc'), ['target' => '_blank']);
                 }
                 if ($googleevent->location !== '') {
                     $summary .= '<hr>';
                     $summary .= html_writer::tag('h5', get_string('location', 'moodle'));
-                    $summary .= html_writer::tag('p', $googleevent->location);
+                    $summary .= html_writer::tag('p', s($googleevent->location));
                     $summary .= '<br>';
                 }
 
+                // calendar_event::create() se llama con su $checkcapability por
+                // defecto (true), así que la capacidad de crear eventos SÍ se
+                // comprueba: no hay ninguna propiedad que lo desactive.
                 $event = new stdClass();
                 $event->eventtype = 'course';
-                $event->checkcapability = false; // User must have event creation permissions.
                 $event->type = CALENDAR_EVENT_COURSE;
                 $event->name = $googleevent->title;
                 $event->description = $summary;
@@ -163,9 +170,12 @@ class importcalendar_external extends external_api {
             'id' => $courseid
         ];
     }
-        /**
-         * @return external_single_structure
-         */
+
+    /**
+     * Import Calendar Returns.
+     *
+     * @return external_single_structure
+     */
     public static function importcalendar_returns(): external_single_structure {
         return new external_single_structure(
             array(

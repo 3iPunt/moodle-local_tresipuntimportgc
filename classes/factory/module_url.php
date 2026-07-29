@@ -30,8 +30,6 @@ use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response_module;
 use mod_url_generator;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Class module_url
  *

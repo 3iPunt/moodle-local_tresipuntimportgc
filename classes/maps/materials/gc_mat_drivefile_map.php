@@ -19,8 +19,6 @@ namespace local_tresipuntimportgc\maps\materials;
 use coding_exception;
 use local_tresipuntimportgc\output\gc_desc_drivefile_component;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class gc_mat_drivefile_map
  *

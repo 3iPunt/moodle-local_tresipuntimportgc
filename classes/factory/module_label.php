@@ -33,8 +33,6 @@ use mod_label_generator;
 use moodle_exception;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Class module_label
  *

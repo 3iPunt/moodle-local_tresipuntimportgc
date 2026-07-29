@@ -26,8 +26,6 @@ namespace local_tresipuntimportgc\responses;
 
 use local_tresipuntimportgc\factory\section;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * response_sections
  *

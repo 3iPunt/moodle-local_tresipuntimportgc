@@ -23,8 +23,6 @@ use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\factory\section;
 use local_tresipuntimportgc\providers\provider;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class gclassroom_map
  *

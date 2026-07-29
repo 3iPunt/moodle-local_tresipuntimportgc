@@ -20,8 +20,6 @@ use coding_exception;
 use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\factory\module_choice;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class gc_mod_coursework_multipleq_map
  *

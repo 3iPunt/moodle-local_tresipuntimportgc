@@ -25,9 +25,10 @@
 namespace local_tresipuntimportgc\adminsetting;
 
 use admin_setting;
+use coding_exception;
+use dml_exception;
+use moodle_exception;
 use moodle_url;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Read-only settings block: connection status, copiable redirect URI and a
@@ -41,6 +42,7 @@ class connection extends admin_setting {
 
     /**
      * Constructor.
+     * @throws coding_exception
      */
     public function __construct() {
         $this->nosave = true;
@@ -70,9 +72,10 @@ class connection extends admin_setting {
     /**
      * Renders the block.
      *
-     * @param  mixed  $data  Ignored.
-     * @param  string $query Admin search query.
+     * @param mixed $data Ignored.
+     * @param string $query Admin search query.
      * @return string
+     * @throws dml_exception|moodle_exception
      */
     public function output_html($data, $query = ''): string {
         global $OUTPUT;

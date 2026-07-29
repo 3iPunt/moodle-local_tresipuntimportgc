@@ -36,11 +36,11 @@ use local_tresipuntimportgc\providers\google;
 use local_tresipuntimportgc\providers\provider;
 use moodle_exception;
 
-defined('MOODLE_INTERNAL') || die();
-
 class course_external extends external_api {
 
     /**
+     * Create course parameters.
+     *
      * @return external_function_parameters
      */
     public static function create_course_parameters(): external_function_parameters {
@@ -57,6 +57,8 @@ class course_external extends external_api {
     }
 
     /**
+     * Create Course.
+     *
      * @param string $providerid
      * @param string $fullname
      * @param string $shortname
@@ -126,6 +128,8 @@ class course_external extends external_api {
     }
 
     /**
+     * Create Course returns.
+     *
      * @return external_single_structure
      */
     public static function create_course_returns(): external_single_structure {

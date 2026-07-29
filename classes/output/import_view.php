@@ -30,8 +30,6 @@ use renderer_base;
 use stdClass;
 use templatable;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Pure renderable of the selection screen: every piece of data arrives
  * through the constructor (no DB, no config reads, no network calls here).

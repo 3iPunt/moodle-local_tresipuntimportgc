@@ -21,8 +21,6 @@ use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\factory\module_forum;
 use local_tresipuntimportgc\providers\provider;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class gc_mod_announcements_map
  *

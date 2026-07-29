@@ -23,8 +23,6 @@ use local_tresipuntimportgc\factory\module_resource;
 use local_tresipuntimportgc\factory\module_url;
 use local_tresipuntimportgc\providers\provider;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class gc_mod_courseworkmaterials_map
  *

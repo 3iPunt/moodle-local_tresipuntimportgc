@@ -91,10 +91,7 @@ Moodle ni el tema.
 | Cron de Moodle | Necesario — las importaciones corren como tareas en segundo plano |
 | Servicios Google | Proyecto de Google Cloud con las APIs de Classroom, Drive, Calendar y Forms, y un cliente OAuth 2.0 de tipo *aplicación web* |
 
-> **Cómo montar el proyecto de Google Cloud paso a paso:**
-> [`docs/google-cloud-setup.es.md`](docs/google-cloud-setup.es.md)
-> ([English](docs/google-cloud-setup.md)). Como el scope de Drive es *restricted*,
-> cada sitio usa su propio cliente OAuth en su Workspace.
+> Cada sitio usa **su propio cliente OAuth**; los pasos, más abajo en *Ajustes*.
 
 ## 🚀 Instalación
 
@@ -105,6 +102,36 @@ Moodle ni el tema.
    o `php admin/cli/purge_caches.php`).
 
 ## 🔧 Ajustes
+
+### Dar acceso a Google (una vez por sitio)
+
+El plugin necesita **un cliente OAuth del propio sitio**: el scope de Drive es
+*restricted*, y una aplicación compartida entre organizaciones obligaría a pasar
+una evaluación de seguridad anual de pago. Con un proyecto propio y audiencia
+*Interna* no hace falta ninguna verificación de Google.
+
+1. En [console.cloud.google.com](https://console.cloud.google.com), con una cuenta
+   de **Google Workspace**, crear un **proyecto**.
+2. **APIs y servicios › Biblioteca**: habilitar **Classroom**, **Drive**,
+   **Calendar** y **Forms**. Solo esas cuatro.
+3. **Google Auth Platform**: completar nombre y correos de la aplicación y poner la
+   **audiencia en «Interna»**.
+4. Pestaña **Clients › Create client › Aplicación web**. En *URIs de redirección
+   autorizados*, pegar **exactamente** la que muestra el bloque de conexión de los
+   ajustes del plugin (Google exige coincidencia literal: `https`, sin barra final).
+   ⚠️ El **secreto solo se muestra al crear el cliente**.
+5. Pegar **ID de cliente** y **secreto** en los ajustes y pulsar **Probar conexión**
+   antes de dejar importar a nadie.
+
+| Si algo falla | Suele ser |
+|---|---|
+| `redirect_uri_mismatch` | La URI no coincide con la del bloque de conexión: `http` en vez de `https`, barra final de más, o un host distinto del `wwwroot` |
+| «Esta app no está verificada» | La audiencia quedó *Externa* sin publicar: pasarla a **Interna**, o añadir la cuenta como usuario de prueba |
+| «API … is disabled» | Falta habilitar una de las cuatro APIs (paso 2); el mensaje dice cuál |
+| Faltan clases en el listado | La cuenta conectada no es profesora en ellas, o son de otro Workspace. Las archivadas sí salen |
+| Las importaciones no arrancan | El cron de Moodle no está en marcha |
+
+### Opciones
 
 En **Administración del sitio › Extensiones › Extensiones locales › Importación
 de cursos desde Google Classroom**:

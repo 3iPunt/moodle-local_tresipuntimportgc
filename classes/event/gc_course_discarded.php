@@ -24,11 +24,13 @@
 
 namespace local_tresipuntimportgc\event;
 
+use coding_exception;
+use context_system;
 use core\event\base;
+use core\exception\moodle_exception;
+use dml_exception;
 use local_tresipuntimportgc\models\import_course;
 use moodle_url;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Triggered by the discard web service when a pending course is discarded.
@@ -44,7 +46,7 @@ class gc_course_discarded extends base {
      *
      * @return void
      */
-    protected function init() {
+    protected function init(): void {
         $this->data['crud'] = 'u';
         $this->data['objecttable'] = 'local_tresipuntimportgc_course';
         $this->data['edulevel'] = self::LEVEL_OTHER;
@@ -53,13 +55,15 @@ class gc_course_discarded extends base {
     /**
      * Builds the event from an import course record.
      *
-     * @param  import_course $course Import course just discarded.
+     * @param import_course $course Import course just discarded.
      * @return self
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public static function create_from_course(import_course $course): self {
         /** @var self $event */
         $event = self::create([
-            'context' => \context_system::instance(),
+            'context' => context_system::instance(),
             'objectid' => (int) $course->get('id'),
             'other' => [
                 'importid' => (int) $course->get('importid'),
@@ -73,6 +77,7 @@ class gc_course_discarded extends base {
      * Return localised event name.
      *
      * @return string
+     * @throws coding_exception
      */
     public static function get_name(): string {
         return get_string('event_coursediscarded', 'local_tresipuntimportgc');
@@ -92,6 +97,7 @@ class gc_course_discarded extends base {
      * Progress page of the import run.
      *
      * @return moodle_url
+     * @throws moodle_exception
      */
     public function get_url(): moodle_url {
         return new moodle_url('/local/tresipuntimportgc/progress.php',
@@ -102,9 +108,9 @@ class gc_course_discarded extends base {
      * Custom validation.
      *
      * @return void
-     * @throws \coding_exception
+     * @throws coding_exception
      */
-    protected function validate_data() {
+    protected function validate_data(): void {
         parent::validate_data();
         if (!isset($this->other['importid'])) {
             throw new \coding_exception('The \'importid\' value must be set in other.');

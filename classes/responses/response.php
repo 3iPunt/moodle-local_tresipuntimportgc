@@ -24,8 +24,6 @@
 
 namespace local_tresipuntimportgc\responses;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Response
  *

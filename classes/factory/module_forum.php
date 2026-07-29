@@ -33,8 +33,6 @@ use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response_module;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Maps a Classroom announcement to a discussion in the course Announcements
  * forum (E10.7), replacing the external tresipuntshare module. The Drive files

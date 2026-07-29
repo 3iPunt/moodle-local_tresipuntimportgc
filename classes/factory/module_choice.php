@@ -29,8 +29,7 @@ use dml_exception;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response_module;
 use mod_choice_generator;
-
-defined('MOODLE_INTERNAL') || die;
+use moodle_exception;
 
 /**
  * Maps a Classroom MULTIPLE_CHOICE_QUESTION to a Moodle Choice activity,
@@ -58,7 +57,6 @@ class module_choice extends module {
      * @param array  $module
      * @param string $intro
      * @param bool   $visible
-     * @throws coding_exception
      */
     public function __construct(string $providersection, array $module, string $intro, bool $visible) {
         parent::__construct('mod_choice', $providersection, $module['title'], $intro, $visible);
@@ -70,7 +68,7 @@ class module_choice extends module {
      *
      * @param  int $courseid
      * @return response_module
-     * @throws dml_exception
+     * @throws dml_exception|moodle_exception
      */
     public function create(int $courseid): response_module {
         $course = get_course($courseid);

@@ -26,8 +26,6 @@ namespace local_tresipuntimportgc\task;
 
 use core\task\scheduled_task;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Deletes import runs (with their courses and traces) older than the
  * configured retention. Moodle courses already created are never touched.

@@ -30,8 +30,6 @@ use renderer_base;
 use stdClass;
 use templatable;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Pure renderable of the imports panel: receives the (already filtered and
  * paginated) rows and the filter state resolved by the page.

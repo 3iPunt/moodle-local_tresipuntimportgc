@@ -24,6 +24,7 @@
 
 namespace local_tresipuntimportgc\external;
 
+use coding_exception;
 use context_system;
 use core_course_category;
 use core_external\external_api;
@@ -31,15 +32,18 @@ use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
+use core_external\restricted_context_exception;
+use dml_exception;
+use invalid_parameter_exception;
 use local_tresipuntimportgc\event\gc_course_discarded;
 use local_tresipuntimportgc\event\gc_course_retried;
 use local_tresipuntimportgc\local\importer;
 use local_tresipuntimportgc\models\import;
 use local_tresipuntimportgc\models\import_course;
 use local_tresipuntimportgc\providers\google;
+use moodle_exception;
 use moodle_url;
-
-defined('MOODLE_INTERNAL') || die();
+use required_capability_exception;
 
 /**
  * Web services of the import run entity.
@@ -68,9 +72,15 @@ class import_external extends external_api {
     /**
      * Returns the run status, the per-course statuses and the new traces.
      *
-     * @param  int $importid  Import run id.
-     * @param  int $lastlogid Only traces with id greater than this.
+     * @param int $importid Import run id.
+     * @param int $lastlogid Only traces with id greater than this.
      * @return array
+     * @throws coding_exception
+     * @throws moodle_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
      */
     public static function get_status(int $importid, int $lastlogid = 0): array {
         $params = self::validate_parameters(self::get_status_parameters(),

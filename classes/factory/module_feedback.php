@@ -24,13 +24,11 @@
 
 namespace local_tresipuntimportgc\factory;
 
-use coding_exception;
 use dml_exception;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response_module;
 use mod_feedback_generator;
-
-defined('MOODLE_INTERNAL') || die;
+use moodle_exception;
 
 /**
  * Maps a Classroom SHORT_ANSWER_QUESTION to a Moodle Feedback activity with an
@@ -58,7 +56,6 @@ class module_feedback extends module {
      * @param array  $module
      * @param string $intro
      * @param bool   $visible
-     * @throws coding_exception
      */
     public function __construct(string $providersection, array $module, string $intro, bool $visible) {
         parent::__construct('mod_feedback', $providersection, $module['title'], $intro, $visible);
@@ -70,7 +67,7 @@ class module_feedback extends module {
      *
      * @param  int $courseid
      * @return response_module
-     * @throws dml_exception
+     * @throws dml_exception|moodle_exception
      */
     public function create(int $courseid): response_module {
         $course = get_course($courseid);

@@ -34,8 +34,6 @@ use core_privacy\local\request\transform;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Privacy provider: declares the data sent to Google and the import history
  * stored in the plugin tables, and implements export and deletion.

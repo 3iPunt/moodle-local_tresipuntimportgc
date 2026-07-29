@@ -27,14 +27,16 @@ namespace local_tresipuntimportgc\factory;
 use coding_exception;
 use dml_exception;
 use local_tresipuntimportgc\responses\response_module;
+use moodle_exception;
 use phpunit_util;
 use testing_data_generator;
 
+// El guard va ANTES del cambio de estado global: este fichero tiene efectos
+// secundarios (require_once), así que sí lo necesita.
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
-
 require_once($CFG->dirroot . '/lib/phpunit/classes/util.php');
-
-defined('MOODLE_INTERNAL') || die;
 
 /**
  * Class module
@@ -71,7 +73,6 @@ abstract class module {
      * @param string $title
      * @param string $intro
      * @param bool $visible
-     * @throws coding_exception
      */
     public function __construct(string $component, string $providersection, string $title, string $intro, bool $visible) {
         $generator = phpunit_util::get_data_generator();
@@ -154,6 +155,7 @@ abstract class module {
      * final intro/introformat from this array.
      *
      * @return array Editor array {text, format, itemid}.
+     * @throws moodle_exception
      */
     protected function intro_editor(): array {
         return [

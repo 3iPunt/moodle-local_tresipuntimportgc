@@ -24,8 +24,6 @@ use local_tresipuntimportgc\factory\module_label;
 use local_tresipuntimportgc\local\run_config;
 use local_tresipuntimportgc\providers\provider;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class gc_mod_coursework_assignment_map
  *

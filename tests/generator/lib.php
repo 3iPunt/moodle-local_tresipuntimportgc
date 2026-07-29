@@ -26,8 +26,6 @@ use local_tresipuntimportgc\models\import;
 use local_tresipuntimportgc\models\import_course;
 use local_tresipuntimportgc\models\import_log;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Seeds import runs, import courses and traces without touching Google.
  *

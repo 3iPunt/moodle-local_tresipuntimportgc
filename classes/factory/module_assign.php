@@ -32,6 +32,8 @@ use local_tresipuntimportgc\providers\google;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response_module;
 use mod_assign_generator;
+use moodle_exception;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -66,7 +68,6 @@ class module_assign extends module {
      * @param array $module
      * @param string $intro
      * @param bool $visible
-     * @throws coding_exception
      */
     public function __construct(string $providersection, array $module, string $intro, bool $visible) {
         parent::__construct('mod_assign', $providersection, $module['title'], $intro, $visible);
@@ -130,7 +131,7 @@ class module_assign extends module {
      *
      * @param  object $res Generator result (with cmid).
      * @return void
-     * @throws coding_exception|dml_exception
+     * @throws coding_exception|dml_exception|moodle_exception
      */
     private function import_rubric($res): void {
         global $CFG;
@@ -154,10 +155,11 @@ class module_assign extends module {
     /**
      * Builds a Moodle rubric definition from the Classroom criteria/levels.
      *
-     * @param  array $criteria Array of {title, description, levels[]}.
-     * @return \stdClass Definition for gradingform_rubric_controller::update_definition().
+     * @param array $criteria Array of {title, description, levels[]}.
+     * @return stdClass Definition for gradingform_rubric_controller::update_definition().
+     * @throws coding_exception
      */
-    private function build_rubric_definition(array $criteria): \stdClass {
+    private function build_rubric_definition(array $criteria): stdClass {
         $rubcriteria = [];
         $ci = 0;
         foreach ($criteria as $criterion) {
@@ -189,11 +191,11 @@ class module_assign extends module {
     /**
      * Imports the Drive files of the materials as assignment intro attachments.
      *
-     * @param  object $res Generator result (with cmid).
+     * @param object $res Generator result (with cmid).
      * @return void
      * @throws coding_exception
      */
-    private function add_additional_files($res): void {
+    private function add_additional_files(object $res): void {
         global $USER;
 
         $context = context_module::instance($res->cmid);

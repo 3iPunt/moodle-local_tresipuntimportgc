@@ -28,14 +28,9 @@ use coding_exception;
 use dml_exception;
 use local_tresipuntimportgc\local\trace_router;
 use local_tresipuntimportgc\providers\provider;
-use local_tresipuntimportgc\responses\error_errors;
 use local_tresipuntimportgc\responses\errors;
 use local_tresipuntimportgc\responses\response;
 use moodle_exception;
-
-defined('MOODLE_INTERNAL') || die;
-
-global $CFG;
 
 /**
  * Class factory
@@ -72,7 +67,7 @@ class factory {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    function create_course(
+    public function create_course(
         string $providerid, int $categoryid, string $fullname, string $shortname, bool $visible, int $importfiles
     ): response {
         trace_router::trace('startingcourse', 'light', $fullname);

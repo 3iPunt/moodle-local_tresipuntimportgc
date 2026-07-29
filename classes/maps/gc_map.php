@@ -25,8 +25,6 @@ use local_tresipuntimportgc\local\run_config;
 use local_tresipuntimportgc\maps\modules\gc_mod_map;
 use local_tresipuntimportgc\providers\provider;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class Google Classroom Map.
  *

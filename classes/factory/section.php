@@ -30,11 +30,12 @@ use local_tresipuntimportgc\responses\response_section;
 use moodle_exception;
 use stdClass;
 
+// El guard va ANTES del cambio de estado global: este fichero tiene efectos
+// secundarios (require_once), así que sí lo necesita.
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
-
 require_once($CFG->dirroot . '/lib/phpunit/classes/util.php');
-
-defined('MOODLE_INTERNAL') || die;
 
 /**
  * Class section
