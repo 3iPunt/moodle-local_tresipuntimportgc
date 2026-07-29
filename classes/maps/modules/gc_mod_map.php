@@ -53,7 +53,7 @@ abstract class gc_mod_map {
      * @param string[][][] $materials
      * @return string
      */
-    static public function get_desc_rich(string $desc = '', array $materials = []): string {
+    public static function get_desc_rich(string $desc = '', array $materials = []): string {
         // La descripción de Classroom es texto plano (la API no da HTML): se
         // convierte de forma segura (escapa HTML, saltos de línea a <br> y
         // enlaza URLs) antes de concatenar el HTML de los materiales.

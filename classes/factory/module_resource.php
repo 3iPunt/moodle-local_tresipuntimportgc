@@ -71,12 +71,12 @@ class module_resource extends module {
     /**
      * Create.
      *
-     * @param int $course_id
+     * @param int $courseid
      * @return response_module
      * @throws dml_exception
      */
-    public function create(int $course_id): response_module {
-        $course = get_course($course_id);
+    public function create(int $courseid): response_module {
+        $course = get_course($courseid);
         $record = [
             'course' => $course,
             'name' => $this->title,
@@ -84,7 +84,7 @@ class module_resource extends module {
             'files' => file_get_unused_draft_itemid()
         ];
         $options = [
-            'section' => $this->get_section($course_id),
+            'section' => $this->get_section($courseid),
             'visible' => $this->visible,
             'showdescription' => false
         ];

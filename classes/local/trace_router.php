@@ -71,7 +71,7 @@ class trace_router {
      * @throws \coding_exception
      */
     public static function trace(string $traceid, string $type, $param = null): void {
-        $message = get_string($traceid, 'local_tresipuntimportgc', $param);
+        $message = get_string($traceid, 'local_tresipuntimportgc', self::escape_param($param));
         if (self::$logger !== null) {
             if ($type === 'danger' || $type === 'error') {
                 self::$logger->error($message);
@@ -82,7 +82,36 @@ class trace_router {
             }
         }
         if (defined('CLI_SCRIPT') && CLI_SCRIPT) {
-            mtrace('  ' . strip_tags($message));
+            mtrace('  ' . html_entity_decode(strip_tags($message), ENT_QUOTES, 'UTF-8'));
         }
+    }
+
+    /**
+     * Escapes the data placed into a trace string.
+     *
+     * Trace strings carry their own markup ('<b>{$a}</b>'), the resulting
+     * message is persisted, and the progress page injects it as HTML. The data
+     * filling those placeholders is untrusted — file names, class and module
+     * titles and error messages straight from the Google APIs — so it is
+     * escaped here, at the single point where every trace is built.
+     *
+     * @param  mixed $param Parameter of the language string (any shape).
+     * @return mixed The same shape with every string escaped.
+     */
+    private static function escape_param($param) {
+        if (is_string($param)) {
+            return s($param);
+        }
+        if (is_array($param)) {
+            return array_map([self::class, 'escape_param'], $param);
+        }
+        if (is_object($param)) {
+            $escaped = new \stdClass();
+            foreach ((array) $param as $key => $value) {
+                $escaped->$key = self::escape_param($value);
+            }
+            return $escaped;
+        }
+        return $param;
     }
 }

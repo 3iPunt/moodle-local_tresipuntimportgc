@@ -44,7 +44,7 @@ global $CFG;
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class factory  {
+class factory {
 
     /** @var provider Provider */
     protected $provider;
@@ -173,13 +173,13 @@ class factory  {
             $errors[] = $createres->error;
             trace_router::trace('coursebasecreatederror', 'warning', $createres->error->to_string());
             trace_router::trace('creationcoursecompletederror', 'danger', null);
-            return new response(false,'', new errors('00002', 'ERROR_CREATE', $errors));
+            return new response(false, '', new errors('00002', 'ERROR_CREATE', $errors));
         }
         $errors[] = $res->error;
         trace_router::trace('recoverycourseerror', 'warning', $res->error->to_string());
         trace_router::trace('creationcoursecompletederror', 'danger', null);
         mtrace(PHP_EOL . '*** FIN CON ERRORES ***');
-        return new response(false,'', new errors('00001', 'ERROR_GET', $errors));
+        return new response(false, '', new errors('00001', 'ERROR_GET', $errors));
     }
 
 }

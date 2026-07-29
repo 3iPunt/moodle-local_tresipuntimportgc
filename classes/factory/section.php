@@ -43,7 +43,7 @@ defined('MOODLE_INTERNAL') || die;
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class section  {
+class section {
 
     /** @var stdClass Name */
     protected $name;
@@ -104,15 +104,15 @@ class section  {
     /**
      * Create.
      *
-     * @param int $course_id
+     * @param int $courseid
      * @return response_section
      */
-    public function create(int $course_id): response_section {
+    public function create(int $courseid): response_section {
         try {
-            $newsection = course_create_section($course_id, 1000);
+            $newsection = course_create_section($courseid, 1000);
             // El nombre del tema va en el name; el topicId ya NO se guarda en el
             // summary visible (§6.3): la correspondencia vive en $sectionmap.
-            course_update_section($course_id, $newsection, array('name' => $this->name));
+            course_update_section($courseid, $newsection, array('name' => $this->name));
             self::$sectionmap[$this->providerid] = (int) $newsection->section;
             return new response_section(true, $this, null);
         } catch (moodle_exception $e) {

@@ -24,6 +24,7 @@
 
 namespace local_tresipuntimportgc\local;
 
+use context_coursecat;
 use core\task\manager;
 use core_course_category;
 use local_tresipuntimportgc\event\gc_course_imported;
@@ -35,6 +36,7 @@ use local_tresipuntimportgc\models\import_course;
 use local_tresipuntimportgc\providers\google;
 use local_tresipuntimportgc\providers\provider;
 use local_tresipuntimportgc\task\import_course_task;
+use required_capability_exception;
 use Throwable;
 
 /**
@@ -62,6 +64,15 @@ class importer {
      * @return import The queued run.
      */
     public static function queue(int $userid, provider $provider, array $courseconfigs): import {
+        // Resolve and authorise every target category before queueing anything:
+        // otherwise a run could be created whose courses all fail later in cron,
+        // one by one, for a permission the user never had.
+        $categoryids = [];
+        foreach ($courseconfigs as $index => $config) {
+            $categoryids[$index] = self::resolve_categoryid((int) $config['categoryid']);
+            self::require_can_create_in_category($categoryids[$index], $userid);
+        }
+
         $import = new import(0, (object) [
             'userid' => $userid,
             'googleaccount' => $provider->get_account_email(),
@@ -69,13 +80,13 @@ class importer {
         $import->set_refresh_token($provider->get_refresh_token());
         $import->create();
 
-        foreach ($courseconfigs as $config) {
+        foreach ($courseconfigs as $index => $config) {
             $course = new import_course(0, (object) [
                 'importid' => $import->get('id'),
                 'providerid' => (string) $config['providerid'],
                 'fullname' => (string) $config['fullname'],
                 'shortname' => (string) $config['shortname'],
-                'categoryid' => self::resolve_categoryid((int) $config['categoryid']),
+                'categoryid' => $categoryids[$index],
                 'visible' => empty($config['visible']) ? 0 : 1,
                 'importfiles' => (int) ($config['importfiles'] ?? 0),
                 'calendarimport' => (int) ($config['calendarimport'] ?? 0),
@@ -107,6 +118,26 @@ class importer {
             return $categoryid;
         }
         return (int) core_course_category::get_default()->id;
+    }
+
+    /**
+     * Guard: the launching user must be able to create courses in the category.
+     *
+     * The import capability alone does not grant course creation anywhere on
+     * the site; the category context is what decides. Checked here for the
+     * whole run, and again in course_external::create_course() because that
+     * function is also reachable as a web service.
+     *
+     * @param  int $categoryid Target category.
+     * @param  int $userid     User launching the import.
+     * @return void
+     * @throws required_capability_exception If the user cannot create there.
+     */
+    private static function require_can_create_in_category(int $categoryid, int $userid): void {
+        $context = context_coursecat::instance($categoryid);
+        if (!has_capability('moodle/course:create', $context, $userid)) {
+            throw new required_capability_exception($context, 'moodle/course:create', 'nopermissions', '');
+        }
     }
 
     /**

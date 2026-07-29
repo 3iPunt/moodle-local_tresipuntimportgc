@@ -76,14 +76,14 @@ class module_teacher_folder extends module {
     /**
      * Create.
      *
-     * @param  int $course_id
+     * @param  int $courseid
      * @return response_module
      * @throws coding_exception|dml_exception
      */
-    public function create(int $course_id): response_module {
+    public function create(int $courseid): response_module {
         global $USER;
 
-        $course = get_course($course_id);
+        $course = get_course($courseid);
         $record = [
             'course' => $course,
             'name' => $this->title,

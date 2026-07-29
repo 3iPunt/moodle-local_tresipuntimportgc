@@ -60,7 +60,7 @@ class errors extends error {
         if ($this->code !== '0') {
             $res = $this->code . ': ' . $this->message;
             foreach ($this->errors as $error) {
-                $res .=  PHP_EOL;
+                $res .= PHP_EOL;
                 $res .= $error->to_string();
             }
         }

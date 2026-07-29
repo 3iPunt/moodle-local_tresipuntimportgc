@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class gc_mat_youtube_map extends gc_mat_map  {
+class gc_mat_youtube_map extends gc_mat_map {
 
     /**
      * Get Render.

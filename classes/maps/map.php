@@ -40,7 +40,7 @@ abstract class map {
      * @param array $course
      * @return course
      */
-    abstract static public function course(array $course): course;
+    abstract public static function course(array $course): course;
 
     /**
      * Courses.
@@ -48,7 +48,7 @@ abstract class map {
      * @param array $courses
      * @return course[]
      */
-    abstract static public function courses(array $courses): array;
+    abstract public static function courses(array $courses): array;
 
     /**
      * Teacher Folder.
@@ -56,7 +56,7 @@ abstract class map {
      * @param string[] $folder
      * @return folder|null
      */
-    abstract static public function teacher_folder(array $folder): ?folder;
+    abstract public static function teacher_folder(array $folder): ?folder;
 
     /**
      * Section.
@@ -64,7 +64,7 @@ abstract class map {
      * @param string[] $section
      * @return section|null
      */
-    abstract static public function section(array $section): ?section;
+    abstract public static function section(array $section): ?section;
 
     /**
      * Sections.
@@ -72,7 +72,7 @@ abstract class map {
      * @param array $sections
      * @return section[]
      */
-    abstract static public function sections(array $sections): array;
+    abstract public static function sections(array $sections): array;
 
     /**
      * Module.
@@ -85,7 +85,7 @@ abstract class map {
      * @param  string $type
      * @return module|module[]|null
      */
-    abstract static public function module(array $module, provider $provider, string $type = '');
+    abstract public static function module(array $module, provider $provider, string $type = '');
 
     /**
      * Modules.
@@ -95,6 +95,6 @@ abstract class map {
      * @param string $type
      * @return module[]
      */
-    abstract static public function modules(array $modules, provider $provider, string $type = ''): array;
+    abstract public static function modules(array $modules, provider $provider, string $type = ''): array;
 
 }

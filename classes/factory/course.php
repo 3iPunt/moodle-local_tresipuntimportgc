@@ -25,7 +25,6 @@
 namespace local_tresipuntimportgc\factory;
 
 use coding_exception;
-use course_modinfo;
 use dml_exception;
 use local_tresipuntimportgc\responses\error;
 use local_tresipuntimportgc\responses\response;
@@ -175,11 +174,11 @@ class course {
         global $USER, $DB;
         if (!is_null($this->get_id())) {
             try {
-                $plugin_instance = $DB->get_record("enrol",
-                    array('courseid' => $this->get_id(), 'enrol'=>'manual'));
+                $plugininstance = $DB->get_record("enrol",
+                    array('courseid' => $this->get_id(), 'enrol' => 'manual'));
                 $plugin = enrol_get_plugin('manual');
                 $roleid = $DB->get_field('role', 'id', array('shortname' => 'editingteacher'));
-                $plugin->enrol_user($plugin_instance, $USER->id, $roleid);
+                $plugin->enrol_user($plugininstance, $USER->id, $roleid);
                 return new response(true, '');
             } catch (moodle_exception $e) {
                 return new response(false, '', new error('11021', $e->getMessage()));
@@ -197,24 +196,22 @@ class course {
      */
     public function clean_sections_intro(): response {
         global $DB;
-        if (!is_null($this->get_id())) {
-            $course = get_course($this->get_id());
-            /** @var course_modinfo $modinfo */
-            $modinfo = get_fast_modinfo($course->id);
-            $sections = $modinfo->get_section_info_all();
-            foreach ($sections as $section) {
-                $updatesection = new stdClass();
-                $updatesection->id = $section->id;
-                $updatesection->summary = '';
-                $DB->update_record('course_sections', $updatesection);
-                course_modinfo::clear_instance_cache($course);
-                rebuild_course_cache($course->id);
-            }
-            return new response(true, '');
-        } else {
+        if (is_null($this->get_id())) {
             return new response(false, null, new error('11030', 'COURSE NOT CREATED'));
         }
+        $courseid = (int) $this->get_id();
 
+        // One statement for every section, and the course cache touched once.
+        // Doing it section by section rebuilt the whole course cache N times.
+        $DB->set_field('course_sections', 'summary', '', ['course' => $courseid]);
+
+        // Clear only: the course has just been imported and nobody is looking at
+        // it yet, so invalidating is enough — the cache is rebuilt on first
+        // access. rebuild_course_cache() already clears the static instance
+        // cache, so no separate call is needed.
+        rebuild_course_cache($courseid, true);
+
+        return new response(true, '');
     }
 
 }

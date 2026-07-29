@@ -15,8 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Web service functions and service definition of the plugin.
+ *
  * @package     local_tresipuntimportgc
- * @copyright   3iPunt <https://www.tresipunt.com/>
+ * @copyright   2026 3iPunt (contacte@tresipunt.com)
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 use local_tresipuntimportgc\external\course_external;

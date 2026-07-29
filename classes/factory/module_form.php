@@ -92,12 +92,12 @@ class module_form extends module {
     /**
      * Create.
      *
-     * @param int $course_id
+     * @param int $courseid
      * @return response_module
      * @throws dml_exception
      */
-    public function create(int $course_id): response_module {
-        $course = get_course($course_id);
+    public function create(int $courseid): response_module {
+        $course = get_course($courseid);
         $record = [
             'course' => $course,
             'name' => $this->title,
@@ -166,7 +166,7 @@ class module_form extends module {
             }
             $record['timeclose'] = mktime($hour, $minute, 0, $this->module['dueDate']['month'], $this->module['dueDate']['day'], $this->module['dueDate']['year']);
         }
-        $options = ['section' => $this->get_section($course_id), 'visible' => $this->visible, 'showdescription' => false];
+        $options = ['section' => $this->get_section($courseid), 'visible' => $this->visible, 'showdescription' => false];
         $res = $this->generator->create_instance($record, $options);
         if (isset($res)) {
             // TODO add questions to questions bank, and associate questions to this quiz. See Etrasa proyect for get code.

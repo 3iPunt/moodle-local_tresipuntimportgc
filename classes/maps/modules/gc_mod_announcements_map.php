@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class gc_mod_announcements_map extends gc_mod_map  {
+class gc_mod_announcements_map extends gc_mod_map {
 
     /**
      * Get Module.

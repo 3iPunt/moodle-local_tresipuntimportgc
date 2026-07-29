@@ -91,7 +91,13 @@ class import_external extends external_api {
                     'id' => (int) $log->get('id'),
                     'timecreated' => (int) $log->get('timecreated'),
                     'level' => $log->get('level'),
-                    'message' => (string) $log->get('message'),
+                    // The progress page injects this as HTML: clean it here too.
+                    // Traces are built escaped (trace_router), but error traces
+                    // logged straight from an exception message — and anything
+                    // already stored by an earlier release — do not go through
+                    // that path.
+                    'message' => format_text((string) $log->get('message'), FORMAT_HTML,
+                        ['context' => $context, 'filter' => false]),
                 ];
             }
             $courses[] = [
@@ -285,7 +291,10 @@ class import_external extends external_api {
         $results = [];
         foreach ($records as $record) {
             $category = core_course_category::get($record->id, IGNORE_MISSING);
-            if ($category && core_course_category::can_view_category($category)) {
+            // Only categories the user can actually import into: offering one
+            // where they cannot create courses would fail on submit.
+            if ($category && core_course_category::can_view_category($category)
+                    && has_capability('moodle/course:create', \context_coursecat::instance($record->id))) {
                 $results[] = ['id' => (int) $record->id, 'name' => $category->get_nested_name(false)];
             }
         }

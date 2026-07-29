@@ -23,6 +23,7 @@
 namespace local_tresipuntimportgc\external;
 
 use coding_exception;
+use context_coursecat;
 use core_course_category;
 use core_external\external_api;
 use core_external\external_function_parameters;
@@ -90,10 +91,14 @@ class course_external extends external_api {
         );
 
         // New value type (bool) is not matching the resolved parameter type and might introduce types-related false-positives.
-        //$category = core_course_category::get($category);
+        // $category = core_course_category::get($category);
         $moodlecategory = core_course_category::get($category);
         if ($moodlecategory) {
             if (core_course_category::can_view_category($moodlecategory)) {
+                // create_course() does not check capabilities: the caller must.
+                // Being allowed to import is not being allowed to create a
+                // course anywhere, so the category context decides.
+                require_capability('moodle/course:create', context_coursecat::instance($moodlecategory->id));
                 // Factory.
                 $provider = $provider ?? new google();
                 $factory = new factory($provider);

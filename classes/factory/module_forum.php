@@ -73,15 +73,15 @@ class module_forum extends module {
     /**
      * Create.
      *
-     * @param  int $course_id
+     * @param  int $courseid
      * @return response_module
      * @throws coding_exception|dml_exception
      */
-    public function create(int $course_id): response_module {
+    public function create(int $courseid): response_module {
         global $CFG, $USER, $DB;
         require_once($CFG->dirroot . '/mod/forum/lib.php');
 
-        $forum = forum_get_course_forum($course_id, 'news');
+        $forum = forum_get_course_forum($courseid, 'news');
         if (empty($forum)) {
             return new response_module(false, null, new error('21000', 'ANNOUNCEMENTS_FORUM_NOT_FOUND'));
         }
@@ -91,7 +91,7 @@ class module_forum extends module {
             $name = get_string('announcement_title', 'local_tresipuntimportgc');
         }
         $discussion = new stdClass();
-        $discussion->course = $course_id;
+        $discussion->course = $courseid;
         $discussion->forum = $forum->id;
         $discussion->name = $name;
         $discussion->message = $text . $this->intro;
@@ -106,7 +106,7 @@ class module_forum extends module {
 
         // Drive files of the announcement → attachments of the first post.
         $firstpost = $DB->get_field('forum_discussions', 'firstpost', ['id' => $did]);
-        $cm = get_coursemodule_from_instance('forum', $forum->id, $course_id);
+        $cm = get_coursemodule_from_instance('forum', $forum->id, $courseid);
         if ($firstpost && $cm) {
             $context = context_module::instance($cm->id);
             foreach ($this->module['materials'] ?? [] as $material) {

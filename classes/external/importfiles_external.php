@@ -114,8 +114,8 @@ class importfiles_external extends external_api {
         ];
     }
         /**
-     * @return external_single_structure
-     */
+         * @return external_single_structure
+         */
     public static function importfiles_returns(): external_single_structure {
         return new external_single_structure(
             array(

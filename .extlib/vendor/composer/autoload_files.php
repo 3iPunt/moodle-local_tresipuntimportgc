@@ -6,10 +6,13 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname(dirname($vendorDir));
 
 return array(
-    '6e3fae29631ef280660b3cdad06f25a8' => $vendorDir . '/symfony/deprecation-contracts/function.php',
-    'a4a119a56e50fbb293281d9a48007e0e' => $vendorDir . '/symfony/polyfill-php80/bootstrap.php',
-    '7b11c4dc42b3b3023073cb14e519683c' => $vendorDir . '/ralouphie/getallheaders/src/getallheaders.php',
-    '37a3dc5111fe8f707ab4c132ef1dbc62' => $vendorDir . '/guzzlehttp/guzzle/src/functions_include.php',
     '1f87db08236948d07391152dccb70f04' => $vendorDir . '/google/apiclient-services/autoload.php',
-    'a8d3953fd9959404dd22d3dfcd0a79f0' => $vendorDir . '/google/apiclient/src/aliases.php',
+    // TRESIPUNT PATCH (see composer.json -> extra.tresipunt-notes.vendor-patch):
+    // google/apiclient/src/aliases.php is NOT loaded. It aliases the legacy
+    // Google_* names to the v2 classes, but Moodle core still ships the v1
+    // library, whose real classes use those names. If this plugin loads first,
+    // core's get_google_client() (lib/google/lib.php) builds the v2 class with a
+    // Google_Config object and dies with a TypeError, breaking
+    // repository_googledocs, portfolio_googledocs and files converter
+    // googledrive. This plugin only uses the namespaced v2 names.
 );

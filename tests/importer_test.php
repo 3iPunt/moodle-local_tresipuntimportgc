@@ -52,11 +52,25 @@ final class importer_test extends \advanced_testcase {
     }
 
     /**
+     * Creates a user allowed to create courses site-wide (what an importer
+     * needs: queue() refuses to import into a category the user cannot use).
+     *
+     * @return \stdClass The user.
+     */
+    private function create_course_creator(): \stdClass {
+        $user = $this->getDataGenerator()->create_user();
+        $roleid = $this->getDataGenerator()->create_role();
+        assign_capability('moodle/course:create', CAP_ALLOW, $roleid, \context_system::instance());
+        role_assign($roleid, $user->id, \context_system::instance());
+        return $user;
+    }
+
+    /**
      * queue() persists the run, its courses and one adhoc task per course.
      */
     public function test_queue_creates_run_courses_and_tasks(): void {
         $this->resetAfterTest();
-        $user = $this->getDataGenerator()->create_user();
+        $user = $this->create_course_creator();
 
         $import = importer::queue((int) $user->id, $this->provider_stub(), [
             ['providerid' => 'gc-1', 'fullname' => 'Bio 1', 'shortname' => 'bio1',
@@ -85,6 +99,35 @@ final class importer_test extends \advanced_testcase {
         sort($queuedids);
         $this->assertSame([(int) $courses[0]->get('id'), (int) $courses[1]->get('id')],
             $queuedids);
+    }
+
+    /**
+     * queue() refuses to import into a category where the user cannot create
+     * courses, and queues nothing at all when it refuses.
+     */
+    public function test_queue_requires_course_create_capability(): void {
+        $this->resetAfterTest();
+        // Import capability only: it does not grant course creation.
+        $user = $this->getDataGenerator()->create_user();
+        $roleid = $this->getDataGenerator()->create_role();
+        assign_capability('local/tresipuntimportgc:import', CAP_ALLOW, $roleid, \context_system::instance());
+        role_assign($roleid, $user->id, \context_system::instance());
+
+        try {
+            importer::queue((int) $user->id, $this->provider_stub(), [
+                ['providerid' => 'gc-1', 'fullname' => 'Bio 1', 'shortname' => 'bio1',
+                    'categoryid' => 1, 'visible' => 1],
+            ]);
+            $this->fail('queue() must require moodle/course:create in the target category');
+        } catch (\required_capability_exception $e) {
+            $this->assertInstanceOf(\required_capability_exception::class, $e);
+        }
+
+        // Nothing was queued: no run, no courses, no tasks.
+        global $DB;
+        $this->assertSame(0, $DB->count_records('local_tresipuntimportgc_import'));
+        $this->assertSame(0, $DB->count_records('local_tresipuntimportgc_course'));
+        $this->assertCount(0, manager::get_adhoc_tasks(import_course_task::class));
     }
 
     /**

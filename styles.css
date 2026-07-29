@@ -9,6 +9,17 @@
     max-width: 1102px; /* 1038px de contenido + padding lateral del tema. */
 }
 
+/* Algunos temas (p. ej. theme_fresk vía su SCSS de ajustes) pintan #region-main
+   como tarjeta blanca con !important. Nuestras pantallas ya traen la suya
+   (.local-tipgc), así que quedarían dos tarjetas anidadas y el fondo de página
+   dejaría de contrastar: lo neutralizamos solo aquí. Doble id + !important para
+   ganar al !important del tema. */
+#page-local-tresipuntimportgc-import #region-main,
+#page-local-tresipuntimportgc-progress #region-main,
+#page-local-tresipuntimportgc-panel #region-main {
+    background-color: transparent !important;
+}
+
 .local-tipgc {
     font-size: 0.95rem;
     /* Ancho de trabajo del plugin en todas las pantallas. */
@@ -17,6 +28,7 @@
     box-shadow: rgba(100, 100, 111, 0.2) 0 7px 29px 0;
     padding: 50px;
     border-radius: 20px;
+    background-color: white;
 }
 
 /* Norma: icono + texto siempre centrados en altura (flex, sin baselines). */
@@ -80,8 +92,8 @@
     display: none;
 }
 .local-tipgc .tipgc-header-title {
-    font-weight: 400;
-    font-size: 1.9rem;
+    font-weight: 700;
+    font-size: 1.7rem;
     letter-spacing: -0.02em;
 }
 .local-tipgc .tipgc-header-desc {

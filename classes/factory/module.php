@@ -43,7 +43,7 @@ defined('MOODLE_INTERNAL') || die;
  * @copyright   2021 Tresipunt
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class module  {
+abstract class module {
 
     /** @var string Mod Name */
     protected $modname = '';
@@ -52,7 +52,7 @@ abstract class module  {
     protected $generator;
 
     /** @var string Provider Section */
-    protected $provider_section;
+    protected $providersection;
 
     /** @var string Title */
     protected $title;
@@ -79,7 +79,7 @@ abstract class module  {
         $this->title = $title;
         $this->intro = $intro;
         $this->visible = $visible;
-        $this->provider_section = $providersection;
+        $this->providersection = $providersection;
     }
 
     /**
@@ -103,25 +103,25 @@ abstract class module  {
     /**
      * Get Section.
      *
-     * @param int $course_id
+     * @param int $courseid
      * @return int
      * @throws dml_exception
      */
-    public function get_section(int $course_id): int {
-        if ($this->provider_section === '') {
+    public function get_section(int $courseid): int {
+        if ($this->providersection === '') {
             return 0;
         } else {
-            return section::get_section($course_id, $this->provider_section);
+            return section::get_section($courseid, $this->providersection);
         }
     }
 
     /**
      * Create.
      *
-     * @param int $course_id
+     * @param int $courseid
      * @return response_module
      */
-    abstract public function create(int $course_id): response_module;
+    abstract public function create(int $courseid): response_module;
 
     /**
      * Builds a Moodle availability restriction «available from» the Classroom

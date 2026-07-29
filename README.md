@@ -18,8 +18,8 @@
 
 Plugin local que importa una clase de Google Classroom como un curso de Moodle:
 secciones, materiales y trabajos, anuncios, la carpeta del profesor y el
-calendario. Las importaciones se ejecutan en segundo plano, un curso cada vez,
-con una página de progreso y un panel de historial. No modifica el núcleo de
+calendario. Cada curso se importa en su propia tarea en segundo plano, con una
+página de progreso y un panel de historial. No modifica el núcleo de
 Moodle ni el tema.
 
 ---
@@ -88,7 +88,13 @@ Moodle ni el tema.
 | Moodle | 4.5 LTS o 5.1 |
 | PHP | 8.1 o superior |
 | Otros plugins | No requiere |
+| Cron de Moodle | Necesario — las importaciones corren como tareas en segundo plano |
 | Servicios Google | Proyecto de Google Cloud con las APIs de Classroom, Drive, Calendar y Forms, y un cliente OAuth 2.0 de tipo *aplicación web* |
+
+> **Cómo montar el proyecto de Google Cloud paso a paso:**
+> [`docs/google-cloud-setup.es.md`](docs/google-cloud-setup.es.md)
+> ([English](docs/google-cloud-setup.md)). Como el scope de Drive es *restricted*,
+> cada sitio usa su propio cliente OAuth en su Workspace.
 
 ## 🚀 Instalación
 
