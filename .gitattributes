@@ -1,0 +1,16 @@
+# Files that live in the repository but must NOT travel in the published ZIP.
+#
+# `export-ignore` is honoured by `git archive`, which is how the release package
+# is built (see the packaging command in the release notes). Note that GitHub's
+# own "Download ZIP" button ignores these rules: always build the package with
+# `git archive`, never with that button.
+#
+# The Composer manifest stays in the repository — it documents how .extlib is
+# regenerated, which libraries are deliberately not vendored (`replace`) and the
+# vendor patch that must be re-applied after `composer update`. It is just build
+# tooling that the person installing the plugin does not need.
+
+composer.json   export-ignore
+composer.lock   export-ignore
+.gitignore      export-ignore
+.gitattributes  export-ignore

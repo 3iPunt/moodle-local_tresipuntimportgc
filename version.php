@@ -18,14 +18,15 @@
  * Plugin version and other meta-data are defined here.
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_tresipuntimportgc';
-$plugin->release = '1.0';
-$plugin->version = 2021072100;
-$plugin->requires = 2018120301;
+$plugin->release = '2.0.0';
+$plugin->version = 2026072404;
+$plugin->requires = 2024100700;
+$plugin->supported = [405, 501];
 $plugin->maturity = MATURITY_STABLE;

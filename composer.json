@@ -1,0 +1,44 @@
+{
+    "name": "tresipunt/local_tresipuntimportgc",
+    "description": "Third-party dependencies for the Google Classroom import plugin (vendored under .extlib).",
+    "license": "GPL-3.0-or-later",
+    "type": "project",
+    "require": {
+        "google/apiclient": "^2.19"
+    },
+    "replace": {
+        "firebase/php-jwt": "6.10.0",
+        "guzzlehttp/guzzle": "7.8.1",
+        "guzzlehttp/promises": "2.0.2",
+        "guzzlehttp/psr7": "2.6.2",
+        "psr/http-client": "1.0.3",
+        "psr/http-factory": "1.1.0",
+        "psr/http-message": "2.0.0",
+        "psr/log": "3.0.2",
+        "ralouphie/getallheaders": "3.0.3",
+        "symfony/deprecation-contracts": "3.5.0"
+    },
+    "config": {
+        "vendor-dir": ".extlib/vendor",
+        "platform": {
+            "php": "8.1"
+        },
+        "optimize-autoloader": true
+    },
+    "scripts": {
+        "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
+    },
+    "extra": {
+        "google/apiclient-services": [
+            "Classroom",
+            "Drive",
+            "Calendar",
+            "Forms",
+            "Oauth2"
+        ],
+        "tresipunt-notes": {
+            "replace": "Moodle core already ships and autoloads these libraries (see lib/classes/component.php: $psr4namespaces and $composerautoloadfiles). Core registers its autoloader first, so a vendored copy here would never be used: it would only add weight and hide a version mismatch. The plugin supports Moodle 4.5 and 5.1, so each version is pinned to the LOWER of the two (what 4.5 ships) — that is the floor the plugin can meet at runtime, and it makes Composer fail loudly if a dependency ever needs a newer one. Verified in both: 4.5 guzzle 7.8.1 / psr7 2.6.2 / promises 2.0.2 / php-jwt 6.10.0 / deprecation-contracts 3.5.0; 5.1 ships the same or newer. Do not raise these to the 5.1 versions while 4.5 is supported.",
+            "vendor-patch": "After every composer update, re-apply the patch that stops google/apiclient from claiming the legacy global Google_* class names. IMPORTANT: with optimize-autoloader the loader reads .extlib/vendor/composer/autoload_static.php, NOT autoload_files.php / autoload_classmap.php — patching only those two has no effect. In autoload_static.php remove the src/aliases.php entry from $files and the 20 Google_* entries from $classMap (patch the other two as well, to keep them consistent). Why: core still ships google-api-php-client v1 (lib/google) whose real classes use those names, and core's get_google_client() builds them with a Google_Config object. Reproduced: with the alias in place, loading this plugin first makes get_google_client() fail with 'Google\\Client::__construct(): Argument #1 ($config) must be of type array, Google_Config given', which breaks repository_googledocs, portfolio_googledocs and files converter googledrive. This plugin only uses the namespaced v2 names, so it needs no aliases."
+        }
+    }
+}

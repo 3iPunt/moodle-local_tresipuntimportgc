@@ -1,0 +1,43 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+  @template local_tresipuntimportgc/components/account_chip
+
+  Connected Google account chip: avatar, email and (optional) change link.
+  Reused wherever the connected account is shown, always with this look.
+
+  Context variables required for this template:
+  * accountemail - connected account email
+  * accountinitial - single letter for the avatar
+  * authurl - OAuth URL for the change-account link (empty to hide it)
+
+  Example context (json):
+  {
+    "accountemail": "user@example.com",
+    "accountinitial": "U",
+    "authurl": "#"
+  }
+}}
+<div class="tipgc-account-chip d-flex align-items-center">
+    <span class="tipgc-avatar" aria-hidden="true">{{ accountinitial }}</span>
+    <div class="tipgc-account-chip-body">
+        <div class="tipgc-account-email">{{ accountemail }}</div>
+        {{# authurl }}
+            <a href="{{ authurl }}" class="tipgc-account-change">{{# str }} changeaccount, local_tresipuntimportgc {{/ str }}</a>
+        {{/ authurl }}
+    </div>
+</div>

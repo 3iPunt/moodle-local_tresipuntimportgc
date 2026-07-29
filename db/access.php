@@ -15,29 +15,43 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Local Tresipunt Import Google Classroom Capabilities.
+ * Capabilities of the plugin.
+ *
+ * Only CAP_ALLOW is declared: anything not granted is denied by default, and
+ * CAP_PROHIBIT here would be irrevocable per context — it would stop a site
+ * administrator from granting the capability to a role with that archetype.
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// Este fichero define $capabilities (estado global), así que sí necesita el guard.
 defined('MOODLE_INTERNAL') || die();
 
-$capabilities = array(
+$capabilities = [
 
-    // View upload CSV page.
-    'local/tresipuntimportgc:import' => array(
+    // Import a class from Google Classroom. Granted to managers and course
+    // creators, not only to site administrators: on many sites the people who
+    // manage courses are not administrators.
+    'local/tresipuntimportgc:import' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => [
+            'coursecreator' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ],
+    ],
+
+    // View the imports panel (history, detail and traces), including the runs of
+    // other users. Same roles.
+    'local/tresipuntimportgc:viewreports' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => array(
-            'student' => CAP_PROHIBIT,
-            'coursecreator' => CAP_PROHIBIT,
-            'guest' => CAP_PROHIBIT,
-            'teacher' => CAP_PROHIBIT,
-            'editingteacher' => CAP_ALLOW,
+        'archetypes' => [
+            'coursecreator' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
-        ),
-    ),
+        ],
+    ],
 
-);
+];

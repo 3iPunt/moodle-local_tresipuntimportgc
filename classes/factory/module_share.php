@@ -1,0 +1,107 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Class module_share
+ *
+ * @package     local_tresipuntimportgc
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace local_tresipuntimportgc\factory;
+
+use coding_exception;
+use core_component;
+use local_tresipuntimportgc\responses\error;
+use local_tresipuntimportgc\responses\response_module;
+use mod_url_generator;
+use moodle_exception;
+use stdClass;
+
+/**
+ * Class module_share
+ *
+ * @package     local_tresipuntimportgc
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class module_share extends module {
+
+    /** @var string Mod Name */
+    protected $modname = 'tresipuntshare';
+
+    /** @var mod_url_generator Generator */
+    protected $generator;
+
+    /** @var string Description */
+    protected $desc;
+
+    /**
+     * constructor.
+     *
+     * @param string $text
+     * @param string $desc
+     * @param bool $visible
+     * @throws coding_exception
+     */
+    public function __construct(string $text, string $desc, bool $visible) {
+        parent::__construct('mod_url', '', $text, $text, $visible);
+        $this->desc = $desc;
+    }
+
+    /**
+     * Create.
+     *
+     * @param int $courseid
+     * @return response_module
+     * @throws moodle_exception
+     */
+    public function create(int $courseid): response_module {
+        global $USER;
+        $plugins = core_component::get_plugin_list('mod');
+        if (array_key_exists($this->get_modname(), $plugins)) {
+
+            $commentname = preg_replace("/[\r\n|\n|\r]+/", " ", $this->title);
+            $name = fullname($USER) . ': ' . substr(trim($commentname), 0, 200);
+            $draftideditor = file_get_submitted_draft_itemid('introeditor');
+
+            if (!empty($this->desc)) {
+                $commentname .= $this->desc;
+            }
+
+            $moduleinfo = new stdClass();
+            $moduleinfo->modulename = $this->get_modname();
+            $moduleinfo->section = 0;
+            $moduleinfo->showdescription = true;
+            $moduleinfo->course = $courseid;
+            $moduleinfo->teacher = $USER->id;
+            $moduleinfo->name = $name;
+            $moduleinfo->introeditor = array('text' => $commentname, 'format' => FORMAT_HTML, 'itemid' => $draftideditor);;
+            $moduleinfo->visible = true;
+            $cm = create_module($moduleinfo);
+            if (isset($cm)) {
+                return new response_module(true, $this, null);
+            } else {
+                return new response_module(false, null, new error('14001', 'MODULE_NOT_CREATED'));
+            }
+        } else {
+            return new response_module(false, null, new error('14000', 'PLUGIN_NOT_EXIST'));
+        }
+    }
+
+
+}
