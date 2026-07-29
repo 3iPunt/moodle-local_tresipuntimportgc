@@ -1,7 +1,7 @@
 <p align="center">
-  <img src="pix/tresipunt_logo.svg" alt="Tresipunt" height="60">
+  <img src="pix/tresipunt_logo.svg" alt="Tresipunt" width="160" height="40">
   &nbsp;&nbsp;&nbsp;
-  <img src="pix/icon.svg" alt="" height="60">
+  <img src="pix/icon.svg" alt="" width="46" height="40">
 </p>
 
 <h1 align="center">Importación de cursos desde Google Classroom</h1>
@@ -177,5 +177,5 @@ Tras tocar `amd/src/*.js`, recompilar con `grunt amd`. La librería
 ---
 
 <p align="center">
-  <a href="https://tresipunt.com"><img src="pix/tresipunt_logo.svg" alt="Tresipunt" width="160"></a>
+  <a href="https://tresipunt.com"><img src="pix/tresipunt_logo.svg" alt="Tresipunt" width="120" height="30"></a>
 </p>
