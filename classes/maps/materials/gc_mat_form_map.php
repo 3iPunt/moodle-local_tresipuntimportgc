@@ -23,7 +23,7 @@ use local_tresipuntimportgc\output\gc_desc_form_component;
  * Class gc_mat_form_map
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class gc_mat_form_map extends gc_mat_map {

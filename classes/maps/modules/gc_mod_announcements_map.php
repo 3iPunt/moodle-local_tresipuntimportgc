@@ -25,7 +25,7 @@ use local_tresipuntimportgc\providers\provider;
  * Class gc_mod_announcements_map
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class gc_mod_announcements_map extends gc_mod_map {

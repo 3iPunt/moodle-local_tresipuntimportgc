@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/local/tresipuntimportgc/classes/maps/materials/gc
  * Class gc_mod_map
  *
  * @package     local_tresipuntimportgc
- * @copyright   2021 Tresipunt
+ * @copyright   2021 3iPunt (contacte@tresipunt.com)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class gc_mod_map {

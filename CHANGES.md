@@ -95,6 +95,15 @@ Compatible with Moodle 4.5 LTS and 5.1 (`requires` 4.5, `supported [405, 501]`).
   folder name), and the web services now use the values returned by
   `validate_parameters()`.
 - The privacy provider declares the `usermodified` field of its three tables.
+- Capabilities declare only `CAP_ALLOW`. The previous `CAP_PROHIBIT` entries for
+  student, guest, teacher and editingteacher were irrevocable per context and
+  stopped a site administrator from granting the capability to a role with those
+  archetypes; anything not granted is denied by default anyway.
+
+### Removed
+
+- The unused `pix/importgc_login.png` image and the empty `db/uninstall.php`
+  (Moodle already drops the tables and settings on uninstall).
 - Fatal error on successful imports (`error` dereferenced on null).
 - TLS host verification is no longer disabled on Google API calls.
 - Import start is protected with `sesskey`; browser cookies are no longer

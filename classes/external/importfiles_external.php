@@ -17,7 +17,7 @@
 /**
  * @package     local_tresipuntimportgc
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @copyright   3iPunt <https://www.tresipunt.com/>
+ * @copyright   2026 3iPunt (contacte@tresipunt.com)
  */
 
 namespace local_tresipuntimportgc\external;
