@@ -24,8 +24,10 @@
 
 namespace local_tresipuntimportgc\models;
 
+use context_system;
 use core\encryption;
 use core\persistent;
+use required_capability_exception;
 
 /**
  * One import run: a set of Google Classroom courses queued together by a user.
@@ -110,6 +112,36 @@ class import extends persistent {
         if (!empty($this->get('refreshtoken'))) {
             $this->set('refreshtoken', null);
             $this->update();
+        }
+    }
+
+    /**
+     * Whether this run was launched by the given user (the current one if none).
+     *
+     * @param  int|null $userid User to check, or null for the current one.
+     * @return bool
+     */
+    public function is_owned_by(?int $userid = null): bool {
+        global $USER;
+
+        return (int) $this->get('userid') === (int) ($userid ?? $USER->id);
+    }
+
+    /**
+     * Guard: the current user may only see and act on their own runs, unless
+     * they hold the reports capability.
+     *
+     * An import run carries someone else's Google account and their refresh
+     * token, so having the import capability is not enough to reach another
+     * user's run.
+     *
+     * @return void
+     * @throws required_capability_exception If the run belongs to someone else.
+     */
+    public function require_can_access(): void {
+        if (!$this->is_owned_by()) {
+            require_capability('local/tresipuntimportgc:viewreports',
+                context_system::instance());
         }
     }
 

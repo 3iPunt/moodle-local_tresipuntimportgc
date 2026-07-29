@@ -90,6 +90,7 @@ class import_external extends external_api {
         require_capability('local/tresipuntimportgc:import', $context);
 
         $import = new import($params['importid']);
+        $import->require_can_access();
         $status = $import->get_status();
         $maxlogid = $params['lastlogid'];
         $courses = [];
@@ -184,6 +185,10 @@ class import_external extends external_api {
         require_capability('local/tresipuntimportgc:import', $context);
 
         $course = new import_course($params['importcourseid']);
+        // Retrying re-queues the task under the current user and replaces the
+        // run's refresh token with theirs: only its owner (or a report viewer)
+        // may do it.
+        $course->get_import()->require_can_access();
         if ($course->get('status') !== import_course::STATUS_ERROR) {
             return ['success' => false,
                 'message' => get_string('retry_notfailed', 'local_tresipuntimportgc')];
@@ -239,6 +244,7 @@ class import_external extends external_api {
         require_capability('local/tresipuntimportgc:import', $context);
 
         $course = new import_course($params['importcourseid']);
+        $course->get_import()->require_can_access();
         if ($course->get('status') !== import_course::STATUS_PENDING) {
             return ['success' => false,
                 'message' => get_string('discard_notpending', 'local_tresipuntimportgc')];

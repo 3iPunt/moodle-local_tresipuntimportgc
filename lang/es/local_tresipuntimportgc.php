@@ -92,6 +92,7 @@ $string['privacy:metadata:log'] = 'Trazas de cada clase importada.';
 $string['privacy:metadata:log:level'] = 'Nivel de la traza (información, aviso o error).';
 $string['privacy:metadata:log:message'] = 'Texto de la traza, que puede mencionar nombres de clases y de ficheros.';
 $string['privacy:metadata:log:timecreated'] = 'Cuándo se escribió la traza.';
+$string['privacy:metadata:usermodified'] = 'El usuario que modificó el registro por última vez.';
 $string['privacy:metadata:google'] = 'Para importar las clases, el plugin se conecta a las APIs de Google (Classroom, Drive, Calendar y Forms) en nombre del usuario.';
 $string['privacy:metadata:google:oauthtoken'] = 'Token OAuth de la cuenta de Google conectada, enviado a Google para autorizar cada llamada a la API.';
 $string['privacy:metadata:google:account'] = 'Identidad de la cuenta de Google elegida por el usuario en la pantalla de consentimiento.';
@@ -101,6 +102,7 @@ $string['selectallcourses'] = 'Seleccionar todas las clases';
 $string['changeaccount'] = 'Cambiar cuenta';
 
 $string['error_client'] = 'Error al generar el cliente';
+$string['error_oauthstate'] = 'No se ha podido verificar la respuesta de Google (estado no válido o caducado). Vuelve a conectar.';
 $string['view_more'] = 'Ver más';
 $string['drivefile'] = 'Archivo GoogleDrive';
 $string['form'] = 'Formulario GoogleDrive';

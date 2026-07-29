@@ -81,7 +81,7 @@ class course_external extends external_api {
         $syscontext = \context_system::instance();
         self::validate_context($syscontext);
         require_capability('local/tresipuntimportgc:import', $syscontext);
-        self::validate_parameters(
+        $params = self::validate_parameters(
             self::create_course_parameters(), [
                 'providerid' => $providerid,
                 'fullname' => $fullname,
@@ -91,6 +91,12 @@ class course_external extends external_api {
                 'importfiles' => $importfiles
             ]
         );
+        $providerid = $params['providerid'];
+        $fullname = $params['fullname'];
+        $shortname = $params['shortname'];
+        $category = $params['category'];
+        $visible = $params['visible'];
+        $importfiles = $params['importfiles'];
 
         // The resolved category goes into its own variable: reusing $category
         // would change its declared type and trip type-related checks.

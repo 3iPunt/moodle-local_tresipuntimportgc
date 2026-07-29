@@ -92,6 +92,7 @@ $string['privacy:metadata:log'] = 'Traces de cada classe importada.';
 $string['privacy:metadata:log:level'] = 'Nivell de la traça (informació, avís o error).';
 $string['privacy:metadata:log:message'] = 'Text de la traça, que pot esmentar noms de classes i de fitxers.';
 $string['privacy:metadata:log:timecreated'] = 'Quan es va escriure la traça.';
+$string['privacy:metadata:usermodified'] = 'L\'usuari que va modificar el registre per última vegada.';
 $string['privacy:metadata:google'] = 'Per importar les classes, el plugin es connecta a les APIs de Google (Classroom, Drive, Calendar i Forms) en nom de l\'usuari.';
 $string['privacy:metadata:google:oauthtoken'] = 'Token OAuth del compte de Google connectat, enviat a Google per autoritzar cada crida a l\'API.';
 $string['privacy:metadata:google:account'] = 'Identitat del compte de Google triat per l\'usuari a la pantalla de consentiment.';
@@ -101,6 +102,7 @@ $string['selectallcourses'] = 'Selecciona totes les classes';
 $string['changeaccount'] = 'Change account';
 
 $string['error_client'] = 'Error when generating the client';
+$string['error_oauthstate'] = 'No s\'ha pogut verificar la resposta de Google (estat no vàlid o caducat). Torna a connectar.';
 $string['view_more'] = 'Veure més';
 $string['drivefile'] = 'Arxiu GoogleDrive';
 $string['form'] = 'Formulario GoogleDrive';

@@ -82,6 +82,19 @@ Compatible with Moodle 4.5 LTS and 5.1 (`requires` 4.5, `supported [405, 501]`).
   when queueing a run and in the web service; the import capability alone no
   longer allows creating courses anywhere on the site. The category selector
   only offers categories the user can create in.
+- An import run can only be seen and acted on by the user who launched it,
+  unless the viewer holds `local/tresipuntimportgc:viewreports`. Previously
+  anyone able to import could read another user's progress page (including
+  their Google account) and retry or discard their courses, which also replaced
+  that run's refresh token with their own.
+- The OAuth callback validates a `state` issued with the consent URL, so a
+  third party cannot make the user's session exchange a code of their own.
+- The Google Calendar description and location are no longer stored as raw HTML;
+  they go through the same plain-text conversion as the rest of the plugin.
+- `shortname` in the file import service is `PARAM_SAFEPATH` (it is used as a
+  folder name), and the web services now use the values returned by
+  `validate_parameters()`.
+- The privacy provider declares the `usermodified` field of its three tables.
 - Fatal error on successful imports (`error` dereferenced on null).
 - TLS host verification is no longer disabled on Google API calls.
 - Import start is protected with `sesskey`; browser cookies are no longer

@@ -49,7 +49,7 @@
             </div>
             <div class="text-muted small mt-1">
                 {{# str }} launchedby, local_tresipuntimportgc, {{ run.launchedby }} {{/ str }}
-                · <span class="tipgc-mono">{{ run.account }}</span>
+                {{# run.account }} · <span class="tipgc-mono">{{ run.account }}</span>{{/ run.account }}
             </div>
         </div>
         <div class="tipgc-runhead-actions d-flex flex-wrap">

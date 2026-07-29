@@ -44,6 +44,7 @@ require_capability('local/tresipuntimportgc:import', context_system::instance())
 // Parameters.
 $action = optional_param('action', '', PARAM_ALPHA);
 $code = optional_param('code', '', PARAM_RAW);
+$oauthstate = optional_param('state', '', PARAM_ALPHANUM);
 $autherror = optional_param('error', '', PARAM_TEXT);
 
 // Page setup.
@@ -103,7 +104,7 @@ if ($autherror !== '') {
 
 // OAuth callback: exchange the code and clean the URL.
 if ($code !== '' && !$provider->has_token()) {
-    $res = $provider->authenticate_with_code($code);
+    $res = $provider->authenticate_with_code($code, $oauthstate);
     if (!$res->success) {
         redirect($selfurl, get_string('error_client', 'local_tresipuntimportgc') . ': ' . $res->error->to_string(),
             null, notification::NOTIFY_ERROR);

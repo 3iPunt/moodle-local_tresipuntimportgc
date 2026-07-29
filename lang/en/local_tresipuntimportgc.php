@@ -92,6 +92,7 @@ $string['privacy:metadata:log'] = 'Trace lines of each imported class.';
 $string['privacy:metadata:log:level'] = 'Level of the trace (info, warning or error).';
 $string['privacy:metadata:log:message'] = 'Text of the trace, which can mention class and file names.';
 $string['privacy:metadata:log:timecreated'] = 'When the trace was written.';
+$string['privacy:metadata:usermodified'] = 'The user who last modified the record.';
 $string['privacy:metadata:google'] = 'To import the classes, the plugin connects to the Google APIs (Classroom, Drive, Calendar and Forms) on behalf of the user.';
 $string['privacy:metadata:google:oauthtoken'] = 'OAuth token of the connected Google account, sent to Google to authorise each API call.';
 $string['privacy:metadata:google:account'] = 'Identity of the Google account chosen by the user in the consent screen.';
@@ -101,6 +102,7 @@ $string['selectallcourses'] = 'Select all classes';
 $string['changeaccount'] = 'Change account';
 
 $string['error_client'] = 'Error when generating the client';
+$string['error_oauthstate'] = 'The Google response could not be verified (invalid or expired state). Please connect again.';
 $string['view_more'] = 'View more';
 $string['drivefile'] = 'GoogleDrive File';
 $string['form'] = 'GoogleDrive Form';

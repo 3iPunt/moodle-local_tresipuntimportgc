@@ -65,6 +65,9 @@ class google extends provider {
     /** @var string Session property holding the connected account email. */
     private const SESSION_EMAIL = 'local_tresipuntimportgc_email';
 
+    /** @var string Session property holding the OAuth state (CSRF token). */
+    private const SESSION_STATE = 'local_tresipuntimportgc_oauthstate';
+
     /** @var string OAuth client id. */
     private $clientid;
 
@@ -139,20 +142,41 @@ class google extends provider {
     /**
      * URL of the Google consent screen for the current user.
      *
+     * Carries a random `state` kept in the session, so the callback can tell a
+     * genuine return from a code injected by a third party.
+     *
      * @return string
      */
     public function get_auth_url(): string {
-        return $this->get_client()->createAuthUrl();
+        global $SESSION;
+
+        $state = random_string(32);
+        $SESSION->{self::SESSION_STATE} = $state;
+        $client = $this->get_client();
+        $client->setState($state);
+        return $client->createAuthUrl();
     }
 
     /**
      * Exchanges the OAuth callback code for a token and stores it in session.
      *
-     * @param  string $code Authorisation code from the callback.
+     * The `state` must match the one issued by get_auth_url(): without that
+     * check a third party could make the victim's session exchange a code of
+     * their own, binding their Google account to it.
+     *
+     * @param  string $code  Authorisation code from the callback.
+     * @param  string $state State returned by Google in the callback.
      * @return response_data
      */
-    public function authenticate_with_code(string $code): response_data {
+    public function authenticate_with_code(string $code, string $state = ''): response_data {
         global $SESSION;
+
+        $expected = (string) ($SESSION->{self::SESSION_STATE} ?? '');
+        unset($SESSION->{self::SESSION_STATE});
+        if ($expected === '' || $state === '' || !hash_equals($expected, $state)) {
+            return new response_data(false, null,
+                new error('02002', get_string('error_oauthstate', 'local_tresipuntimportgc')));
+        }
 
         try {
             $client = $this->get_client();

@@ -64,6 +64,7 @@ class provider implements
             'googleaccount' => 'privacy:metadata:import:googleaccount',
             'refreshtoken' => 'privacy:metadata:import:refreshtoken',
             'timecreated' => 'privacy:metadata:import:timecreated',
+            'usermodified' => 'privacy:metadata:usermodified',
         ], 'privacy:metadata:import');
 
         $collection->add_database_table('local_tresipuntimportgc_course', [
@@ -71,12 +72,14 @@ class provider implements
             'status' => 'privacy:metadata:course:status',
             'timestarted' => 'privacy:metadata:course:timestarted',
             'timefinished' => 'privacy:metadata:course:timefinished',
+            'usermodified' => 'privacy:metadata:usermodified',
         ], 'privacy:metadata:course');
 
         $collection->add_database_table('local_tresipuntimportgc_log', [
             'level' => 'privacy:metadata:log:level',
             'message' => 'privacy:metadata:log:message',
             'timecreated' => 'privacy:metadata:log:timecreated',
+            'usermodified' => 'privacy:metadata:usermodified',
         ], 'privacy:metadata:log');
 
         $collection->add_external_location_link('google', [

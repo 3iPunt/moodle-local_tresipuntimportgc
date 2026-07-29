@@ -39,6 +39,9 @@ require_login();
 require_capability('local/tresipuntimportgc:import', context_system::instance());
 
 $import = new import($importid);
+// Solo la propia ejecución, salvo que se tenga la capacidad de consulta: una
+// ejecución lleva la cuenta de Google de quien la lanzó.
+$import->require_can_access();
 
 // Page setup.
 $startedon = userdate($import->get('timecreated'), get_string('strftimedatetimeshort', 'langconfig'));
@@ -115,11 +118,15 @@ $pct = static function (int $n) use ($total): float {
 };
 
 $launcher = $DB->get_record('user', ['id' => $import->get('userid')]);
+// La cuenta de Google solo se muestra si es la propia o si se administra el
+// sitio (mismo criterio que la columna de cuenta del panel).
+$showaccount = $import->is_owned_by()
+    || has_capability('moodle/site:config', context_system::instance());
 $run = (object) [
     'statuslabel' => get_string($runstatus[$state][0], 'local_tresipuntimportgc'),
     'statusclass' => $runstatus[$state][1],
     'isactive' => !$finished,
-    'account' => (string) $import->get('googleaccount'),
+    'account' => $showaccount ? (string) $import->get('googleaccount') : '',
     'launchedby' => $launcher ? fullname($launcher) : '',
     'startedon' => $startedon,
     'nsuccess' => $counts['success'],

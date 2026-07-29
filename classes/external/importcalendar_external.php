@@ -77,12 +77,14 @@ class importcalendar_external extends external_api {
         $syscontext = \context_system::instance();
         self::validate_context($syscontext);
         require_capability('local/tresipuntimportgc:import', $syscontext);
-        self::validate_parameters(
+        $params = self::validate_parameters(
             self::importcalendar_parameters(), [
                 'providerid' => $providerid,
                 'courseid' => $courseid
             ]
         );
+        $providerid = $params['providerid'];
+        $courseid = $params['courseid'];
         $provider = new google();
         $resevents = $provider->get_calendar_events($providerid);
         if (!$resevents->success) {

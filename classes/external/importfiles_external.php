@@ -46,7 +46,9 @@ class importfiles_external extends external_api {
             array(
                 'providerid' => new external_value(PARAM_TEXT, 'Course ID Provider', VALUE_REQUIRED),
                 'courseid' => new external_value(PARAM_INT, 'Course id for import files', VALUE_REQUIRED),
-                'shortname' => new external_value(PARAM_RAW, 'Short name of course', VALUE_REQUIRED),
+                // PARAM_SAFEPATH: se usa como nombre de carpeta en el área de
+                // ficheros, así que no puede traer separadores de ruta.
+                'shortname' => new external_value(PARAM_SAFEPATH, 'Short name of course', VALUE_REQUIRED),
             )
         );
     }
@@ -69,13 +71,16 @@ class importfiles_external extends external_api {
         $syscontext = \context_system::instance();
         self::validate_context($syscontext);
         require_capability('local/tresipuntimportgc:import', $syscontext);
-        self::validate_parameters(
+        $params = self::validate_parameters(
             self::importfiles_parameters(), [
                 'providerid' => $providerid,
                 'courseid' => $courseid,
                 'shortname' => $shortname
             ]
         );
+        $providerid = $params['providerid'];
+        $courseid = $params['courseid'];
+        $shortname = $params['shortname'];
         $provider = new google();
         $errors = [];
 

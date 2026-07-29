@@ -32,13 +32,16 @@ final class external_test extends \advanced_testcase {
     /**
      * Seeds one import with one course in the given status and returns the course.
      *
-     * @param  string $status Course status.
+     * @param  string   $status Course status.
+     * @param  int|null $userid Owner of the run; a fresh user when null.
      * @return import_course
      */
-    private function seed_course(string $status): import_course {
+    private function seed_course(string $status, ?int $userid = null): import_course {
         $generator = $this->getDataGenerator()->get_plugin_generator('local_tresipuntimportgc');
-        $user = $this->getDataGenerator()->create_user();
-        return $generator->create_import_course(['userid' => $user->id, 'status' => $status]);
+        if ($userid === null) {
+            $userid = (int) $this->getDataGenerator()->create_user()->id;
+        }
+        return $generator->create_import_course(['userid' => $userid, 'status' => $status]);
     }
 
     /**
@@ -92,12 +95,12 @@ final class external_test extends \advanced_testcase {
     public function test_get_status_returns_courses_and_traces(): void {
         $this->resetAfterTest();
         $generator = $this->getDataGenerator()->get_plugin_generator('local_tresipuntimportgc');
-        $course = $this->seed_course(import_course::STATUS_SUCCESS);
+        $user = $this->login_user_with_capability();
+        $course = $this->seed_course(import_course::STATUS_SUCCESS, (int) $user->id);
         $first = $generator->create_log(
             ['importcourseid' => $course->get('id'), 'message' => 'one']);
         $generator->create_log(
             ['importcourseid' => $course->get('id'), 'level' => 'error', 'message' => 'two']);
-        $this->login_user_with_capability();
 
         $result = import_external::get_status((int) $course->get('importid'), 0);
         $result = \core_external\external_api::clean_returnvalue(
@@ -129,9 +132,9 @@ final class external_test extends \advanced_testcase {
      */
     public function test_discard_course_only_pending(): void {
         $this->resetAfterTest();
-        $pending = $this->seed_course(import_course::STATUS_PENDING);
-        $done = $this->seed_course(import_course::STATUS_SUCCESS);
-        $this->login_user_with_capability();
+        $user = $this->login_user_with_capability();
+        $pending = $this->seed_course(import_course::STATUS_PENDING, (int) $user->id);
+        $done = $this->seed_course(import_course::STATUS_SUCCESS, (int) $user->id);
 
         $result = import_external::discard_course((int) $pending->get('id'));
         $this->assertTrue($result['success']);
@@ -144,13 +147,47 @@ final class external_test extends \advanced_testcase {
     }
 
     /**
+     * The import capability alone does not reach another user's run: it carries
+     * their Google account, and retrying would replace their refresh token.
+     */
+    public function test_another_users_run_is_out_of_reach(): void {
+        $this->resetAfterTest();
+        $pending = $this->seed_course(import_course::STATUS_PENDING);
+        $failed = $this->seed_course(import_course::STATUS_ERROR);
+        $user = $this->login_user_with_capability();
+
+        foreach ([
+            fn() => import_external::get_status((int) $pending->get('importid'), 0),
+            fn() => import_external::discard_course((int) $pending->get('id')),
+            fn() => import_external::retry_course((int) $failed->get('id')),
+        ] as $call) {
+            try {
+                $call();
+                $this->fail('another user\'s run must require the reports capability');
+            } catch (\required_capability_exception $e) {
+                $this->assertInstanceOf(\required_capability_exception::class, $e);
+            }
+        }
+
+        // With the reports capability, the same calls go through.
+        $roleid = $this->getDataGenerator()->create_role();
+        assign_capability('local/tresipuntimportgc:viewreports', CAP_ALLOW,
+            $roleid, \context_system::instance());
+        role_assign($roleid, $user->id, \context_system::instance());
+        accesslib_clear_all_caches_for_unit_testing();
+
+        $result = import_external::discard_course((int) $pending->get('id'));
+        $this->assertTrue($result['success']);
+    }
+
+    /**
      * Retry refuses non-failed courses and requires a Google connection.
      */
     public function test_retry_course_guards(): void {
         $this->resetAfterTest();
-        $pending = $this->seed_course(import_course::STATUS_PENDING);
-        $failed = $this->seed_course(import_course::STATUS_ERROR);
-        $this->login_user_with_capability();
+        $user = $this->login_user_with_capability();
+        $pending = $this->seed_course(import_course::STATUS_PENDING, (int) $user->id);
+        $failed = $this->seed_course(import_course::STATUS_ERROR, (int) $user->id);
 
         $result = import_external::retry_course((int) $pending->get('id'));
         $this->assertFalse($result['success']);
