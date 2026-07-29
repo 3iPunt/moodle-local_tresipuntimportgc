@@ -113,10 +113,10 @@ $string['shortname_in_use_help'] = 'Aquest nom curt ja l\'utilitza un altre curs
 $string['select_category'] = 'Seleccionar categoria';
 $string['course_visible'] = 'Visible per als alumnes';
 
-// Traces
+// Traces.
 $string['shortnamealreadyexist'] = 'The short name <b>{$a}</b> is already in use. Choose another short name for this course and try again';
 
-// Traces Course
+// Traces of the course factory.
 $string['startingcourse'] = 'Beginning course creation <b>{$a}</b>';
 $string['recoverycourse'] = 'Course retrieved from Classroom correctly';
 $string['recoverycourseerror'] = 'ERROR when retrieving the Classroom course: <b>{$a}</b>';
@@ -139,7 +139,7 @@ $string['cleancourseerror'] = 'ERROR when normalising the initial section of the
 $string['creationcoursecompleted'] = 'Course creation process completed';
 $string['creationcoursecompletederror'] = 'Course creation process completed WITH ERRORS';
 
-// Traces importfiles
+// Traces of the Drive file import.
 $string['importingfiles'] = 'Importing files from Google Drive to the user\'s Private Area';
 $string['filesfound'] = '{$a} files have been found';
 $string['importfilesuccess'] = 'The file <b>{$a}</b> has been successfully imported';
@@ -148,13 +148,13 @@ $string['importfileerror'] = 'The file <b>{$a->name}</b> could not be imported: 
 $string['importfileerrorcontent'] = '<b>{$a}</b> és un formulari de Google: no es descarrega com a fitxer (els formularis s\'incrusten o s\'enllacen segons la configuració de formularis).';
 $string['convertdocumentto'] = 'Converting the file <b>{$a->title}</b> to format <b>{$a->format}</b>';
 
-// Traces importcalendar
+// Traces of the calendar import.
 $string['importingcalendar'] = 'Importing Google Calendar from the course to the Moodle calendar';
 $string['noteventsfound'] = 'No events found in course calendar';
 $string['eventsfound'] = '{$a} events have been found in the course calendar unrelated to course content';
 $string['conference'] = 'Hangouts meeting';
 
-// Traces errors
+// Traces of errors.
 $string['user_can_not_view_category'] = 'You do not have access to the category "{$a->category}", the course "{$a->course}" shall not be created.';
 $string['category_no_exist'] = 'The category with id {$a->categoryid} does not exist, the course "{$a->course}" shall not be created.';
 

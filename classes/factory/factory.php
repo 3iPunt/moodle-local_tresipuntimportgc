@@ -126,10 +126,13 @@ class factory {
                             if (!is_null($mod)) {
                                 $resmod = $mod->create($courseid);
                                 if ($resmod->success) {
-                                    trace_router::trace('modulecreated', 'success', ['type' => $resmod->data->get_modname(), 'title' => $resmod->data->get_title()]);
+                                    trace_router::trace('modulecreated', 'success',
+                                        ['type' => $resmod->data->get_modname(),
+                                            'title' => $resmod->data->get_title()]);
                                 } else {
                                     $errors[] = $resmod->error;
-                                    trace_router::trace('moduleerrorcreated', 'warning', ['type' => $mod->get_modname(), 'title' => $mod->get_title()]);
+                                    trace_router::trace('moduleerrorcreated', 'warning',
+                                        ['type' => $mod->get_modname(), 'title' => $mod->get_title()]);
                                 }
                             }
                         }

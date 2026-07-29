@@ -92,13 +92,13 @@ class course_external extends external_api {
             ]
         );
 
-        // New value type (bool) is not matching the resolved parameter type and might introduce types-related false-positives.
-        // $category = core_course_category::get($category);
+        // The resolved category goes into its own variable: reusing $category
+        // would change its declared type and trip type-related checks.
         $moodlecategory = core_course_category::get($category);
         if ($moodlecategory) {
             if (core_course_category::can_view_category($moodlecategory)) {
-                // create_course() does not check capabilities: the caller must.
-                // Being allowed to import is not being allowed to create a
+                // Core create_course() does not check capabilities: the caller
+                // must. Being allowed to import is not being allowed to create a
                 // course anywhere, so the category context decides.
                 require_capability('moodle/course:create', context_coursecat::instance($moodlecategory->id));
                 // Factory.
@@ -110,7 +110,8 @@ class course_external extends external_api {
                 $id = $res->success ? $res->data : null;
             } else {
                 $success = false;
-                trace_router::trace('user_can_not_view_category', 'danger', ['category' => $moodlecategory->name, 'course' => $fullname]);
+                trace_router::trace('user_can_not_view_category', 'danger',
+                    ['category' => $moodlecategory->name, 'course' => $fullname]);
                 $errors = 'USER_CAN_NOT_VIEW_CATEGORY';
                 $id = null;
             }

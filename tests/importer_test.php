@@ -148,7 +148,8 @@ final class importer_test extends \advanced_testcase {
         $import = $generator->create_import(['userid' => $admin->id]);
         $import->set_refresh_token('1//token');
         $import->update();
-        // importfiles = 3 and calendarimport = 2 keep the run to course creation only.
+        // With importfiles = 3 and calendarimport = 2 the run stops at course
+        // creation.
         $course = $generator->create_import_course([
             'importid' => $import->get('id'), 'providerid' => 'gc-1',
             'fullname' => 'Biology 101', 'shortname' => 'bio101',

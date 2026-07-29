@@ -106,7 +106,9 @@ class module_assign extends module {
                 $hour = $this->module['dueTime']['hours'];
                 $minute = $this->module['dueTime']['minutes'] ?? 0;
             }
-            $record['duedate'] = mktime($hour, $minute, 0, $this->module['dueDate']['month'], $this->module['dueDate']['day'], $this->module['dueDate']['year']);
+            $duedate = $this->module['dueDate'];
+            $record['duedate'] = mktime($hour, $minute, 0,
+                $duedate['month'], $duedate['day'], $duedate['year']);
         }
         $options = [
             'section' => $this->get_section($courseid),

@@ -75,7 +75,8 @@ class module_form extends module {
             (isset($module['workType']) && $module['workType'] === 'MULTIPLE_CHOICE_QUESTION')) {
             $this->modname = 'feedback';
         }
-        if (isset($module['materials'][0]) && array_key_first($module['materials'][0]) === 'form' && count($module['materials']) === 1) {
+        if (isset($module['materials'][0]) && count($module['materials']) === 1
+                && array_key_first($module['materials'][0]) === 'form') {
             $formurl = $module['materials'][0]['form']['formUrl'];
             // Only forms the connected account can edit are readable via API;
             // forms owned by another teacher will simply not be found.
@@ -85,7 +86,8 @@ class module_form extends module {
                 // TODO when isquiz, import questions once the Forms API mapping lands.
             }
         }
-        // modname sin prefijo (traza); el generador necesita el componente con prefijo.
+        // El modname va sin prefijo (para la traza); el generador necesita el
+        // componente con prefijo.
         parent::__construct('mod_' . $this->modname, $providersection, $module['title'], $intro, $visible);
     }
 
@@ -142,7 +144,7 @@ class module_form extends module {
             'questionsperpage'       => 1,
             'shuffleanswers'         => 1,
             'sumgrades'              => 10, // TODO Dinamyc from questions.
-            'grade'                  => 10, // ¿?
+            'grade'                  => 10, // TODO derive from the questions too.
             'timecreated'            => time(),
             'timemodified'           => time(),
             'timelimit'              => 0,
@@ -164,13 +166,16 @@ class module_form extends module {
                 $hour = $this->module['dueTime']['hours'];
                 $minute = $this->module['dueTime']['minutes'] ?? 0;
             }
-            $record['timeclose'] = mktime($hour, $minute, 0, $this->module['dueDate']['month'], $this->module['dueDate']['day'], $this->module['dueDate']['year']);
+            $duedate = $this->module['dueDate'];
+            $record['timeclose'] = mktime($hour, $minute, 0,
+                $duedate['month'], $duedate['day'], $duedate['year']);
         }
         $options = ['section' => $this->get_section($courseid), 'visible' => $this->visible, 'showdescription' => false];
         $res = $this->generator->create_instance($record, $options);
         if (isset($res)) {
-            // TODO add questions to questions bank, and associate questions to this quiz. See Etrasa proyect for get code.
-            // Need the questions to come to the builder, as well as if there is additional configuration, such as grading, multi-answering, etc.
+            // TODO add the questions to the question bank and link them to this
+            // quiz. The builder also needs the extra configuration that comes
+            // with them: grading, multiple answers, and so on.
             return new response_module(true, $this, null);
         }
         return new response_module(false, null, new error('13000', 'MODULE_NOT_CREATED'));

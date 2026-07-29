@@ -119,9 +119,9 @@ class importcalendar_external extends external_api {
                     $summary .= '<br>';
                 }
 
-                // calendar_event::create() se llama con su $checkcapability por
-                // defecto (true), así que la capacidad de crear eventos SÍ se
-                // comprueba: no hay ninguna propiedad que lo desactive.
+                // La llamada a calendar_event::create() usa su $checkcapability
+                // por defecto (true), así que la capacidad de crear eventos SÍ
+                // se comprueba: no hay ninguna propiedad que lo desactive.
                 $event = new stdClass();
                 $event->eventtype = 'course';
                 $event->type = CALENDAR_EVENT_COURSE;

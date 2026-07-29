@@ -113,10 +113,10 @@ $string['shortname_in_use_help'] = 'Este nombre corto ya lo usa otro curso; cám
 $string['select_category'] = 'Seleccionar categoría';
 $string['course_visible'] = 'Visible para los alumnos';
 
-// Traces
+// Traces.
 $string['shortnamealreadyexist'] = 'El nombre corto <b>{$a}</b> ya está siendo utilizado. Escoja otro nombre corto para este curso y vuelva a intentarlo.';
 
-// Traces Course
+// Traces of the course factory.
 $string['startingcourse'] = 'Comenzando creación del curso <b>{$a}</b>';
 $string['recoverycourse'] = 'Curso recuperado de Classroom correctamente';
 $string['recoverycourseerror'] = 'ERROR al recuperar el curso de Classroom: <b>{$a}</b>';
@@ -139,7 +139,7 @@ $string['cleancourseerror'] = 'ERROR al normalizar la sección inicial del curso
 $string['creationcoursecompleted'] = 'Proceso de creación del curso finalizado';
 $string['creationcoursecompletederror'] = 'Proceso de creación del curso finalizado CON ERRORES';
 
-// Traces importfiles
+// Traces of the Drive file import.
 $string['importingfiles'] = 'Importando archivos de Google Drive al Área Privada del usuario';
 $string['filesfound'] = 'Se han encontrado {$a} archivos';
 $string['importfilesuccess'] = 'El archivo <b>{$a}</b> se ha importado correctamente';
@@ -148,13 +148,13 @@ $string['importfileerror'] = 'El archivo <b>{$a->name}</b> no se ha podido impor
 $string['importfileerrorcontent'] = '<b>{$a}</b> es un formulario de Google: no se descarga como archivo (los formularios se incrustan o enlazan según la configuración de formularios).';
 $string['convertdocumentto'] = 'Convirtiendo el archivo <b>{$a->title}</b> a formato <b>{$a->format}</b>';
 
-// Traces importcalendar
+// Traces of the calendar import.
 $string['importingcalendar'] = 'Importando Google Calendar del curso al calendario de Moodle';
 $string['noteventsfound'] = 'No se han encontrado eventos en el calendario del curso';
 $string['eventsfound'] = 'Se han encontrado {$a} eventos en el calendario del curso sin relación con contenidos del curso';
 $string['conference'] = 'Reunión en Hangouts';
 
-// Traces errors
+// Traces of errors.
 $string['user_can_not_view_category'] = 'No tienes acceso a la categoría "{$a->category}", el curso "{$a->course}" no se creará.';
 $string['category_no_exist'] = 'La categoría con id {$a->categoryid} no existe, el curso "{$a->course}" no se creará.';
 

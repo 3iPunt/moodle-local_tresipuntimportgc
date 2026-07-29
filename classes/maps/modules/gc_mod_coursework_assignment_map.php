@@ -47,9 +47,11 @@ class gc_mod_coursework_assignment_map extends gc_mod_map {
         $section = $module['topicId'] ?? '';
         $mats = $module['materials'] ?? [];
         $desc = isset($module['description']) ? self::get_desc_rich($module['description'], $mats) : self::get_desc_rich('', $mats);
-        /* TODO what is mapped as module_assign can also be a form with answers (quiz), so it is impossible to isolate the
-            modules here. It is only possible to know what kind of module it belongs to by reading "materials", i.e. if it
-            contains "form" it is a quiz if it has answers, or feedback if it does not, and is driveFile is a type resource, etc... */
+        /* TODO what is mapped as module_assign can also be a form with answers
+            (quiz), so the modules cannot be told apart here. The only way to know
+            which kind it is, is by reading "materials": a "form" is a quiz when it
+            has answers and a feedback when it does not, a driveFile is a resource,
+            and so on. */
         if (isset($module['materials'][0])) {
             $firstkey = array_key_first($module['materials'][0]);
             if ($firstkey === 'form' && count($module['materials']) === 1) {
