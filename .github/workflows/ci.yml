@@ -61,6 +61,10 @@ jobs:
           coverage: none
 
       - name: Initialise moodle-plugin-ci
+        # COMPOSER_AUTH authenticates Composer's GitHub downloads to avoid
+        # HTTP 429 rate limits on the shared runner IPs.
+        env:
+          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.GITHUB_TOKEN }}"}}'
         run: |
           composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
           echo $(cd ci/bin; pwd) >> $GITHUB_PATH
