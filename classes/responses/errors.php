@@ -37,7 +37,7 @@ class errors extends error {
     public $errors;
 
     /**
-     * Error constructor.
+     * errors constructor.
      * @param string $code
      * @param string $message
      * @param error[] $errors

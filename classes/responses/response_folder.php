@@ -38,13 +38,13 @@ class response_folder extends response {
     public $data;
 
     /**
-     * response_templates constructor.
+     * response_folder constructor.
      *
      * @param bool $success
      * @param folder|null $data
      * @param error|null $error
      */
-    public function __construct(bool $success, folder $data = null, error $error = null) {
+    public function __construct(bool $success, ?folder $data = null, ?error $error = null) {
         parent::__construct($success, '', $error);
         $this->data = $data;
     }

@@ -47,7 +47,7 @@ class response {
      * @param string $data
      * @param error|null $error $error
      */
-    public function __construct(bool $success, string $data, error $error = null) {
+    public function __construct(bool $success, string $data, ?error $error = null) {
         $this->success = $success;
         $this->data = $data;
         if (isset($error)) {

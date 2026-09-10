@@ -36,6 +36,17 @@ final class google_test extends \advanced_testcase {
     private const SESSION_EMAIL = 'local_tresipuntimportgc_email';
 
     /**
+     * Loads the provider before each test.
+     *
+     * Loading it registers the vendored Google autoloader (done at file level
+     * in providers/google.php), which the library objects built below need.
+     */
+    protected function setUp(): void {
+        parent::setUp();
+        class_exists(google::class);
+    }
+
+    /**
      * is_configured() is true only when both client id and secret are set.
      */
     public function test_is_configured(): void {

@@ -38,13 +38,13 @@ class response_courses extends response {
     public $data;
 
     /**
-     * response_templates constructor.
+     * response_courses constructor.
      *
      * @param bool $success
      * @param course[] $data
      * @param error|null $error
      */
-    public function __construct(bool $success, array $data = [], error $error = null) {
+    public function __construct(bool $success, array $data = [], ?error $error = null) {
         parent::__construct($success, '', $error);
         $this->data = $data;
     }

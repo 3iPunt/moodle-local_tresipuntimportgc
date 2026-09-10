@@ -65,7 +65,7 @@ class course {
      * @param string $desc
      * @param object|null $providerdata
      */
-    public function __construct(string $providerid, string $desc, object $providerdata = null) {
+    public function __construct(string $providerid, string $desc, ?object $providerdata = null) {
         $this->providerid = $providerid;
         $this->providerdata = $providerdata;
         $this->description = $desc;

@@ -38,13 +38,13 @@ class response_section extends response {
     public $data;
 
     /**
-     * response_templates constructor.
+     * response_section constructor.
      *
      * @param bool $success
      * @param section|null $data
      * @param error|null $error
      */
-    public function __construct(bool $success, section $data = null, error $error = null) {
+    public function __construct(bool $success, ?section $data = null, ?error $error = null) {
         parent::__construct($success, '', $error);
         $this->data = $data;
     }
