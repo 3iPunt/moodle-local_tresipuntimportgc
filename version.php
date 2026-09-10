@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_tresipuntimportgc';
-$plugin->release = '2.0.0';
-$plugin->version = 2026072404;
+$plugin->release = '2.0.1';
+$plugin->version = 2026091000;
 $plugin->requires = 2024100700;
 $plugin->supported = [405, 501];
 $plugin->maturity = MATURITY_STABLE;

@@ -38,7 +38,6 @@ use mod_url_generator;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class module_url extends module {
-
     /** @var string Mod Name */
     protected $modname = 'url';
 
@@ -86,6 +85,4 @@ class module_url extends module {
         }
         return new response_module(false, null, new error('15000', 'MODULE_NOT_CREATED'));
     }
-
-
 }

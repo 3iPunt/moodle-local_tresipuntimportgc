@@ -88,26 +88,42 @@ if ($action === 'import') {
         ];
     }
     if ($configs === []) {
-        redirect($selfurl, get_string('importqueue_novalid', 'local_tresipuntimportgc'),
-            null, notification::NOTIFY_ERROR);
+        redirect(
+            $selfurl,
+            get_string('importqueue_novalid', 'local_tresipuntimportgc'),
+            null,
+            notification::NOTIFY_ERROR
+        );
     }
     $import = importer::queue((int) $USER->id, $provider, $configs);
-    redirect(new moodle_url('/local/tresipuntimportgc/progress.php', ['id' => $import->get('id')]),
-        get_string('importqueued', 'local_tresipuntimportgc'), null, notification::NOTIFY_SUCCESS);
+    redirect(
+        new moodle_url('/local/tresipuntimportgc/progress.php', ['id' => $import->get('id')]),
+        get_string('importqueued', 'local_tresipuntimportgc'),
+        null,
+        notification::NOTIFY_SUCCESS
+    );
 }
 
 // The user denied (or Google returned) an error on the consent screen.
 if ($autherror !== '') {
-    redirect($selfurl, get_string('error_client', 'local_tresipuntimportgc') . ': ' . $autherror,
-        null, notification::NOTIFY_ERROR);
+    redirect(
+        $selfurl,
+        get_string('error_client', 'local_tresipuntimportgc') . ': ' . $autherror,
+        null,
+        notification::NOTIFY_ERROR
+    );
 }
 
 // OAuth callback: exchange the code and clean the URL.
 if ($code !== '' && !$provider->has_token()) {
     $res = $provider->authenticate_with_code($code, $oauthstate);
     if (!$res->success) {
-        redirect($selfurl, get_string('error_client', 'local_tresipuntimportgc') . ': ' . $res->error->to_string(),
-            null, notification::NOTIFY_ERROR);
+        redirect(
+            $selfurl,
+            get_string('error_client', 'local_tresipuntimportgc') . ': ' . $res->error->to_string(),
+            null,
+            notification::NOTIFY_ERROR
+        );
     }
     redirect($selfurl);
 }
@@ -161,11 +177,20 @@ if (!$provider->is_configured()) {
     // nunca queda sin categoría y el usuario ve dónde irán los cursos.
     $defaultcat = core_course_category::get_default();
     $defaultcategory = ['id' => (int) $defaultcat->id, 'name' => $defaultcat->get_nested_name(false)];
-    $view = new import_view('list', $courses, $categories, $allowconfig, $filesoptions,
-        $calendaroptions, $provider->get_account_email(), $provider->get_auth_url(),
-        $isadmin, $errormsg,
+    $view = new import_view(
+        'list',
+        $courses,
+        $categories,
+        $allowconfig,
+        $filesoptions,
+        $calendaroptions,
+        $provider->get_account_email(),
+        $provider->get_auth_url(),
+        $isadmin,
+        $errormsg,
         has_capability('local/tresipuntimportgc:viewreports', context_system::instance()),
-        $defaultcategory);
+        $defaultcategory
+    );
 }
 
 $renderer = $PAGE->get_renderer('local_tresipuntimportgc');

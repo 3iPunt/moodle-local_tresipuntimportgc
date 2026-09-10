@@ -38,7 +38,6 @@ use local_tresipuntimportgc\models\import_course;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class import_course_task extends adhoc_task {
-
     /**
      * Runs the import of the course referenced in the custom data.
      *

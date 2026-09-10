@@ -34,20 +34,18 @@ use local_tresipuntimportgc\factory\folder;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class response_folder extends response {
-
     /** @var folder Data */
     public $data;
 
     /**
-     * response_templates constructor.
+     * response_folder constructor.
      *
      * @param bool $success
      * @param folder|null $data
      * @param error|null $error
      */
-    public function __construct(bool $success, folder $data = null, error $error = null) {
+    public function __construct(bool $success, ?folder $data = null, ?error $error = null) {
         parent::__construct($success, '', $error);
         $this->data = $data;
     }
-
 }

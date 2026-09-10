@@ -43,7 +43,6 @@ use stdClass;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class module_forum extends module {
-
     /** @var string Mod Name */
     protected $modname = 'forum';
 
@@ -109,8 +108,16 @@ class module_forum extends module {
             $context = context_module::instance($cm->id);
             foreach ($this->module['materials'] ?? [] as $material) {
                 if (array_key_first($material) === 'driveFile') {
-                    drive_files::import($this->provider, $material['driveFile']['driveFile']['id'],
-                        $context->id, (int) $USER->id, 'mod_forum', 'attachment', '/', (int) $firstpost);
+                    drive_files::import(
+                        $this->provider,
+                        $material['driveFile']['driveFile']['id'],
+                        $context->id,
+                        (int) $USER->id,
+                        'mod_forum',
+                        'attachment',
+                        '/',
+                        (int) $firstpost
+                    );
                 }
             }
         }

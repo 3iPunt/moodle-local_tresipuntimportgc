@@ -28,7 +28,6 @@ use local_tresipuntimportgc\models\import;
  * @covers     \local_tresipuntimportgc\local\panel_query
  */
 final class panel_query_test extends \advanced_testcase {
-
     /** @var \component_generator_base Plugin generator. */
     private $generator;
 
@@ -53,10 +52,15 @@ final class panel_query_test extends \advanced_testcase {
         global $DB;
         $import = $this->generator->create_import(['userid' => $userid]);
         $this->generator->create_import_course(
-            ['importid' => $import->get('id'), 'status' => $status]);
+            ['importid' => $import->get('id'), 'status' => $status]
+        );
         if ($daysago > 0) {
-            $DB->set_field('local_tresipuntimportgc_import', 'timecreated',
-                time() - $daysago * DAYSECS, ['id' => $import->get('id')]);
+            $DB->set_field(
+                'local_tresipuntimportgc_import',
+                'timecreated',
+                time() - $daysago * DAYSECS,
+                ['id' => $import->get('id')]
+            );
         }
         return $import;
     }
@@ -121,12 +125,18 @@ final class panel_query_test extends \advanced_testcase {
     public function test_search_by_name_and_account(): void {
         global $DB;
         $alice = $this->getDataGenerator()->create_user(
-            ['firstname' => 'Alice', 'lastname' => 'Adams']);
+            ['firstname' => 'Alice', 'lastname' => 'Adams']
+        );
         $bob = $this->getDataGenerator()->create_user(
-            ['firstname' => 'Bob', 'lastname' => 'Brown']);
+            ['firstname' => 'Bob', 'lastname' => 'Brown']
+        );
         $ia = $this->seed((int) $alice->id, 'success');
-        $DB->set_field('local_tresipuntimportgc_import', 'googleaccount',
-            'alice@school.org', ['id' => $ia->get('id')]);
+        $DB->set_field(
+            'local_tresipuntimportgc_import',
+            'googleaccount',
+            'alice@school.org',
+            ['id' => $ia->get('id')]
+        );
         $this->seed((int) $bob->id, 'success');
 
         $this->assertSame(1, panel_query::fetch('', 'Alice', 0, 25)->total);

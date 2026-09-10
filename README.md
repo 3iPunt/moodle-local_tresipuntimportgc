@@ -149,6 +149,22 @@ Classroom** (also under the plugin category in *Plugins*). Requires the
 `local/tresipuntimportgc:import` capability (by default, managers and course
 creators).
 
+## 🔒 Privacy
+
+The plugin implements the Moodle privacy API (`classes/privacy/provider.php`).
+
+**Sent to Google**: the account you connect with, so that the Classroom, Drive,
+Calendar and Forms APIs can be read on your behalf. Every scope it requests is
+**read-only** — the plugin never writes anything back to Google.
+
+**Stored in Moodle**: the import history (who launched each import, which Google
+account was used, which classes were imported, their status and timestamps) and
+the per-course traces. The OAuth refresh token is kept **encrypted and only while
+a run is in progress**, and destroyed when it finishes.
+
+Both export and deletion of that history are supported through Moodle's privacy
+requests. The retention setting purges old history automatically. Uninstalling
+removes the plugin tables and its settings; imported courses are not affected.
 ## 🗑️ Uninstalling
 
 Uninstalling removes the plugin tables (import history and traces) and its

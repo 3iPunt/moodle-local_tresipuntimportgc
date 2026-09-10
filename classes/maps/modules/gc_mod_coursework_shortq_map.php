@@ -29,12 +29,11 @@ use local_tresipuntimportgc\providers\provider;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class gc_mod_coursework_shortq_map extends gc_mod_map {
-
     /**
      * Get Module.
      *
-     * @param $module
-     * @param provider $provider
+     * @param array $module Classroom item as returned by the Classroom API.
+     * @param provider $provider Connected provider.
      * @return module
      * @throws coding_exception
      */
@@ -45,7 +44,10 @@ class gc_mod_coursework_shortq_map extends gc_mod_map {
         $desc = self::get_desc_rich($module['description'] ?? '', $mats);
         // Pregunta de respuesta corta → Retroalimentación con el enunciado (E10.1).
         return new module_feedback(
-            $section, $module, $desc, $visible
+            $section,
+            $module,
+            $desc,
+            $visible
         );
     }
 }

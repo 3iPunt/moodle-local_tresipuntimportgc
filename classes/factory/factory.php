@@ -40,7 +40,6 @@ use moodle_exception;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class factory {
-
     /** @var provider Provider */
     protected $provider;
 
@@ -68,7 +67,12 @@ class factory {
      * @throws moodle_exception
      */
     public function create_course(
-        string $providerid, int $categoryid, string $fullname, string $shortname, bool $visible, int $importfiles
+        string $providerid,
+        int $categoryid,
+        string $fullname,
+        string $shortname,
+        bool $visible,
+        int $importfiles
     ): response {
         trace_router::trace('startingcourse', 'light', $fullname);
         section::reset_map();
@@ -82,7 +86,8 @@ class factory {
             if ($createres->success) {
                 $courseid = (int)$createres->data->get_id();
                 trace_router::trace('coursebasecreated', 'success', $courseid);
-                // TODO add cover image if a non-generic Classroom image is associated with it
+                // The class cover image is not imported; doing it when the image is not
+                // the generic Classroom one is in the plugin roadmap.
                 // Create Teacher Resource if config.
                 if ($importfiles === 0) {
                     // Descargar la carpeta del profesor a una carpeta del curso,
@@ -94,7 +99,10 @@ class factory {
                         // Nombre traducido al idioma del usuario que lanza la
                         // importación (no el nombre interno que trae Google).
                         $folder = new module_teacher_folder(
-                            get_string('teacher_folder', 'local_tresipuntimportgc'), $files, $this->provider);
+                            get_string('teacher_folder', 'local_tresipuntimportgc'),
+                            $files,
+                            $this->provider
+                        );
                         $folder->create($courseid);
                         trace_router::trace('teacherfoldercreated', 'success', null);
                     } else {
@@ -121,18 +129,25 @@ class factory {
                     $resmods = $this->provider->get_modules($providerid);
                     if ($resmods->success) {
                         trace_router::trace('recoverymodules', 'success', count($resmods->data));
-                        // TODO sort mods by Classroom appearance, they now come unordered.
+                        // Modules arrive by update date: the API does not report the order
+                        // they have in Classroom. Sorting them is in the roadmap.
                         foreach ($resmods->data as $mod) {
                             if (!is_null($mod)) {
                                 $resmod = $mod->create($courseid);
                                 if ($resmod->success) {
-                                    trace_router::trace('modulecreated', 'success',
+                                    trace_router::trace(
+                                        'modulecreated',
+                                        'success',
                                         ['type' => $resmod->data->get_modname(),
-                                            'title' => $resmod->data->get_title()]);
+                                        'title' => $resmod->data->get_title()]
+                                    );
                                 } else {
                                     $errors[] = $resmod->error;
-                                    trace_router::trace('moduleerrorcreated', 'warning',
-                                        ['type' => $mod->get_modname(), 'title' => $mod->get_title()]);
+                                    trace_router::trace(
+                                        'moduleerrorcreated',
+                                        'warning',
+                                        ['type' => $mod->get_modname(), 'title' => $mod->get_title()]
+                                    );
                                 }
                             }
                         }
@@ -161,7 +176,8 @@ class factory {
                     return new response(
                         true,
                         $res->data->get_id(),
-                        count($errors) > 0 ? new errors('00004', 'NOTICE_WITH_ERRORS', $errors) : null);
+                        count($errors) > 0 ? new errors('00004', 'NOTICE_WITH_ERRORS', $errors) : null
+                    );
                 }
                 $errors[] = $ressections->error;
                 trace_router::trace('recoverysectionserror', 'warning', $ressections->error->to_string());
@@ -179,5 +195,4 @@ class factory {
         mtrace(PHP_EOL . '*** FIN CON ERRORES ***');
         return new response(false, '', new errors('00001', 'ERROR_GET', $errors));
     }
-
 }

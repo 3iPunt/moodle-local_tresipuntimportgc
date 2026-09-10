@@ -41,7 +41,6 @@ use stdClass;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class module_label extends module {
-
     /** @var string Mod Name */
     protected $modname = 'label';
 
@@ -86,7 +85,7 @@ class module_label extends module {
         $options = [
             'section' => $this->get_section($courseid),
             'visible' => $this->visible,
-            'showdescription' => true
+            'showdescription' => true,
         ];
         if (count($this->material) > 0 && array_key_first($this->material) === 'form') {
             $record = $this->add_form($record);
@@ -99,22 +98,27 @@ class module_label extends module {
     }
 
     /**
+     * Adds the embedded Google Form to the label intro.
+     *
      * @param array $res
      * @return array
      * @throws coding_exception
      */
     private function add_form(array $res): array {
         $res['intro'] = html_writer::tag('h4', $this->title, ['class' => 'card-title']);
-        $res['intro'] .= html_writer::tag('h6',
+        $res['intro'] .= html_writer::tag(
+            'h6',
             get_string('form', 'local_tresipuntimportgc'),
-            ['class' => 'card-subtitle mb-2 text-muted']);
-        $res['intro'] .= html_writer::tag('iframe', get_string('loading'), [
+            ['class' => 'card-subtitle mb-2 text-muted']
+        );
+        // Sin contenido ni frameborder/margin*: obsoletos en HTML5. El borde va
+        // por estilo, que este HTML se guarda en el curso y debe valerse solo.
+        $res['intro'] .= html_writer::tag('iframe', '', [
             'src' => $this->material['form']['formUrl'],
+            'title' => $this->title,
             'width' => '640',
             'height' => '378',
-            'frameborder' => '0',
-            'marginheight' => '0',
-            'marginwidth' => '0',
+            'style' => 'border: 0;',
         ]);
         return $res;
     }

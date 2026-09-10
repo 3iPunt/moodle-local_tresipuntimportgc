@@ -33,7 +33,6 @@ use local_tresipuntimportgc\providers\provider;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class gc_map extends map {
-
     /**
      * Course.
      *
@@ -130,7 +129,7 @@ class gc_map extends map {
             $class = is_array($modtypes) ? ($modtypes[$module['workType']] ?? null) : $modtypes;
             if (!empty($class)) {
                 try {
-                    $modmap = new $class;
+                    $modmap = new $class();
                     return $modmap->get_mod($module, $provider);
                 } catch (Throwable $e) {
                     // Robustez (§6.5): un Error en la transformación de un

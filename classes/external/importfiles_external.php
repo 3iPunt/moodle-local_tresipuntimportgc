@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Web service that imports the Drive files of the teacher folder.
+ *
  * @package     local_tresipuntimportgc
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright   2026 3iPunt (contacte@tresipunt.com)
@@ -34,8 +36,14 @@ use local_tresipuntimportgc\local\trace_router;
 use local_tresipuntimportgc\providers\google;
 use moodle_exception;
 
+/**
+ * Drive file import web service: stores the teacher folder files in Moodle.
+ *
+ * @package    local_tresipuntimportgc
+ * @copyright  2026 3iPunt (contacte@tresipunt.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class importfiles_external extends external_api {
-
     /**
      * Import Files Parameters.
      *
@@ -43,13 +51,13 @@ class importfiles_external extends external_api {
      */
     public static function importfiles_parameters(): external_function_parameters {
         return new external_function_parameters(
-            array(
+            [
                 'providerid' => new external_value(PARAM_TEXT, 'Course ID Provider', VALUE_REQUIRED),
                 'courseid' => new external_value(PARAM_INT, 'Course id for import files', VALUE_REQUIRED),
                 // PARAM_SAFEPATH: se usa como nombre de carpeta en el área de
                 // ficheros, así que no puede traer separadores de ruta.
                 'shortname' => new external_value(PARAM_SAFEPATH, 'Short name of course', VALUE_REQUIRED),
-            )
+            ]
         );
     }
 
@@ -72,10 +80,11 @@ class importfiles_external extends external_api {
         self::validate_context($syscontext);
         require_capability('local/tresipuntimportgc:import', $syscontext);
         $params = self::validate_parameters(
-            self::importfiles_parameters(), [
+            self::importfiles_parameters(),
+            [
                 'providerid' => $providerid,
                 'courseid' => $courseid,
-                'shortname' => $shortname
+                'shortname' => $shortname,
             ]
         );
         $providerid = $params['providerid'];
@@ -115,7 +124,7 @@ class importfiles_external extends external_api {
         return [
             'success' => true,
             'errors' => implode('; ', $errors),
-            'id' => $courseid
+            'id' => $courseid,
         ];
     }
 
@@ -126,11 +135,11 @@ class importfiles_external extends external_api {
      */
     public static function importfiles_returns(): external_single_structure {
         return new external_single_structure(
-            array(
+            [
                 'success' => new external_value(PARAM_BOOL, 'Was it a success?'),
                 'errors' => new external_value(PARAM_TEXT, 'Error message'),
-                'id' => new external_value(PARAM_INT, 'Course ID', false)
-            )
+                'id' => new external_value(PARAM_INT, 'Course ID', false),
+            ]
         );
     }
 }

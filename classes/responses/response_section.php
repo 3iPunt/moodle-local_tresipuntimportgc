@@ -34,20 +34,18 @@ use local_tresipuntimportgc\factory\section;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class response_section extends response {
-
     /** @var section Data */
     public $data;
 
     /**
-     * response_templates constructor.
+     * response_section constructor.
      *
      * @param bool $success
      * @param section|null $data
      * @param error|null $error
      */
-    public function __construct(bool $success, section $data = null, error $error = null) {
+    public function __construct(bool $success, ?section $data = null, ?error $error = null) {
         parent::__construct($success, '', $error);
         $this->data = $data;
     }
-
 }

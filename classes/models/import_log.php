@@ -34,7 +34,6 @@ use core\persistent;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class import_log extends persistent {
-
     /** @var string Database table. */
     public const TABLE = 'local_tresipuntimportgc_log';
 

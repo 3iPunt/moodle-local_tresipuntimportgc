@@ -36,14 +36,13 @@ namespace local_tresipuntimportgc\local;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class run_config {
-
     /** @var array<string,mixed> Effective settings of the running course. */
     private static $config = [];
 
     /**
      * Sets the effective configuration of the course being imported.
      *
-     * @param  array<string,mixed> $config Effective settings.
+     * @param  array $config Effective settings, keyed by setting name.
      * @return void
      */
     public static function set(array $config): void {

@@ -32,7 +32,6 @@ use core_privacy\tests\provider_testcase;
  * @covers     \local_tresipuntimportgc\privacy\provider
  */
 final class provider_test extends provider_testcase {
-
     /**
      * Seeds an import with one course and one trace for a user.
      *
@@ -42,10 +41,12 @@ final class provider_test extends provider_testcase {
     private function seed_history(int $userid): void {
         $generator = $this->getDataGenerator()->get_plugin_generator('local_tresipuntimportgc');
         $import = $generator->create_import(
-            ['userid' => $userid, 'googleaccount' => 'user' . $userid . '@example.com']);
+            ['userid' => $userid, 'googleaccount' => 'user' . $userid . '@example.com']
+        );
         $course = $generator->create_import_course(
             ['importid' => $import->get('id'), 'fullname' => 'Class of ' . $userid,
-                'status' => 'success']);
+            'status' => 'success']
+        );
         $generator->create_log(['importcourseid' => $course->get('id'), 'message' => 'done']);
     }
 
@@ -70,8 +71,10 @@ final class provider_test extends provider_testcase {
         $this->assertCount(1, $contextlist->get_contextids());
         $this->assertInstanceOf(\context_system::class, $contextlist->current());
 
-        $this->assertCount(0,
-            provider::get_contexts_for_userid((int) $other->id)->get_contextids());
+        $this->assertCount(
+            0,
+            provider::get_contexts_for_userid((int) $other->id)->get_contextids()
+        );
     }
 
     /**
@@ -97,15 +100,19 @@ final class provider_test extends provider_testcase {
         $this->seed_history((int) $user->id);
 
         $context = \context_system::instance();
-        $contextlist = new approved_contextlist($user, 'local_tresipuntimportgc',
-            [$context->id]);
+        $contextlist = new approved_contextlist(
+            $user,
+            'local_tresipuntimportgc',
+            [$context->id]
+        );
         provider::export_user_data($contextlist);
 
         $writer = writer::with_context($context);
         $this->assertTrue($writer->has_any_data());
         $subcontext = [get_string('privacy:exportpath', 'local_tresipuntimportgc')];
         $imports = \local_tresipuntimportgc\models\import::get_records(
-            ['userid' => (int) $user->id]);
+            ['userid' => (int) $user->id]
+        );
         $import = reset($imports);
         $data = $writer->get_data(array_merge($subcontext, ['import-' . $import->get('id')]));
         $this->assertSame('user' . $user->id . '@example.com', $data->googleaccount);
@@ -125,14 +132,21 @@ final class provider_test extends provider_testcase {
         $this->seed_history((int) $user->id);
         $this->seed_history((int) $other->id);
 
-        $contextlist = new approved_contextlist($user, 'local_tresipuntimportgc',
-            [\context_system::instance()->id]);
+        $contextlist = new approved_contextlist(
+            $user,
+            'local_tresipuntimportgc',
+            [\context_system::instance()->id]
+        );
         provider::delete_data_for_user($contextlist);
 
-        $this->assertSame(0, $DB->count_records('local_tresipuntimportgc_import',
-            ['userid' => $user->id]));
-        $this->assertSame(1, $DB->count_records('local_tresipuntimportgc_import',
-            ['userid' => $other->id]));
+        $this->assertSame(0, $DB->count_records(
+            'local_tresipuntimportgc_import',
+            ['userid' => $user->id]
+        ));
+        $this->assertSame(1, $DB->count_records(
+            'local_tresipuntimportgc_import',
+            ['userid' => $other->id]
+        ));
         $this->assertSame(1, $DB->count_records('local_tresipuntimportgc_course'));
         $this->assertSame(1, $DB->count_records('local_tresipuntimportgc_log'));
     }
@@ -148,8 +162,11 @@ final class provider_test extends provider_testcase {
         $this->seed_history((int) $user->id);
         $this->seed_history((int) $other->id);
 
-        $userlist = new approved_userlist(\context_system::instance(),
-            'local_tresipuntimportgc', [(int) $user->id]);
+        $userlist = new approved_userlist(
+            \context_system::instance(),
+            'local_tresipuntimportgc',
+            [(int) $user->id]
+        );
         provider::delete_data_for_users($userlist);
         $this->assertSame(1, $DB->count_records('local_tresipuntimportgc_import'));
 

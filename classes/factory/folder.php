@@ -32,7 +32,6 @@ namespace local_tresipuntimportgc\factory;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class folder {
-
     /** @var string ID course Provider */
     protected $providerid;
 
@@ -63,5 +62,4 @@ class folder {
     public function get_providerid(): string {
         return $this->providerid;
     }
-
 }

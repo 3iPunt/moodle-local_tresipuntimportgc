@@ -32,12 +32,11 @@ use local_tresipuntimportgc\providers\provider;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class gc_mod_coursework_assignment_map extends gc_mod_map {
-
     /**
      * Get Module.
      *
-     * @param $module
-     * @param provider $provider
+     * @param array $module Classroom item as returned by the Classroom API.
+     * @param provider $provider Connected provider.
      * @return module
      * @throws coding_exception
      * @throws dml_exception
@@ -47,11 +46,9 @@ class gc_mod_coursework_assignment_map extends gc_mod_map {
         $section = $module['topicId'] ?? '';
         $mats = $module['materials'] ?? [];
         $desc = isset($module['description']) ? self::get_desc_rich($module['description'], $mats) : self::get_desc_rich('', $mats);
-        /* TODO what is mapped as module_assign can also be a form with answers
-            (quiz), so the modules cannot be told apart here. The only way to know
-            which kind it is, is by reading "materials": a "form" is a quiz when it
-            has answers and a feedback when it does not, a driveFile is a resource,
-            and so on. */
+        // A coursework mapped as assign can also be a form, so the kind is only
+        // known by reading its materials: a form with answers is a quiz, one
+        // without answers a feedback, and a driveFile a resource.
         if (isset($module['materials'][0])) {
             $firstkey = array_key_first($module['materials'][0]);
             if ($firstkey === 'form' && count($module['materials']) === 1) {
@@ -61,13 +58,20 @@ class gc_mod_coursework_assignment_map extends gc_mod_map {
                 }
                 // Embed the original Google Form in a label.
                 return new module_label(
-                    $section, $module['title'], $desc, $visible, reset($mats)
+                    $section,
+                    $module['title'],
+                    $desc,
+                    $visible,
+                    reset($mats)
                 );
             }
         }
         return new module_assign(
-            $section, $module, $desc, $visible, $mats
+            $section,
+            $module,
+            $desc,
+            $visible,
+            $mats
         );
     }
-
 }
