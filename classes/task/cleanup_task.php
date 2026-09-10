@@ -35,7 +35,6 @@ use core\task\scheduled_task;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cleanup_task extends scheduled_task {
-
     /**
      * Task name shown in the scheduled tasks admin page.
      *
@@ -59,15 +58,23 @@ class cleanup_task extends scheduled_task {
             return;
         }
         $cutoff = time() - $days * DAYSECS;
-        $imports = $DB->get_fieldset_select('local_tresipuntimportgc_import', 'id',
-            'timecreated < :cutoff', ['cutoff' => $cutoff]);
+        $imports = $DB->get_fieldset_select(
+            'local_tresipuntimportgc_import',
+            'id',
+            'timecreated < :cutoff',
+            ['cutoff' => $cutoff]
+        );
         if ($imports === []) {
             mtrace('local_tresipuntimportgc: no import runs older than ' . $days . ' days.');
             return;
         }
         [$insql, $params] = $DB->get_in_or_equal($imports, SQL_PARAMS_NAMED);
-        $courses = $DB->get_fieldset_select('local_tresipuntimportgc_course', 'id',
-            "importid $insql", $params);
+        $courses = $DB->get_fieldset_select(
+            'local_tresipuntimportgc_course',
+            'id',
+            "importid $insql",
+            $params
+        );
         if ($courses !== []) {
             [$coursesql, $courseparams] = $DB->get_in_or_equal($courses, SQL_PARAMS_NAMED);
             $DB->delete_records_select('local_tresipuntimportgc_log', "importcourseid $coursesql", $courseparams);

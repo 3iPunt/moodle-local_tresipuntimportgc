@@ -29,7 +29,6 @@ use local_tresipuntimportgc\providers\google;
  * @covers     \local_tresipuntimportgc\providers\google
  */
 final class google_test extends \advanced_testcase {
-
     /** @var string Session key holding the OAuth token (mirror of the provider const). */
     private const SESSION_TOKEN = 'local_tresipuntimportgc_token';
 
@@ -126,10 +125,12 @@ final class google_test extends \advanced_testcase {
         $classroom = $this->createMock(\Google\Service\Classroom::class);
         $classroom->courses = $coursesres;
 
-        $provider = new class($classroom) extends google {
+        $provider = new class ($classroom) extends google {
             /** @var \Google\Service\Classroom Fake service. */
             private $fake;
             /**
+             * Takes the fake Classroom service in place of the real one.
+             *
              * @param \Google\Service\Classroom $classroom Fake Classroom service.
              */
             public function __construct(\Google\Service\Classroom $classroom) {
@@ -137,6 +138,8 @@ final class google_test extends \advanced_testcase {
                 $this->fake = $classroom;
             }
             /**
+             * Returns the fake service, so no call ever reaches Google.
+             *
              * @return \Google\Service\Classroom Fake service.
              */
             protected function get_classroom(): \Google\Service\Classroom {
@@ -160,6 +163,8 @@ final class google_test extends \advanced_testcase {
 
         $provider = new class extends google {
             /**
+             * Simulates a provider with no usable token.
+             *
              * @return \Google\Service\Classroom Never: always throws.
              */
             protected function get_classroom(): \Google\Service\Classroom {

@@ -42,8 +42,10 @@ require_capability('local/tresipuntimportgc:viewreports', context_system::instan
 
 // Page setup.
 $title = get_string('panel_title', 'local_tresipuntimportgc');
-$baseurl = new moodle_url('/local/tresipuntimportgc/panel.php',
-    array_filter(['status' => $statusfilter, 'search' => $search]));
+$baseurl = new moodle_url(
+    '/local/tresipuntimportgc/panel.php',
+    array_filter(['status' => $statusfilter, 'search' => $search])
+);
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url($baseurl);
 $PAGE->set_title($title);
@@ -85,8 +87,10 @@ foreach ($result->records as $record) {
         'statuslabel' => get_string($runstatus[$record->derivedstatus][0], 'local_tresipuntimportgc'),
         'statusclass' => $runstatus[$record->derivedstatus][1],
         'active' => in_array($record->derivedstatus, [import::STATUS_QUEUED, import::STATUS_RUNNING], true),
-        'detailurl' => (new moodle_url('/local/tresipuntimportgc/progress.php',
-            ['id' => $record->id]))->out(false),
+        'detailurl' => (new moodle_url(
+            '/local/tresipuntimportgc/progress.php',
+            ['id' => $record->id]
+        ))->out(false),
     ];
 }
 
@@ -106,8 +110,11 @@ $cronstalled = $hasopenruns && (time() - $lastcron > 600);
 
 $from = $total === 0 ? 0 : $page * $perpage + 1;
 $to = min($total, ($page + 1) * $perpage);
-$pagingnote = get_string('pagingnote', 'local_tresipuntimportgc',
-    (object) ['from' => $from, 'to' => $to, 'total' => $total]);
+$pagingnote = get_string(
+    'pagingnote',
+    'local_tresipuntimportgc',
+    (object) ['from' => $from, 'to' => $to, 'total' => $total]
+);
 $pagingbar = $OUTPUT->paging_bar($total, $page, $perpage, $baseurl);
 
 $renderer = $PAGE->get_renderer('local_tresipuntimportgc');

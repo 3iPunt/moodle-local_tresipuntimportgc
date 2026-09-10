@@ -33,7 +33,6 @@ namespace local_tresipuntimportgc\responses;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class errors extends error {
-
     /** @var error[] Errors */
     public $errors;
 
@@ -64,5 +63,4 @@ class errors extends error {
         }
         return $res;
     }
-
 }

@@ -34,15 +34,15 @@ require_once($CFG->dirroot . '/local/tresipuntimportgc/classes/maps/materials/gc
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class gc_mod_map {
-
+    /** @var array Map of Classroom module type => map class that handles it. */
     public const GC_MODS = [
         'courseWork' => [
             'ASSIGNMENT' => gc_mod_coursework_assignment_map::class,
             'SHORT_ANSWER_QUESTION' => gc_mod_coursework_shortq_map::class,
-            'MULTIPLE_CHOICE_QUESTION' => gc_mod_coursework_multipleq_map::class
+            'MULTIPLE_CHOICE_QUESTION' => gc_mod_coursework_multipleq_map::class,
         ],
         'courseWorkMaterials' => gc_mod_courseworkmaterials_map::class,
-        'announcements' => gc_mod_announcements_map::class
+        'announcements' => gc_mod_announcements_map::class,
     ];
 
 
@@ -58,16 +58,15 @@ abstract class gc_mod_map {
         // convierte de forma segura (escapa HTML, saltos de línea a <br> y
         // enlaza URLs) antes de concatenar el HTML de los materiales.
         $html = $desc === '' ? '' : text_to_html($desc, false, false, true);
-        /* TODO IMPORTANT The initial purpose of this plugin is to invite the user to DELETE their Classroom account
-             AND ALL CONTENT from Drive related to the course, WE CANNOT LINK ANYTHING from Google in Moodle
-            (it makes no sense), we have to import everything into Moodle no matter what,
-            STUDENTS WANT PRIVACY!!!! */
+        // Materials are still rendered as links to Google. Importing their content
+        // into Moodle, so the Classroom account and its Drive files can be deleted
+        // afterwards, is in the plugin roadmap.
         foreach ($materials as $mat) {
             $key = array_key_first($mat);
             if (isset(gc_mat_map::GC_MATS[$key])) {
                 $class = gc_mat_map::GC_MATS[$key];
                 /** @var gc_mat_map $item */
-                $item = new $class;
+                $item = new $class();
                 $html .= $item->get_render($mat[$key]);
             }
         }
@@ -80,11 +79,10 @@ abstract class gc_mod_map {
      * Returns a single module, an array of modules (a Classroom item that maps
      * to several Moodle activities, e.g. combined materials, E10.11) or null.
      *
-     * @param  $module
-     * @param  provider $provider
+     * @param  array $module Classroom item as returned by the Classroom API.
+     * @param  provider $provider Connected provider.
      * @return module|module[]|null
      * @throws coding_exception
      */
     abstract public function get_mod($module, provider $provider);
-
 }

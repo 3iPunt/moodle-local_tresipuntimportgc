@@ -46,7 +46,6 @@ require_once($CFG->dirroot . '/lib/modinfolib.php');
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class course {
-
     /** @var string ID course Provider */
     protected $providerid;
 
@@ -100,10 +99,14 @@ class course {
      * @return response_course
      */
     public function create_course(
-        int $categoryid, string $fullname, string $shortname, bool $visible): response_course {
+        int $categoryid,
+        string $fullname,
+        string $shortname,
+        bool $visible
+    ): response_course {
         $data = new stdClass();
         $data->category = $categoryid;
-        $data->idnumber = $this->providerid . '_' .uniqid();
+        $data->idnumber = $this->providerid . '_' . uniqid();
         $data->shortname = $shortname;
         $data->fullname = $fullname;
         $data->visible = $visible;
@@ -137,8 +140,10 @@ class course {
         }
         $room = trim((string) ($this->providerdata->room ?? ''));
         if ($room !== '') {
-            $parts[] = \html_writer::tag('p',
-                get_string('course_room', 'local_tresipuntimportgc', s($room)));
+            $parts[] = \html_writer::tag(
+                'p',
+                get_string('course_room', 'local_tresipuntimportgc', s($room))
+            );
         }
         return implode("\n", $parts);
     }
@@ -158,12 +163,12 @@ class course {
                 $title . ': ' . get_string('teacher_folder', 'local_tresipuntimportgc'),
                 '',
                 false,
-                $link);
+                $link
+            );
             return $modurl->create($this->get_id());
         } else {
             return new response_module(false, null, new error('11010', 'COURSE NOT CREATED'));
         }
-
     }
 
     /**
@@ -175,10 +180,12 @@ class course {
         global $USER, $DB;
         if (!is_null($this->get_id())) {
             try {
-                $plugininstance = $DB->get_record("enrol",
-                    array('courseid' => $this->get_id(), 'enrol' => 'manual'));
+                $plugininstance = $DB->get_record(
+                    "enrol",
+                    ['courseid' => $this->get_id(), 'enrol' => 'manual']
+                );
                 $plugin = enrol_get_plugin('manual');
-                $roleid = $DB->get_field('role', 'id', array('shortname' => 'editingteacher'));
+                $roleid = $DB->get_field('role', 'id', ['shortname' => 'editingteacher']);
                 $plugin->enrol_user($plugininstance, $USER->id, $roleid);
                 return new response(true, '');
             } catch (moodle_exception $e) {
@@ -214,5 +221,4 @@ class course {
 
         return new response(true, '');
     }
-
 }

@@ -40,7 +40,6 @@ use required_capability_exception;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class import extends persistent {
-
     /** @var string Database table. */
     public const TABLE = 'local_tresipuntimportgc_import';
 
@@ -140,8 +139,10 @@ class import extends persistent {
      */
     public function require_can_access(): void {
         if (!$this->is_owned_by()) {
-            require_capability('local/tresipuntimportgc:viewreports',
-                context_system::instance());
+            require_capability(
+                'local/tresipuntimportgc:viewreports',
+                context_system::instance()
+            );
         }
     }
 

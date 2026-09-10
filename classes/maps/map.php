@@ -31,7 +31,6 @@ use local_tresipuntimportgc\providers\provider;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class map {
-
     /**
      * Course.
      *
@@ -94,5 +93,4 @@ abstract class map {
      * @return module[]
      */
     abstract public static function modules(array $modules, provider $provider, string $type = ''): array;
-
 }

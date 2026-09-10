@@ -38,7 +38,6 @@ use local_tresipuntimportgc\task\import_course_task;
  * @covers     \local_tresipuntimportgc\local\importer
  */
 final class importer_test extends \advanced_testcase {
-
     /**
      * Builds a provider stub with a connected account and token.
      *
@@ -97,8 +96,10 @@ final class importer_test extends \advanced_testcase {
             return (int) $task->get_custom_data()->importcourseid;
         }, array_values($tasks));
         sort($queuedids);
-        $this->assertSame([(int) $courses[0]->get('id'), (int) $courses[1]->get('id')],
-            $queuedids);
+        $this->assertSame(
+            [(int) $courses[0]->get('id'), (int) $courses[1]->get('id')],
+            $queuedids
+        );
     }
 
     /**
@@ -162,7 +163,8 @@ final class importer_test extends \advanced_testcase {
         $provider->method('get_account_email')->willReturn('prof@example.com');
         $provider->method('get_refresh_token')->willReturn('1//token');
         $provider->method('get_course')->willReturn(
-            new response_course(true, new course('gc-1', 'A description', (object) []), null));
+            new response_course(true, new course('gc-1', 'A description', (object) []), null)
+        );
         $provider->method('get_sections')->willReturn(new response_sections(true, []));
         $provider->method('get_modules')->willReturn(new response_modules(true, []));
 
@@ -245,13 +247,19 @@ final class importer_test extends \advanced_testcase {
 
         $provider = $this->createMock(provider::class);
         $provider->method('authenticate_with_refresh_token')->willReturn(
-            new response_data(false, null,
-                new \local_tresipuntimportgc\responses\error('E', 'bad token')));
+            new response_data(
+                false,
+                null,
+                new \local_tresipuntimportgc\responses\error('E', 'bad token')
+            )
+        );
 
         importer::run_course($course, $provider);
 
-        $this->assertSame(import_course::STATUS_ERROR,
-            (new import_course($course->get('id')))->get('status'));
+        $this->assertSame(
+            import_course::STATUS_ERROR,
+            (new import_course($course->get('id')))->get('status')
+        );
     }
 
     /**
@@ -263,7 +271,8 @@ final class importer_test extends \advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
 
         $done = $generator->create_import_course(
-            ['userid' => $user->id, 'status' => import_course::STATUS_SUCCESS]);
+            ['userid' => $user->id, 'status' => import_course::STATUS_SUCCESS]
+        );
         importer::run_course($done);
 
         $reloaded = new import_course($done->get('id'));
@@ -315,14 +324,19 @@ final class importer_test extends \advanced_testcase {
         $first->mark_running();
         $first->mark_success(99);
         $finish->invoke(null, new import($import->get('id')));
-        $this->assertSame('1//token', (new import($import->get('id')))->get_refresh_token(),
-            'The token must survive while a course is still open');
+        $this->assertSame(
+            '1//token',
+            (new import($import->get('id')))->get_refresh_token(),
+            'The token must survive while a course is still open'
+        );
 
         $second->mark_running();
         $second->mark_error();
         $finish->invoke(null, new import($import->get('id')));
-        $this->assertNull((new import($import->get('id')))->get_refresh_token(),
-            'The token must be wiped when the run finishes');
+        $this->assertNull(
+            (new import($import->get('id')))->get_refresh_token(),
+            'The token must be wiped when the run finishes'
+        );
     }
 
     /**

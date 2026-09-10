@@ -34,7 +34,6 @@ use local_tresipuntimportgc\factory\module;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class response_module extends response {
-
     /** @var module Data */
     public $data;
 
@@ -49,5 +48,4 @@ class response_module extends response {
         parent::__construct($success, '', $error);
         $this->data = $data;
     }
-
 }

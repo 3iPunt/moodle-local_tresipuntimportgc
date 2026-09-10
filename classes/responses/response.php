@@ -32,7 +32,6 @@ namespace local_tresipuntimportgc\responses;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class response {
-
     /** @var bool Success */
     public $success;
 
@@ -56,7 +55,6 @@ class response {
         } else {
             $this->error = new error('0', '');
         }
-
     }
 
     /**

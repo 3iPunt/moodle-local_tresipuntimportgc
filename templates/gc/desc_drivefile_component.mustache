@@ -17,19 +17,23 @@
 {{!
   @template local_tresipuntimportgc/gc/desc_drivefile_component
 
-  Component for description Youtube type.
+  Card of a Drive file attached to a Classroom item.
 
   Classes required for JS:
   * none
 
   Data attributes required for JS:
+  * none
 
   Context variables required for this template:
-  * none
+  * title - file name
+  * alternatelink - URL of the file in Drive
 
   Example context (json):
   {
-    "": "" }
+    "title": "Unit 1 notes.pdf",
+    "alternatelink": "#"
+  }
 }}
 <div class="card desc_drivefile_component" style="display: flex; flex-direction: row; margin-top: 15px">
     <div class="card-body">

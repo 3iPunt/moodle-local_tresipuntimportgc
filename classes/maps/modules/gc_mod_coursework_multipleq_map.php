@@ -28,12 +28,11 @@ use local_tresipuntimportgc\factory\module_choice;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class gc_mod_coursework_multipleq_map extends gc_mod_map {
-
     /**
      * Get Module.
      *
-     * @param $module
-     * @param $provider
+     * @param array $module Classroom item as returned by the Classroom API.
+     * @param provider $provider Connected provider.
      * @return module
      * @throws coding_exception
      */
@@ -45,8 +44,10 @@ class gc_mod_coursework_multipleq_map extends gc_mod_map {
         $desc = self::get_desc_rich($desc, $mats);
         // Pregunta de opción múltiple → actividad de Elección con sus opciones (E10.1).
         return new module_choice(
-            $section, $module, $desc, $visible
+            $section,
+            $module,
+            $desc,
+            $visible
         );
     }
-
 }

@@ -35,7 +35,6 @@ namespace local_tresipuntimportgc\responses;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class response_data {
-
     /** @var bool Whether the call succeeded. */
     public $success;
 

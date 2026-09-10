@@ -41,14 +41,13 @@ use mod_folder_generator;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class module_folder extends module {
-
     /** @var string Mod Name */
     protected $modname = 'folder';
 
     /** @var mod_folder_generator Generator */
     protected $generator;
 
-    /** array material */
+    /** @var array Materials of the Classroom module. */
     protected $materials;
 
     /**
@@ -80,12 +79,12 @@ class module_folder extends module {
             'name' => $this->title,
             'introeditor' => $this->intro_editor(),
             'showexpanded' => true,
-            'files' => file_get_unused_draft_itemid()
+            'files' => file_get_unused_draft_itemid(),
         ];
         $options = [
             'section' => $this->get_section($courseid),
             'visible' => $this->visible,
-            'showdescription' => false
+            'showdescription' => false,
         ];
         $res = $this->generator->create_instance($record, $options);
         if (isset($res)) {
@@ -124,6 +123,4 @@ class module_folder extends module {
             }
         }
     }
-
-
 }

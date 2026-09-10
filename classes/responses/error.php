@@ -33,7 +33,6 @@ namespace local_tresipuntimportgc\responses;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class error {
-
     /** @var int Error Code */
     public $code;
 
@@ -62,5 +61,4 @@ class error {
         }
         return $res;
     }
-
 }

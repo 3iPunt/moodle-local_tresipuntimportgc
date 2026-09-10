@@ -34,7 +34,6 @@ use local_tresipuntimportgc\factory\folder;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class response_folder extends response {
-
     /** @var folder Data */
     public $data;
 
@@ -49,5 +48,4 @@ class response_folder extends response {
         parent::__construct($success, '', $error);
         $this->data = $data;
     }
-
 }
