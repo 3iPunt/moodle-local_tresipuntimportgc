@@ -34,7 +34,6 @@ use core_text;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class helper {
-
     /**
      * Builds a course shortname candidate from a Classroom class name:
      * accents transliterated to ASCII, spaces to underscores, lowercased.

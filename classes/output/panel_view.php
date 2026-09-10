@@ -39,7 +39,6 @@ use templatable;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 o later
  */
 class panel_view implements renderable, templatable {
-
     /** @var array Table rows (see panel.php). */
     private $rows;
 
@@ -72,8 +71,15 @@ class panel_view implements renderable, templatable {
      * @param string $pagingnote  Paging summary.
      * @param string $pagingbar   Rendered paging bar HTML.
      */
-    public function __construct(array $rows, array $statuschips, string $search,
-            bool $emptysite, bool $cronstalled, string $pagingnote, string $pagingbar) {
+    public function __construct(
+        array $rows,
+        array $statuschips,
+        string $search,
+        bool $emptysite,
+        bool $cronstalled,
+        string $pagingnote,
+        string $pagingbar
+    ) {
         $this->rows = $rows;
         $this->statuschips = $statuschips;
         $this->search = $search;

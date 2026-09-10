@@ -25,72 +25,91 @@
 defined('MOODLE_INTERNAL') || die();
 global $ADMIN, $CFG;
 
-$ADMIN->add('courses', new admin_externalpage('local_tresipuntimportgc_import',
+$ADMIN->add('courses', new admin_externalpage(
+    'local_tresipuntimportgc_import',
     new lang_string('import_page', 'local_tresipuntimportgc'),
-    $CFG->wwwroot . '/local/tresipuntimportgc/import.php', ['local/tresipuntimportgc:import']));
+    $CFG->wwwroot . '/local/tresipuntimportgc/import.php',
+    ['local/tresipuntimportgc:import']
+));
 
-// Categoría del plugin en Extensiones. Se registra siempre para que el panel
-// aparezca por su capacidad (no solo para administradores del sitio).
-$ADMIN->add('modules', new admin_category('local_tresipuntimportgc_category',
-    new lang_string('pluginname', 'local_tresipuntimportgc')));
+// Plugin category under Plugins. Always registered so that the panel shows
+// up by capability (not only for site administrators).
+$ADMIN->add('modules', new admin_category(
+    'local_tresipuntimportgc_category',
+    new lang_string('pluginname', 'local_tresipuntimportgc')
+));
 
-// Acceso a importar también desde la categoría del plugin (además de Cursos).
-$ADMIN->add('local_tresipuntimportgc_category', new admin_externalpage('local_tresipuntimportgc_import_menu',
+// Access to the importer from the plugin category too (besides Courses).
+$ADMIN->add('local_tresipuntimportgc_category', new admin_externalpage(
+    'local_tresipuntimportgc_import_menu',
     new lang_string('import_page', 'local_tresipuntimportgc'),
-    $CFG->wwwroot . '/local/tresipuntimportgc/import.php', ['local/tresipuntimportgc:import']));
+    $CFG->wwwroot . '/local/tresipuntimportgc/import.php',
+    ['local/tresipuntimportgc:import']
+));
 
-// El panel de importaciones: visible para quien tenga la capacidad de consulta.
-$ADMIN->add('local_tresipuntimportgc_category', new admin_externalpage('local_tresipuntimportgc_panel',
+// The imports panel: visible to anyone holding the reports capability.
+$ADMIN->add('local_tresipuntimportgc_category', new admin_externalpage(
+    'local_tresipuntimportgc_panel',
     new lang_string('panel_title', 'local_tresipuntimportgc'),
-    $CFG->wwwroot . '/local/tresipuntimportgc/panel.php', ['local/tresipuntimportgc:viewreports']));
+    $CFG->wwwroot . '/local/tresipuntimportgc/panel.php',
+    ['local/tresipuntimportgc:viewreports']
+));
 
-// Los ajustes del plugin son configuración de sitio: solo administradores.
+// The plugin settings are site configuration: administrators only.
 if ($hassiteconfig) {
     $settingspage = new admin_settingpage(
         'local_tresipuntimportgc_config',
-        new lang_string('pluginconfig', 'local_tresipuntimportgc'));
+        new lang_string('pluginconfig', 'local_tresipuntimportgc')
+    );
     $ADMIN->add('local_tresipuntimportgc_category', $settingspage);
 
     if ($ADMIN->fulltree) {
-        // Bloque A: conexión con Google.
+        // Block A: connection with Google.
         $settingspage->add(
             new admin_setting_heading(
                 'local_tresipuntimportgc_gc',
                 new lang_string('gcheading', 'local_tresipuntimportgc'),
-                new lang_string('gcheading_desc', 'local_tresipuntimportgc'))
+                new lang_string('gcheading_desc', 'local_tresipuntimportgc')
+            )
         );
 
-        // Estado de la conexión + URI de redirección copiable + probar.
+        // Connection status, copiable redirect URI and test link.
         $settingspage->add(new \local_tresipuntimportgc\adminsetting\connection());
 
-        $settingspage->add(new admin_setting_configtext('local_tresipuntimportgc/clientid',
+        $settingspage->add(new admin_setting_configtext(
+            'local_tresipuntimportgc/clientid',
             new lang_string('clientid', 'local_tresipuntimportgc'),
             new lang_string('clientid_help', 'local_tresipuntimportgc'),
             '',
             PARAM_RAW
         ));
 
-        $settingspage->add(new admin_setting_configpasswordunmask('local_tresipuntimportgc/secretkey',
+        $settingspage->add(new admin_setting_configpasswordunmask(
+            'local_tresipuntimportgc/secretkey',
             new lang_string('secretkey', 'local_tresipuntimportgc'),
             new lang_string('secretkey_help', 'local_tresipuntimportgc'),
             ''
         ));
 
-        // Bloque B: opciones de importación por defecto.
+        // Block B: default import options.
         $settingspage->add(
             new admin_setting_heading(
                 'local_tresipuntimportgc_config_import',
                 new lang_string('configimportheading', 'local_tresipuntimportgc'),
-                new lang_string('configimportheading_help', 'local_tresipuntimportgc'))
+                new lang_string('configimportheading_help', 'local_tresipuntimportgc')
+            )
         );
 
         $settingspage->add(
             new admin_setting_configcheckbox(
                 'local_tresipuntimportgc/allowconfig',
                 new lang_string('allowconfig', 'local_tresipuntimportgc'),
-                new lang_string('allowconfig_help', 'local_tresipuntimportgc'), 0));
+                new lang_string('allowconfig_help', 'local_tresipuntimportgc'),
+                0
+            )
+        );
 
-        // Formularios de Google: solo opciones implementadas.
+        // Google Forms: implemented options only.
         $options = [
             0 => get_string('formsiframegenerate', 'local_tresipuntimportgc'),
             2 => get_string('notimport', 'local_tresipuntimportgc'),
@@ -99,9 +118,13 @@ if ($hassiteconfig) {
             new admin_setting_configselect(
                 'local_tresipuntimportgc/formsimport',
                 new lang_string('googleformsimport', 'local_tresipuntimportgc'),
-                new lang_string('googleformsimport_help', 'local_tresipuntimportgc'), 0, $options));
+                new lang_string('googleformsimport_help', 'local_tresipuntimportgc'),
+                0,
+                $options
+            )
+        );
 
-        // Ficheros de Google Drive: solo opciones implementadas.
+        // Google Drive files: implemented options only.
         $options = [
             0 => get_string('generategdlink', 'local_tresipuntimportgc'),
             1 => get_string('importtoprivatearea', 'local_tresipuntimportgc'),
@@ -111,9 +134,13 @@ if ($hassiteconfig) {
             new admin_setting_configselect(
                 'local_tresipuntimportgc/importfiles',
                 new lang_string('importfiles', 'local_tresipuntimportgc'),
-                new lang_string('importfiles_help', 'local_tresipuntimportgc'), 0, $options));
+                new lang_string('importfiles_help', 'local_tresipuntimportgc'),
+                0,
+                $options
+            )
+        );
 
-        // Calendario del curso: solo opciones implementadas.
+        // Course calendar: implemented options only.
         $options = [
             1 => get_string('calendarimport', 'local_tresipuntimportgc'),
             2 => get_string('notimport', 'local_tresipuntimportgc'),
@@ -122,7 +149,11 @@ if ($hassiteconfig) {
             new admin_setting_configselect(
                 'local_tresipuntimportgc/calendarimport',
                 new lang_string('googlecalendarimport', 'local_tresipuntimportgc'),
-                new lang_string('googlecalendarimport_help', 'local_tresipuntimportgc'), 2, $options));
+                new lang_string('googlecalendarimport_help', 'local_tresipuntimportgc'),
+                2,
+                $options
+            )
+        );
 
         // Contenidos dirigidos a estudiantes concretos.
         $options = [
@@ -133,24 +164,31 @@ if ($hassiteconfig) {
             new admin_setting_configselect(
                 'local_tresipuntimportgc/importindividual',
                 new lang_string('importindividual', 'local_tresipuntimportgc'),
-                new lang_string('importindividual_help', 'local_tresipuntimportgc'), 0, $options));
+                new lang_string('importindividual_help', 'local_tresipuntimportgc'),
+                0,
+                $options
+            )
+        );
 
         // Bloque C: registro.
         $settingspage->add(
             new admin_setting_heading(
                 'local_tresipuntimportgc_log',
                 new lang_string('logheading', 'local_tresipuntimportgc'),
-                new lang_string('logheading_desc', 'local_tresipuntimportgc'))
+                new lang_string('logheading_desc', 'local_tresipuntimportgc')
+            )
         );
 
-        $settingspage->add(new admin_setting_configtext('local_tresipuntimportgc/logretention',
+        $settingspage->add(new admin_setting_configtext(
+            'local_tresipuntimportgc/logretention',
             new lang_string('logretention', 'local_tresipuntimportgc'),
             new lang_string('logretention_help', 'local_tresipuntimportgc'),
             365,
             PARAM_INT
         ));
 
-        $settingspage->add(new admin_setting_configtext('local_tresipuntimportgc/panelpagesize',
+        $settingspage->add(new admin_setting_configtext(
+            'local_tresipuntimportgc/panelpagesize',
             new lang_string('panelpagesize', 'local_tresipuntimportgc'),
             new lang_string('panelpagesize_help', 'local_tresipuntimportgc'),
             25,

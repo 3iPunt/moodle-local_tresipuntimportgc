@@ -48,7 +48,6 @@ require_once($CFG->dirroot . '/mod/assign/locallib.php');
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class module_assign extends module {
-
     /** @var string Mod Name */
     protected $modname = 'assign';
 
@@ -91,11 +90,11 @@ class module_assign extends module {
             'introeditor' => $this->intro_editor(),
             'files' => file_get_unused_draft_itemid(),
         ];
-        // Nota máxima del trabajo → calificación por puntos de la tarea (E10.4).
+        // Coursework max points to the point grade of the assignment (E10.4).
         if (isset($this->module['maxPoints']) && (int) $this->module['maxPoints'] > 0) {
             $record['grade'] = (int) $this->module['maxPoints'];
         }
-        // Fecha de publicación programada → restricción de acceso (E10.5).
+        // Scheduled publication date to an access restriction (E10.5).
         if ($availability = self::scheduled_availability($this->module)) {
             $record['availability'] = $availability;
         }
@@ -107,13 +106,19 @@ class module_assign extends module {
                 $minute = $this->module['dueTime']['minutes'] ?? 0;
             }
             $duedate = $this->module['dueDate'];
-            $record['duedate'] = mktime($hour, $minute, 0,
-                $duedate['month'], $duedate['day'], $duedate['year']);
+            $record['duedate'] = mktime(
+                $hour,
+                $minute,
+                0,
+                $duedate['month'],
+                $duedate['day'],
+                $duedate['year']
+            );
         }
         $options = [
             'section' => $this->get_section($courseid),
             'visible' => $this->visible,
-            'showdescription' => false
+            'showdescription' => false,
         ];
         $res = $this->generator->create_instance($record, $options);
         if (isset($res)) {

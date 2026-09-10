@@ -34,7 +34,6 @@ namespace local_tresipuntimportgc\local;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class trace_router {
-
     /** @var logger|null Active logger, if an import course is running. */
     private static $logger = null;
 

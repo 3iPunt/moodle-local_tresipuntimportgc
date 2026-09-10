@@ -17,21 +17,25 @@
 {{!
   @template local_tresipuntimportgc/gc/desc_youtube_component
 
-  Component for description Youtube type.
+  Card of a YouTube video attached to a Classroom item, embedded in an iframe.
 
   Classes required for JS:
   * none
 
   Data attributes required for JS:
+  * none
 
   Context variables required for this template:
-  * none
+  * id - YouTube video id
+  * title - video title
 
   Example context (json):
   {
-    "": "" }
+    "id": "aqz-KE-bpKQ",
+    "title": "Big Buck Bunny"
+  }
 }}
 <div class="desc_youtube_component" style="margin-top: 15px">
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/{{ id }}" title="{{ title }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/{{ id }}" title="{{ title }}" style="border: 0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     <br>
 </div>

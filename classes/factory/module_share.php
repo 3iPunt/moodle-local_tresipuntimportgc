@@ -40,7 +40,6 @@ use stdClass;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class module_share extends module {
-
     /** @var string Mod Name */
     protected $modname = 'tresipuntshare';
 
@@ -74,7 +73,6 @@ class module_share extends module {
         global $USER;
         $plugins = core_component::get_plugin_list('mod');
         if (array_key_exists($this->get_modname(), $plugins)) {
-
             $commentname = preg_replace("/[\r\n|\n|\r]+/", " ", $this->title);
             $name = fullname($USER) . ': ' . substr(trim($commentname), 0, 200);
             $draftideditor = file_get_submitted_draft_itemid('introeditor');
@@ -90,7 +88,8 @@ class module_share extends module {
             $moduleinfo->course = $courseid;
             $moduleinfo->teacher = $USER->id;
             $moduleinfo->name = $name;
-            $moduleinfo->introeditor = array('text' => $commentname, 'format' => FORMAT_HTML, 'itemid' => $draftideditor);;
+            $moduleinfo->introeditor = ['text' => $commentname, 'format' => FORMAT_HTML, 'itemid' => $draftideditor];
+            ;
             $moduleinfo->visible = true;
             $cm = create_module($moduleinfo);
             if (isset($cm)) {
@@ -102,6 +101,4 @@ class module_share extends module {
             return new response_module(false, null, new error('14000', 'PLUGIN_NOT_EXIST'));
         }
     }
-
-
 }

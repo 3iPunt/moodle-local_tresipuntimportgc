@@ -42,7 +42,6 @@ use templatable;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class progress_view implements renderable, templatable {
-
     /** @var stdClass Run summary (see progress.php). */
     private $run;
 
@@ -73,9 +72,17 @@ class progress_view implements renderable, templatable {
      * @param bool     $cronstalled Cron looks stalled.
      * @param int      $importid    Import run id.
      * @param int      $lastlogid   Highest trace id already rendered.
+     * @param bool     $canviewpanel Whether the user can view the imports panel.
      */
-    public function __construct(stdClass $run, array $courses, bool $finished,
-            bool $cronstalled, int $importid, int $lastlogid, bool $canviewpanel = false) {
+    public function __construct(
+        stdClass $run,
+        array $courses,
+        bool $finished,
+        bool $cronstalled,
+        int $importid,
+        int $lastlogid,
+        bool $canviewpanel = false
+    ) {
         $this->run = $run;
         $this->courses = $courses;
         $this->finished = $finished;

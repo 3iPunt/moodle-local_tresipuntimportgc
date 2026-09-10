@@ -38,7 +38,6 @@ use local_tresipuntimportgc\models\import_log;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class logger {
-
     /** @var int Id of the import course the traces belong to. */
     private $importcourseid;
 

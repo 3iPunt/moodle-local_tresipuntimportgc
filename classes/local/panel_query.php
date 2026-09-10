@@ -40,7 +40,6 @@ use local_tresipuntimportgc\models\import_course;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class panel_query {
-
     /**
      * Fetches the panel page.
      *
@@ -51,8 +50,12 @@ class panel_query {
      * @return object {records, total, emptysite, hasopenruns}. Each record adds
      *                derivedstatus, launchername and the n* counts.
      */
-    public static function fetch(string $statusfilter, string $search, int $page,
-            int $perpage): object {
+    public static function fetch(
+        string $statusfilter,
+        string $search,
+        int $page,
+        int $perpage
+    ): object {
         global $DB;
 
         $perpage = max(1, $perpage);
@@ -88,14 +91,21 @@ class panel_query {
                 import_course::STATUS_ERROR => (int) $record->nerror,
                 import_course::STATUS_DISCARDED => (int) $record->ndiscarded,
             ]);
-            $hasopenruns = $hasopenruns || in_array($record->derivedstatus,
-                [import::STATUS_QUEUED, import::STATUS_RUNNING], true);
+            $hasopenruns = $hasopenruns || in_array(
+                $record->derivedstatus,
+                [import::STATUS_QUEUED, import::STATUS_RUNNING],
+                true
+            );
             if ($statusfilter !== '' && $record->derivedstatus !== $statusfilter) {
                 continue;
             }
             $record->launchername = fullname($record);
-            if ($search !== '' && stripos(
-                    $record->launchername . ' ' . $record->googleaccount, $search) === false) {
+            if (
+                $search !== '' && stripos(
+                    $record->launchername . ' ' . $record->googleaccount,
+                    $search
+                ) === false
+            ) {
                 continue;
             }
             $filtered[] = $record;

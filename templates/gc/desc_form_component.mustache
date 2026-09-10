@@ -17,24 +17,29 @@
 {{!
   @template local_tresipuntimportgc/gc/desc_form_component
 
-  Component for description Youtube type.
+  Card of a Google Form attached to a Classroom item, embedded in an iframe.
 
   Classes required for JS:
   * none
 
   Data attributes required for JS:
+  * none
 
   Context variables required for this template:
-  * none
+  * title - form title
+  * formurl - URL of the form to embed
 
   Example context (json):
   {
-    "": "" }
+    "title": "Unit 1 quiz",
+    "formurl": "https://docs.google.com/forms/d/e/example/viewform"
+  }
 }}
 <div class="card desc_form_component" style="display: flex; flex-direction: row; margin-top: 15px">
     <div class="card-body">
         <h4 class="card-title">{{ title }}</h4>
         <h6 class="card-subtitle mb-2 text-muted">{{# str }} form, local_tresipuntimportgc {{/ str }}</h6>
-        <iframe src="{{ formurl }}" width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0">{{# str }} loading {{/ str }}</iframe>
+        <iframe src="{{ formurl }}" title="{{ title }}" height="600"
+                style="width: 100%; border: 0;"></iframe>
     </div>
 </div>

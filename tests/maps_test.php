@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/tresipuntimportgc/classes/maps/modules/gc_m
  * @covers     \local_tresipuntimportgc\maps\modules\gc_mod_map
  */
 final class maps_test extends \advanced_testcase {
-
     /**
      * Classroom courseWork fixture: an assignment whose only material is a form.
      *

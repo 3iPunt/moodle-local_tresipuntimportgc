@@ -34,20 +34,18 @@ use local_tresipuntimportgc\factory\module;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class response_modules extends response {
-
     /** @var module[] Data */
     public $data;
 
     /**
-     * response_templates constructor.
+     * response_modules constructor.
      *
      * @param bool $success
      * @param module[] $data
      * @param error|null $error
      */
-    public function __construct(bool $success, array $data = [], error $error = null) {
+    public function __construct(bool $success, array $data = [], ?error $error = null) {
         parent::__construct($success, '', $error);
         $this->data = $data;
     }
-
 }

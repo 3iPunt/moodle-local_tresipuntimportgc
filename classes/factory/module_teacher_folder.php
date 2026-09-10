@@ -43,7 +43,6 @@ use mod_folder_generator;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class module_teacher_folder extends module {
-
     /** @var string Mod Name */
     protected $modname = 'folder';
 
@@ -85,8 +84,8 @@ class module_teacher_folder extends module {
         $record = [
             'course' => $course,
             'name' => $this->title,
-            // Descripción propia: además evita que el generador inyecte su
-            // valor de test ("Test folder N") cuando el intro va vacío.
+            // Own description: it also stops the generator from injecting its test
+            // value ("Test folder N") when the intro is left empty.
             'intro' => get_string('teacher_folder_intro', 'local_tresipuntimportgc'),
             'introformat' => FORMAT_HTML,
             'files' => file_get_unused_draft_itemid(),
@@ -98,8 +97,15 @@ class module_teacher_folder extends module {
         }
         $context = context_module::instance($res->cmid);
         foreach ($this->files as $filemeta) {
-            drive_files::store($this->provider, $filemeta, $context->id,
-                (int) $USER->id, 'mod_folder', 'content', '/');
+            drive_files::store(
+                $this->provider,
+                $filemeta,
+                $context->id,
+                (int) $USER->id,
+                'mod_folder',
+                'content',
+                '/'
+            );
         }
         return new response_module(true, $this, null);
     }

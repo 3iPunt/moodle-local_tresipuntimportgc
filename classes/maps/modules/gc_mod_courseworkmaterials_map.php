@@ -31,12 +31,11 @@ use local_tresipuntimportgc\providers\provider;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class gc_mod_courseworkmaterials_map extends gc_mod_map {
-
     /**
      * Get Module.
      *
-     * @param $module
-     * @param provider $provider
+     * @param array $module Classroom item as returned by the Classroom API.
+     * @param provider $provider Connected provider.
      * @return module
      * @throws coding_exception
      */
@@ -45,7 +44,8 @@ class gc_mod_courseworkmaterials_map extends gc_mod_map {
         $section = $module['topicId'] ?? '';
         $mats = $module['materials'] ?? [];
         $desc = isset($module['description']) ? self::get_desc_rich($module['description'], $mats) : self::get_desc_rich('', $mats);
-        // TODO rethink logic, this is rubbish for understanding how it is supposed to work.
+        // The module type is guessed from the first material; this chain of
+        // conditions is hard to follow and pending a refactor (IGC-019).
         $firstkey = '';
         if (isset($module['materials'][0])) {
             $firstkey = array_key_first($module['materials'][0]);
@@ -53,24 +53,36 @@ class gc_mod_courseworkmaterials_map extends gc_mod_map {
 
         if ($firstkey === 'driveFile' && count($module['materials']) === 1) {
             return new module_resource(
-                $section, $module['title'], $desc, $visible, reset($module['materials'])
+                $section,
+                $module['title'],
+                $desc,
+                $visible,
+                reset($module['materials'])
             );
         }
         if ($firstkey === 'form' && count($module['materials']) === 1) {
-            // Formulario adjunto → embed en etiqueta (E10.2); nunca un quiz vacío.
-            // La conversión a cuestionario con preguntas es futura (Forms API).
+            // Attached form to an embed in a label (E10.2); never an empty quiz.
+            // Converting it into a quiz with questions is future work (Forms API).
             return new module_label(
-                $section, $module['title'], $desc, $visible, reset($module['materials'])
+                $section,
+                $module['title'],
+                $desc,
+                $visible,
+                reset($module['materials'])
             );
         }
         if ($firstkey === 'link' && count($module['materials']) === 1) {
             return new module_url(
-                $section, $module['title'], $desc, $visible, $module['alternateLink']
+                $section,
+                $module['title'],
+                $desc,
+                $visible,
+                $module['alternateLink']
             );
         }
         if (isset($module['materials']) && count($module['materials']) > 1) {
-            // Materiales combinados → un recurso por material (E10.11): los
-            // ficheros a Moodle, los enlaces/vídeos como URL, el formulario embebido.
+            // Combined materials to one resource per material (E10.11): files to
+            // Moodle, links and videos as URL, the form embedded.
             $mods = [];
             foreach ($module['materials'] as $material) {
                 $key = array_key_first($material);
@@ -82,13 +94,18 @@ class gc_mod_courseworkmaterials_map extends gc_mod_map {
                     $mods[] = new module_url($section, $title, '', $visible, $material['link']['url'] ?? '');
                 } else if ($key === 'youtubeVideo') {
                     $title = $material['youtubeVideo']['title'] ?? $module['title'];
-                    $mods[] = new module_url($section, $title, '', $visible,
-                        $material['youtubeVideo']['alternateLink'] ?? '');
+                    $mods[] = new module_url(
+                        $section,
+                        $title,
+                        '',
+                        $visible,
+                        $material['youtubeVideo']['alternateLink'] ?? ''
+                    );
                 } else if ($key === 'form') {
                     $mods[] = new module_label($section, $module['title'], $desc, $visible, $material);
                 }
             }
-            // Si nada encajó, cae a etiqueta con el conjunto (comportamiento previo).
+            // If nothing matched, fall back to a label with the whole set (previous behaviour).
             return $mods !== [] ? $mods
                 : new module_label($section, $module['title'], $desc, $visible, $module['materials']);
         }
@@ -96,8 +113,11 @@ class gc_mod_courseworkmaterials_map extends gc_mod_map {
             $mats = reset($mats);
         }
         return new module_label(
-            $section, $module['title'], $desc, $visible, $mats
+            $section,
+            $module['title'],
+            $desc,
+            $visible,
+            $mats
         );
     }
-
 }

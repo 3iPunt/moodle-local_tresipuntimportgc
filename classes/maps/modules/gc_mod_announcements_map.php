@@ -29,11 +29,11 @@ use local_tresipuntimportgc\providers\provider;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class gc_mod_announcements_map extends gc_mod_map {
-
     /**
      * Get Module.
      *
-     * @param $module
+     * @param array $module Classroom item as returned by the Classroom API.
+     * @param provider $provider Connected provider.
      * @return module
      * @throws coding_exception
      */
@@ -41,10 +41,12 @@ class gc_mod_announcements_map extends gc_mod_map {
         $visible = $module['state'] === 'PUBLISHED';
         $mats = isset($module['materials']) ? $module['materials'] : [];
         $desc = self::get_desc_rich('', $mats);
-        // Anuncio → discusión en el foro de novedades del curso (E10.7).
+        // Announcement to a discussion in the course news forum (E10.7).
         return new module_forum(
-            $module, $desc, $visible, $provider
+            $module,
+            $desc,
+            $visible,
+            $provider
         );
     }
-
 }

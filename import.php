@@ -88,26 +88,42 @@ if ($action === 'import') {
         ];
     }
     if ($configs === []) {
-        redirect($selfurl, get_string('importqueue_novalid', 'local_tresipuntimportgc'),
-            null, notification::NOTIFY_ERROR);
+        redirect(
+            $selfurl,
+            get_string('importqueue_novalid', 'local_tresipuntimportgc'),
+            null,
+            notification::NOTIFY_ERROR
+        );
     }
     $import = importer::queue((int) $USER->id, $provider, $configs);
-    redirect(new moodle_url('/local/tresipuntimportgc/progress.php', ['id' => $import->get('id')]),
-        get_string('importqueued', 'local_tresipuntimportgc'), null, notification::NOTIFY_SUCCESS);
+    redirect(
+        new moodle_url('/local/tresipuntimportgc/progress.php', ['id' => $import->get('id')]),
+        get_string('importqueued', 'local_tresipuntimportgc'),
+        null,
+        notification::NOTIFY_SUCCESS
+    );
 }
 
 // The user denied (or Google returned) an error on the consent screen.
 if ($autherror !== '') {
-    redirect($selfurl, get_string('error_client', 'local_tresipuntimportgc') . ': ' . $autherror,
-        null, notification::NOTIFY_ERROR);
+    redirect(
+        $selfurl,
+        get_string('error_client', 'local_tresipuntimportgc') . ': ' . $autherror,
+        null,
+        notification::NOTIFY_ERROR
+    );
 }
 
 // OAuth callback: exchange the code and clean the URL.
 if ($code !== '' && !$provider->has_token()) {
     $res = $provider->authenticate_with_code($code, $oauthstate);
     if (!$res->success) {
-        redirect($selfurl, get_string('error_client', 'local_tresipuntimportgc') . ': ' . $res->error->to_string(),
-            null, notification::NOTIFY_ERROR);
+        redirect(
+            $selfurl,
+            get_string('error_client', 'local_tresipuntimportgc') . ': ' . $res->error->to_string(),
+            null,
+            notification::NOTIFY_ERROR
+        );
     }
     redirect($selfurl);
 }
@@ -132,13 +148,13 @@ if (!$provider->is_configured()) {
             'archived' => ($d->courseState ?? '') === 'ARCHIVED',
             'link' => $d->alternateLink ?? '',
             'defaultshortname' => $slug,
-            // Aviso previo: el nombre corto propuesto ya está en uso (evita que
-            // el curso falle luego en la importación por duplicado).
+            // Early warning: the proposed short name is already taken (it stops the
+            // course from failing later in the import as a duplicate).
             'shortnameexists' => $slug !== '' && $DB->record_exists('course', ['shortname' => $slug]),
         ];
     }
-    // Las categorías se buscan por AJAX en el importador (autocompletado), no
-    // se precargan todas aquí: el selector escala con cualquier volumen.
+    // Categories are searched over AJAX in the importer (autocomplete), they
+    // are not all preloaded here: the selector scales with any volume.
     $categories = [];
     $allowconfig = (bool) get_config('local_tresipuntimportgc', 'allowconfig');
     $filesdefault = (int) get_config('local_tresipuntimportgc', 'importfiles');
@@ -157,15 +173,24 @@ if (!$provider->is_configured()) {
         ['value' => 2, 'text' => get_string('notimport', 'local_tresipuntimportgc'),
             'selected' => $calendardefault !== 1 ? 'selected' : ''],
     ];
-    // Categoría preseleccionada por defecto (la del sitio): así el importador
-    // nunca queda sin categoría y el usuario ve dónde irán los cursos.
+    // Default preselected category (the site one): this way the importer is
+    // never left without a category and the user sees where courses will go.
     $defaultcat = core_course_category::get_default();
     $defaultcategory = ['id' => (int) $defaultcat->id, 'name' => $defaultcat->get_nested_name(false)];
-    $view = new import_view('list', $courses, $categories, $allowconfig, $filesoptions,
-        $calendaroptions, $provider->get_account_email(), $provider->get_auth_url(),
-        $isadmin, $errormsg,
+    $view = new import_view(
+        'list',
+        $courses,
+        $categories,
+        $allowconfig,
+        $filesoptions,
+        $calendaroptions,
+        $provider->get_account_email(),
+        $provider->get_auth_url(),
+        $isadmin,
+        $errormsg,
         has_capability('local/tresipuntimportgc:viewreports', context_system::instance()),
-        $defaultcategory);
+        $defaultcategory
+    );
 }
 
 $renderer = $PAGE->get_renderer('local_tresipuntimportgc');

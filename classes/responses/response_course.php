@@ -34,20 +34,18 @@ use local_tresipuntimportgc\factory\course;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class response_course extends response {
-
     /** @var course Data */
     public $data;
 
     /**
-     * response_templates constructor.
+     * response_course constructor.
      *
      * @param bool $success
      * @param course|null $data
      * @param error|null $error
      */
-    public function __construct(bool $success, course $data = null, error $error = null) {
+    public function __construct(bool $success, ?course $data = null, ?error $error = null) {
         parent::__construct($success, '', $error);
         $this->data = $data;
     }
-
 }

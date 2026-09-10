@@ -51,7 +51,6 @@ use Throwable;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class importer {
-
     /**
      * Registers an import run and queues one adhoc task per course.
      *
@@ -191,7 +190,7 @@ class importer {
 
             $course->mark_running();
 
-            // Config efectiva del curso hasta los mapas (formularios, individuales).
+            // Effective course config passed down to the maps (forms, individual).
             run_config::set([
                 'formsimport' => (int) $course->get('formsimport'),
                 'importindividual' => (int) $course->get('importindividual'),
