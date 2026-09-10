@@ -45,7 +45,6 @@ require_once($CFG->dirroot . '/lib/phpunit/classes/util.php');
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class section {
-
     /** @var stdClass Name */
     protected $name;
 
@@ -94,7 +93,7 @@ class section {
      * @return int
      * @throws dml_exception
      */
-    public static function get_section(int $courseid, string $providerid) : int {
+    public static function get_section(int $courseid, string $providerid): int {
         if (!isset(self::$sectionmap[$providerid])) {
             mtrace('    -- ERROR: SECTION_NOT_FOUND: ' . $providerid);
             return 0;
@@ -113,13 +112,11 @@ class section {
             $newsection = course_create_section($courseid, 1000);
             // El nombre del tema va en el name; el topicId ya NO se guarda en el
             // summary visible (§6.3): la correspondencia vive en $sectionmap.
-            course_update_section($courseid, $newsection, array('name' => $this->name));
+            course_update_section($courseid, $newsection, ['name' => $this->name]);
             self::$sectionmap[$this->providerid] = (int) $newsection->section;
             return new response_section(true, $this, null);
         } catch (moodle_exception $e) {
             return new response_section(false, null, new error('16000', $e->getMessage()));
         }
     }
-
-
 }

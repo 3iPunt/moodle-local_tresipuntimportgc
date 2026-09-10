@@ -32,7 +32,6 @@ use local_tresipuntimportgc\models\import_course;
  * @covers     \local_tresipuntimportgc\event\gc_course_discarded
  */
 final class events_test extends \advanced_testcase {
-
     /**
      * Seeds one import course.
      *
@@ -42,7 +41,8 @@ final class events_test extends \advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('local_tresipuntimportgc');
         $user = $this->getDataGenerator()->create_user();
         return $generator->create_import_course(
-            ['userid' => $user->id, 'providerid' => 'gc-42', 'fullname' => 'Bio 1']);
+            ['userid' => $user->id, 'providerid' => 'gc-42', 'fullname' => 'Bio 1']
+        );
     }
 
     /**
@@ -64,10 +64,14 @@ final class events_test extends \advanced_testcase {
         $this->assertSame(77, (int) $event->other['courseid']);
         $this->assertSame('gc-42', $event->other['providerid']);
         $this->assertStringContainsString('gc-42', $event->get_description());
-        $this->assertStringContainsString('/local/tresipuntimportgc/progress.php',
-            $event->get_url()->out(false));
-        $this->assertSame((int) $course->get('importid'),
-            (int) $event->get_url()->get_param('id'));
+        $this->assertStringContainsString(
+            '/local/tresipuntimportgc/progress.php',
+            $event->get_url()->out(false)
+        );
+        $this->assertSame(
+            (int) $course->get('importid'),
+            (int) $event->get_url()->get_param('id')
+        );
         $this->assertNotEmpty($event->get_name());
     }
 

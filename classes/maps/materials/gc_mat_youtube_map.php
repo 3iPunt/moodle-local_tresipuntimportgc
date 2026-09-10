@@ -29,11 +29,10 @@ use local_tresipuntimportgc\output\gc_desc_youtube_component;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class gc_mat_youtube_map extends gc_mat_map {
-
     /**
      * Get Render.
      *
-     * @param $mat
+     * @param array $mat Material payload as returned by the Classroom API.
      * @return string
      * @throws coding_exception
      */
@@ -41,5 +40,4 @@ class gc_mat_youtube_map extends gc_mat_map {
         $component = new gc_desc_youtube_component($mat);
         return $this->get_renderer()->render($component);
     }
-
 }

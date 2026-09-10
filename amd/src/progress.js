@@ -234,6 +234,29 @@ define([
     };
 
     /**
+     * Runs a retry/discard action and reloads on success.
+     *
+     * Kept out of the modal callback so the promise chains stay flat.
+     *
+     * @param {String} action retry|discard.
+     * @param {Number} id Import course id.
+     * @return {Promise} Resolved once the web service answered.
+     */
+    var runAction = function(action, id) {
+        return Ajax.call([{
+            methodname: 'local_tresipuntimportgc_import_' + action + '_course',
+            args: {importcourseid: id}
+        }])[0].then(function(response) {
+            if (response.success) {
+                window.location.reload();
+            } else {
+                Notification.addNotification({message: response.message, type: 'error'});
+            }
+            return response;
+        }).catch(Notification.exception);
+    };
+
+    /**
      * Confirms and executes a retry/discard action.
      *
      * @param {String} action retry|discard.
@@ -251,17 +274,7 @@ define([
             show: true
         }).then(function(modal) {
             modal.getRoot().on(ModalEvents.save, function() {
-                Ajax.call([{
-                    methodname: 'local_tresipuntimportgc_import_' + action + '_course',
-                    args: {importcourseid: id}
-                }])[0].then(function(response) {
-                    if (response.success) {
-                        window.location.reload();
-                    } else {
-                        Notification.addNotification({message: response.message, type: 'error'});
-                    }
-                    return response;
-                }).catch(Notification.exception);
+                runAction(action, id);
             });
             return modal;
         }).catch(Notification.exception);

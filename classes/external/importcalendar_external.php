@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Web service that imports the Classroom calendar into a Moodle course.
+ *
  * @package     local_tresipuntimportgc
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright   2026 3iPunt (contacte@tresipunt.com)
@@ -42,8 +44,14 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/calendar/lib.php');
 
+/**
+ * Calendar import web service: brings the class events into the course calendar.
+ *
+ * @package    local_tresipuntimportgc
+ * @copyright  2026 3iPunt (contacte@tresipunt.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class importcalendar_external extends external_api {
-
     /**
      * Import Calendard Parameters.
      *
@@ -51,10 +59,10 @@ class importcalendar_external extends external_api {
      */
     public static function importcalendar_parameters(): external_function_parameters {
         return new external_function_parameters(
-            array(
+            [
                 'providerid' => new external_value(PARAM_TEXT, 'Course ID Provider', VALUE_REQUIRED),
-                'courseid' => new external_value(PARAM_INT, 'Course id for import events', VALUE_REQUIRED)
-            )
+                'courseid' => new external_value(PARAM_INT, 'Course id for import events', VALUE_REQUIRED),
+            ]
         );
     }
 
@@ -78,9 +86,10 @@ class importcalendar_external extends external_api {
         self::validate_context($syscontext);
         require_capability('local/tresipuntimportgc:import', $syscontext);
         $params = self::validate_parameters(
-            self::importcalendar_parameters(), [
+            self::importcalendar_parameters(),
+            [
                 'providerid' => $providerid,
-                'courseid' => $courseid
+                'courseid' => $courseid,
             ]
         );
         $providerid = $params['providerid'];
@@ -88,8 +97,11 @@ class importcalendar_external extends external_api {
         $provider = new google();
         $resevents = $provider->get_calendar_events($providerid);
         if (!$resevents->success) {
-            trace_router::trace('importfileerror', 'danger',
-                ['name' => $providerid, 'error' => $resevents->error->to_string()]);
+            trace_router::trace(
+                'importfileerror',
+                'danger',
+                ['name' => $providerid, 'error' => $resevents->error->to_string()]
+            );
             return ['success' => false, 'errors' => $resevents->error->to_string(), 'id' => $courseid];
         }
 
@@ -103,16 +115,21 @@ class importcalendar_external extends external_api {
         } else {
             trace_router::trace('eventsfound', 'warning', count($events));
             foreach ($events as $googleevent) {
-                // TODO template.
+                // El resumen del evento se compone concatenando HTML en vez de con
+                // una plantilla Mustache (IGC-020).
                 // La descripción de Google es texto plano: mismo tratamiento que
                 // en los módulos y el resumen del curso (escapa, respeta saltos
                 // y enlaza URLs).
                 $summary = text_to_html((string) $googleevent->description, false, false, true);
-                // TODO replace link to Meet Conference for a Zoom, BigBlue, etc resource.
+                // El enlace de videoconferencia se deja como enlace; convertirlo en una
+                // actividad (BigBlueButton, Zoom) está en el roadmap del plugin.
                 foreach ($googleevent->conferencelinks as $link) {
                     $summary .= '<hr>';
-                    $summary .= html_writer::link($link,
-                        get_string('conference', 'local_tresipuntimportgc'), ['target' => '_blank']);
+                    $summary .= html_writer::link(
+                        $link,
+                        get_string('conference', 'local_tresipuntimportgc'),
+                        ['target' => '_blank']
+                    );
                 }
                 if ($googleevent->location !== '') {
                     $summary .= '<hr>';
@@ -150,10 +167,20 @@ class importcalendar_external extends external_api {
                         if ($attachment->fileid !== '') {
                             $meta = $provider->get_drive_file($attachment->fileid);
                             if ($meta->success) {
-                                drive_files::store($provider, $meta->data, $coursecontext->id,
-                                    (int) $USER->id, 'calendar', 'event_description', '/', (int) $ev->id);
+                                drive_files::store(
+                                    $provider,
+                                    $meta->data,
+                                    $coursecontext->id,
+                                    (int) $USER->id,
+                                    'calendar',
+                                    'event_description',
+                                    '/',
+                                    (int) $ev->id
+                                );
                                 $links[] = html_writer::link(
-                                    '@@PLUGINFILE@@/' . rawurlencode($meta->data->name), $meta->data->name);
+                                    '@@PLUGINFILE@@/' . rawurlencode($meta->data->name),
+                                    $meta->data->name
+                                );
                                 continue;
                             }
                         }
@@ -169,7 +196,7 @@ class importcalendar_external extends external_api {
         return [
             'success' => true,
             'errors' => '',
-            'id' => $courseid
+            'id' => $courseid,
         ];
     }
 
@@ -180,11 +207,11 @@ class importcalendar_external extends external_api {
      */
     public static function importcalendar_returns(): external_single_structure {
         return new external_single_structure(
-            array(
+            [
                 'success' => new external_value(PARAM_BOOL, 'Was it a success?'),
                 'errors' => new external_value(PARAM_TEXT, 'Error message'),
-                'id' => new external_value(PARAM_INT, 'Course ID', false)
-            )
+                'id' => new external_value(PARAM_INT, 'Course ID', false),
+            ]
         );
     }
 }

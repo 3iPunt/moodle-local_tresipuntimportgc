@@ -42,7 +42,6 @@ use templatable;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class import_view implements renderable, templatable {
-
     /** @var string One of: noconfig | connect | list. */
     private $state;
 
@@ -150,8 +149,10 @@ class import_view implements renderable, templatable {
         $data->haserror = $this->errormsg !== '';
         $data->errormsg = $this->errormsg;
         $data->authurl = $this->authurl;
-        $data->settingsurl = (new moodle_url('/admin/settings.php',
-            ['section' => 'local_tresipuntimportgc_config']))->out(false);
+        $data->settingsurl = (new moodle_url(
+            '/admin/settings.php',
+            ['section' => 'local_tresipuntimportgc_config']
+        ))->out(false);
         $data->isadmin = $this->isadmin;
         $data->accountemail = (string) $this->accountemail;
         $data->accountinitial = mb_strtoupper(mb_substr((string) $this->accountemail, 0, 1));

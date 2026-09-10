@@ -48,7 +48,6 @@ require_once($CFG->dirroot . '/mod/assign/locallib.php');
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class module_assign extends module {
-
     /** @var string Mod Name */
     protected $modname = 'assign';
 
@@ -107,13 +106,19 @@ class module_assign extends module {
                 $minute = $this->module['dueTime']['minutes'] ?? 0;
             }
             $duedate = $this->module['dueDate'];
-            $record['duedate'] = mktime($hour, $minute, 0,
-                $duedate['month'], $duedate['day'], $duedate['year']);
+            $record['duedate'] = mktime(
+                $hour,
+                $minute,
+                0,
+                $duedate['month'],
+                $duedate['day'],
+                $duedate['year']
+            );
         }
         $options = [
             'section' => $this->get_section($courseid),
             'visible' => $this->visible,
-            'showdescription' => false
+            'showdescription' => false,
         ];
         $res = $this->generator->create_instance($record, $options);
         if (isset($res)) {

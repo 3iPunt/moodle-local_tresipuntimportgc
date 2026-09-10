@@ -105,6 +105,6 @@ $services = [
             'local_tresipuntimportgc_import_discard_course',
         ],
         'restrictedusers' => 0,
-        'enabled' => 1
-    ]
+        'enabled' => 1,
+    ],
 ];

@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Web service that creates one Moodle course from a Classroom class.
+ *
  * @package     local_tresipuntimportgc
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright   2026 3iPunt (contacte@tresipunt.com)
@@ -36,8 +38,14 @@ use local_tresipuntimportgc\providers\google;
 use local_tresipuntimportgc\providers\provider;
 use moodle_exception;
 
+/**
+ * Course creation web service, used by the import task for each queued course.
+ *
+ * @package    local_tresipuntimportgc
+ * @copyright  2026 3iPunt (contacte@tresipunt.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class course_external extends external_api {
-
     /**
      * Create course parameters.
      *
@@ -45,14 +53,14 @@ class course_external extends external_api {
      */
     public static function create_course_parameters(): external_function_parameters {
         return new external_function_parameters(
-            array(
+            [
                 'providerid' => new external_value(PARAM_TEXT, 'Course ID Provider', VALUE_REQUIRED),
                 'fullname' => new external_value(PARAM_TEXT, 'Course Fullname', VALUE_REQUIRED),
                 'shortname' => new external_value(PARAM_TEXT, 'Course Shortname', VALUE_REQUIRED),
                 'category' => new external_value(PARAM_INT, 'Category ID', VALUE_REQUIRED),
                 'visible' => new external_value(PARAM_BOOL, 'Visibility', VALUE_REQUIRED),
                 'importfiles' => new external_value(PARAM_INT, 'Config for Import Google Drive files', VALUE_REQUIRED),
-            )
+            ]
         );
     }
 
@@ -74,21 +82,28 @@ class course_external extends external_api {
      * @throws moodle_exception
      */
     public static function create_course(
-        string $providerid, string $fullname, string $shortname, int $category, bool $visible,
-        int $importfiles, ?provider $provider = null): array {
+        string $providerid,
+        string $fullname,
+        string $shortname,
+        int $category,
+        bool $visible,
+        int $importfiles,
+        ?provider $provider = null
+    ): array {
         global $CFG;
         require_once($CFG->dirroot . '/course/lib.php');
         $syscontext = \context_system::instance();
         self::validate_context($syscontext);
         require_capability('local/tresipuntimportgc:import', $syscontext);
         $params = self::validate_parameters(
-            self::create_course_parameters(), [
+            self::create_course_parameters(),
+            [
                 'providerid' => $providerid,
                 'fullname' => $fullname,
                 'shortname' => $shortname,
                 'category' => $category,
                 'visible' => $visible,
-                'importfiles' => $importfiles
+                'importfiles' => $importfiles,
             ]
         );
         $providerid = $params['providerid'];
@@ -116,8 +131,11 @@ class course_external extends external_api {
                 $id = $res->success ? $res->data : null;
             } else {
                 $success = false;
-                trace_router::trace('user_can_not_view_category', 'danger',
-                    ['category' => $moodlecategory->name, 'course' => $fullname]);
+                trace_router::trace(
+                    'user_can_not_view_category',
+                    'danger',
+                    ['category' => $moodlecategory->name, 'course' => $fullname]
+                );
                 $errors = 'USER_CAN_NOT_VIEW_CATEGORY';
                 $id = null;
             }
@@ -130,7 +148,7 @@ class course_external extends external_api {
         return [
             'success' => $success,
             'errors' => $errors,
-            'id' => $id
+            'id' => $id,
         ];
     }
 
@@ -141,11 +159,11 @@ class course_external extends external_api {
      */
     public static function create_course_returns(): external_single_structure {
         return new external_single_structure(
-            array(
+            [
                 'success' => new external_value(PARAM_BOOL, 'Was it a success?'),
                 'errors' => new external_value(PARAM_TEXT, 'Error message'),
-                'id' => new external_value(PARAM_INT, 'Course ID', false)
-            )
+                'id' => new external_value(PARAM_INT, 'Course ID', false),
+            ]
         );
     }
 }

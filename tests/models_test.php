@@ -29,7 +29,6 @@ use local_tresipuntimportgc\models\import_course;
  * @covers     \local_tresipuntimportgc\models\import_course
  */
 final class models_test extends \advanced_testcase {
-
     /**
      * Cases of the derived run status.
      *
@@ -77,7 +76,8 @@ final class models_test extends \advanced_testcase {
         $this->assertSame(import::STATUS_QUEUED, $import->get_status());
 
         $generator->create_import_course(
-            ['importid' => $import->get('id'), 'status' => import_course::STATUS_SUCCESS]);
+            ['importid' => $import->get('id'), 'status' => import_course::STATUS_SUCCESS]
+        );
         $this->assertSame(import::STATUS_RUNNING, $import->get_status());
         $this->assertSame(['pending' => 1, 'success' => 1], $import->get_status_counts());
     }
@@ -122,7 +122,8 @@ final class models_test extends \advanced_testcase {
         $this->assertNotNull($course->get('timefinished'));
 
         $failed = $generator->create_import_course(
-            ['userid' => $user->id, 'status' => import_course::STATUS_ERROR]);
+            ['userid' => $user->id, 'status' => import_course::STATUS_ERROR]
+        );
         $failed->mark_retried();
         $this->assertSame(import_course::STATUS_PENDING, $failed->get('status'));
         $this->assertNull($failed->get('courseid'));
@@ -138,7 +139,8 @@ final class models_test extends \advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
 
         $done = $generator->create_import_course(
-            ['userid' => $user->id, 'status' => import_course::STATUS_SUCCESS]);
+            ['userid' => $user->id, 'status' => import_course::STATUS_SUCCESS]
+        );
         $this->expectException(\coding_exception::class);
         $done->mark_running();
     }
@@ -153,9 +155,11 @@ final class models_test extends \advanced_testcase {
 
         $course = $generator->create_import_course(['userid' => $user->id]);
         $first = $generator->create_log(
-            ['importcourseid' => $course->get('id'), 'message' => 'one']);
+            ['importcourseid' => $course->get('id'), 'message' => 'one']
+        );
         $generator->create_log(
-            ['importcourseid' => $course->get('id'), 'level' => 'error', 'message' => 'two']);
+            ['importcourseid' => $course->get('id'), 'level' => 'error', 'message' => 'two']
+        );
 
         $this->assertCount(2, $course->get_logs());
         $newer = $course->get_logs((int) $first->get('id'));

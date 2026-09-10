@@ -40,7 +40,6 @@ use moodle_url;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class gc_course_imported extends base {
-
     /**
      * Init method.
      *
@@ -102,8 +101,10 @@ class gc_course_imported extends base {
      * @throws moodle_exception
      */
     public function get_url(): moodle_url {
-        return new moodle_url('/local/tresipuntimportgc/progress.php',
-            ['id' => $this->other['importid']]);
+        return new moodle_url(
+            '/local/tresipuntimportgc/progress.php',
+            ['id' => $this->other['importid']]
+        );
     }
 
     /**

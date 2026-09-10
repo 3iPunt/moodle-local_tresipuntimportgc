@@ -46,7 +46,6 @@ require_once($CFG->dirroot . '/lib/phpunit/classes/util.php');
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class module {
-
     /** @var string Mod Name */
     protected $modname = '';
 
@@ -164,5 +163,4 @@ abstract class module {
             'itemid' => file_get_unused_draft_itemid(),
         ];
     }
-
 }

@@ -56,7 +56,6 @@ use required_capability_exception;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class import_external extends external_api {
-
     /**
      * get_status parameters.
      *
@@ -83,8 +82,10 @@ class import_external extends external_api {
      * @throws restricted_context_exception
      */
     public static function get_status(int $importid, int $lastlogid = 0): array {
-        $params = self::validate_parameters(self::get_status_parameters(),
-            ['importid' => $importid, 'lastlogid' => $lastlogid]);
+        $params = self::validate_parameters(
+            self::get_status_parameters(),
+            ['importid' => $importid, 'lastlogid' => $lastlogid]
+        );
         $context = context_system::instance();
         self::validate_context($context);
         require_capability('local/tresipuntimportgc:import', $context);
@@ -107,8 +108,11 @@ class import_external extends external_api {
                     // logged straight from an exception message — and anything
                     // already stored by an earlier release — do not go through
                     // that path.
-                    'message' => format_text((string) $log->get('message'), FORMAT_HTML,
-                        ['context' => $context, 'filter' => false]),
+                    'message' => format_text(
+                        (string) $log->get('message'),
+                        FORMAT_HTML,
+                        ['context' => $context, 'filter' => false]
+                    ),
                 ];
             }
             $courses[] = [
@@ -122,8 +126,11 @@ class import_external extends external_api {
         }
         return [
             'status' => $status,
-            'finished' => in_array($status,
-                [import::STATUS_COMPLETED, import::STATUS_PARTIAL, import::STATUS_ERROR], true),
+            'finished' => in_array(
+                $status,
+                [import::STATUS_COMPLETED, import::STATUS_PARTIAL, import::STATUS_ERROR],
+                true
+            ),
             'maxlogid' => $maxlogid,
             'courses' => $courses,
         ];
@@ -178,8 +185,10 @@ class import_external extends external_api {
     public static function retry_course(int $importcourseid): array {
         global $USER;
 
-        $params = self::validate_parameters(self::retry_course_parameters(),
-            ['importcourseid' => $importcourseid]);
+        $params = self::validate_parameters(
+            self::retry_course_parameters(),
+            ['importcourseid' => $importcourseid]
+        );
         $context = context_system::instance();
         self::validate_context($context);
         require_capability('local/tresipuntimportgc:import', $context);
@@ -237,8 +246,10 @@ class import_external extends external_api {
      * @return array
      */
     public static function discard_course(int $importcourseid): array {
-        $params = self::validate_parameters(self::discard_course_parameters(),
-            ['importcourseid' => $importcourseid]);
+        $params = self::validate_parameters(
+            self::discard_course_parameters(),
+            ['importcourseid' => $importcourseid]
+        );
         $context = context_system::instance();
         self::validate_context($context);
         require_capability('local/tresipuntimportgc:import', $context);
@@ -301,16 +312,25 @@ class import_external extends external_api {
             $select .= ' AND ' . $DB->sql_like('name', ':q', false);
             $sqlparams['q'] = '%' . $DB->sql_like_escape($search) . '%';
         }
-        $records = $DB->get_records_select('course_categories', $select, $sqlparams,
-            'name ASC', 'id, name', 0, 50);
+        $records = $DB->get_records_select(
+            'course_categories',
+            $select,
+            $sqlparams,
+            'name ASC',
+            'id, name',
+            0,
+            50
+        );
 
         $results = [];
         foreach ($records as $record) {
             $category = core_course_category::get($record->id, IGNORE_MISSING);
             // Only categories the user can actually import into: offering one
             // where they cannot create courses would fail on submit.
-            if ($category && core_course_category::can_view_category($category)
-                    && has_capability('moodle/course:create', \context_coursecat::instance($record->id))) {
+            if (
+                $category && core_course_category::can_view_category($category)
+                    && has_capability('moodle/course:create', \context_coursecat::instance($record->id))
+            ) {
                 $results[] = ['id' => (int) $record->id, 'name' => $category->get_nested_name(false)];
             }
         }

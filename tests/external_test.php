@@ -28,7 +28,6 @@ use local_tresipuntimportgc\models\import_course;
  * @covers     \local_tresipuntimportgc\external\import_external
  */
 final class external_test extends \advanced_testcase {
-
     /**
      * Seeds one import with one course in the given status and returns the course.
      *
@@ -52,8 +51,12 @@ final class external_test extends \advanced_testcase {
     private function login_user_with_capability(): \stdClass {
         $user = $this->getDataGenerator()->create_user();
         $roleid = $this->getDataGenerator()->create_role();
-        assign_capability('local/tresipuntimportgc:import', CAP_ALLOW,
-            $roleid, \context_system::instance());
+        assign_capability(
+            'local/tresipuntimportgc:import',
+            CAP_ALLOW,
+            $roleid,
+            \context_system::instance()
+        );
         role_assign($roleid, $user->id, \context_system::instance());
         $this->setUser($user);
         return $user;
@@ -98,21 +101,27 @@ final class external_test extends \advanced_testcase {
         $user = $this->login_user_with_capability();
         $course = $this->seed_course(import_course::STATUS_SUCCESS, (int) $user->id);
         $first = $generator->create_log(
-            ['importcourseid' => $course->get('id'), 'message' => 'one']);
+            ['importcourseid' => $course->get('id'), 'message' => 'one']
+        );
         $generator->create_log(
-            ['importcourseid' => $course->get('id'), 'level' => 'error', 'message' => 'two']);
+            ['importcourseid' => $course->get('id'), 'level' => 'error', 'message' => 'two']
+        );
 
         $result = import_external::get_status((int) $course->get('importid'), 0);
         $result = \core_external\external_api::clean_returnvalue(
-            import_external::get_status_returns(), $result);
+            import_external::get_status_returns(),
+            $result
+        );
         $this->assertSame('completed', $result['status']);
         $this->assertTrue($result['finished']);
         $this->assertCount(1, $result['courses']);
         $this->assertCount(2, $result['courses'][0]['logs']);
 
         // Incremental: only traces newer than the first one.
-        $result = import_external::get_status((int) $course->get('importid'),
-            (int) $first->get('id'));
+        $result = import_external::get_status(
+            (int) $course->get('importid'),
+            (int) $first->get('id')
+        );
         $this->assertCount(1, $result['courses'][0]['logs']);
     }
 
@@ -138,8 +147,10 @@ final class external_test extends \advanced_testcase {
 
         $result = import_external::discard_course((int) $pending->get('id'));
         $this->assertTrue($result['success']);
-        $this->assertSame(import_course::STATUS_DISCARDED,
-            (new import_course($pending->get('id')))->get('status'));
+        $this->assertSame(
+            import_course::STATUS_DISCARDED,
+            (new import_course($pending->get('id')))->get('status')
+        );
 
         $result = import_external::discard_course((int) $done->get('id'));
         $this->assertFalse($result['success']);
@@ -156,11 +167,13 @@ final class external_test extends \advanced_testcase {
         $failed = $this->seed_course(import_course::STATUS_ERROR);
         $user = $this->login_user_with_capability();
 
-        foreach ([
+        foreach (
+            [
             fn() => import_external::get_status((int) $pending->get('importid'), 0),
             fn() => import_external::discard_course((int) $pending->get('id')),
             fn() => import_external::retry_course((int) $failed->get('id')),
-        ] as $call) {
+            ] as $call
+        ) {
             try {
                 $call();
                 $this->fail('another user\'s run must require the reports capability');
@@ -171,8 +184,12 @@ final class external_test extends \advanced_testcase {
 
         // With the reports capability, the same calls go through.
         $roleid = $this->getDataGenerator()->create_role();
-        assign_capability('local/tresipuntimportgc:viewreports', CAP_ALLOW,
-            $roleid, \context_system::instance());
+        assign_capability(
+            'local/tresipuntimportgc:viewreports',
+            CAP_ALLOW,
+            $roleid,
+            \context_system::instance()
+        );
         role_assign($roleid, $user->id, \context_system::instance());
         accesslib_clear_all_caches_for_unit_testing();
 
@@ -195,9 +212,13 @@ final class external_test extends \advanced_testcase {
         // Failed course, but no Google session token: refused with a reason.
         $result = import_external::retry_course((int) $failed->get('id'));
         $this->assertFalse($result['success']);
-        $this->assertSame(get_string('retry_needsconnection', 'local_tresipuntimportgc'),
-            $result['message']);
-        $this->assertSame(import_course::STATUS_ERROR,
-            (new import_course($failed->get('id')))->get('status'));
+        $this->assertSame(
+            get_string('retry_needsconnection', 'local_tresipuntimportgc'),
+            $result['message']
+        );
+        $this->assertSame(
+            import_course::STATUS_ERROR,
+            (new import_course($failed->get('id')))->get('status')
+        );
     }
 }

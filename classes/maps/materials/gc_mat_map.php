@@ -26,7 +26,7 @@ use renderer_base;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class gc_mat_map {
-
+    /** @var string Logical name of the material type (empty in the base map). */
     const GC_LOGICAL = '';
 
     /*
@@ -35,11 +35,12 @@ abstract class gc_mat_map {
      * YouTube y los enlaces externos se mantienen como enlace/embed en la
      * descripción (límite legal: no se descargan); el formulario se embebe.
      */
+    /** @var array Map of Classroom material type => map class that handles it. */
     const GC_MATS = [
         'youtubeVideo' => gc_mat_youtube_map::class, // Enlace/embed a YouTube.
-        'link' => gc_mat_link_map::class,            // Enlace externo.
+        'link' => gc_mat_link_map::class, // Enlace externo.
         // 'driveFile' NO va aquí: se trae al almacenamiento de Moodle en su módulo.
-        'form' => gc_mat_form_map::class,            // Formulario embebido.
+        'form' => gc_mat_form_map::class, // Formulario embebido.
     ];
 
     /**
@@ -55,9 +56,8 @@ abstract class gc_mat_map {
     /**
      * Get Render.
      *
-     * @param $mat
+     * @param array $mat Material payload as returned by the Classroom API.
      * @return string
      */
     abstract public function get_render($mat): string;
-
 }

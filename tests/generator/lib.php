@@ -34,7 +34,6 @@ use local_tresipuntimportgc\models\import_log;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_tresipuntimportgc_generator extends component_generator_base {
-
     /**
      * Creates an import run.
      *

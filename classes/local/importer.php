@@ -51,7 +51,6 @@ use Throwable;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class importer {
-
     /**
      * Registers an import run and queues one adhoc task per course.
      *

@@ -38,7 +38,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class drive_files {
-
     /**
      * Stores one Google Drive file (by metadata) into a Moodle file area.
      *
@@ -53,8 +52,16 @@ class drive_files {
      * @return void
      * @throws \coding_exception
      */
-    public static function store(provider $provider, stdClass $filemeta, int $contextid,
-            int $userid, string $component, string $filearea, string $filepath, int $itemid = 0): void {
+    public static function store(
+        provider $provider,
+        stdClass $filemeta,
+        int $contextid,
+        int $userid,
+        string $component,
+        string $filearea,
+        string $filepath,
+        int $itemid = 0
+    ): void {
         if ($filemeta->mimetype === 'application/vnd.google-apps.form') {
             // Un Google Form no tiene binario descargable: se omite (no es un
             // error, los formularios se tratan aparte según formsimport).
@@ -68,8 +75,11 @@ class drive_files {
             'application/vnd.google-apps.drawing' => '.svg',
         ];
         if (isset($exports[$filemeta->mimetype])) {
-            trace_router::trace('convertdocumentto', 'info',
-                ['title' => $filemeta->name, 'format' => $exports[$filemeta->mimetype]]);
+            trace_router::trace(
+                'convertdocumentto',
+                'info',
+                ['title' => $filemeta->name, 'format' => $exports[$filemeta->mimetype]]
+            );
         }
         $res = $provider->save_drive_file_to_storage($filemeta, [
             'contextid' => $contextid,
@@ -84,8 +94,11 @@ class drive_files {
         } else if ($res->success) {
             trace_router::trace('importfilealreadyexist', 'warning', $filemeta->name);
         } else {
-            trace_router::trace('importfileerror', 'danger',
-                ['name' => $filemeta->name, 'error' => $res->error->to_string()]);
+            trace_router::trace(
+                'importfileerror',
+                'danger',
+                ['name' => $filemeta->name, 'error' => $res->error->to_string()]
+            );
         }
     }
 
@@ -103,12 +116,23 @@ class drive_files {
      * @return void
      * @throws \coding_exception
      */
-    public static function import(provider $provider, string $fileid, int $contextid,
-            int $userid, string $component, string $filearea, string $filepath, int $itemid = 0): void {
+    public static function import(
+        provider $provider,
+        string $fileid,
+        int $contextid,
+        int $userid,
+        string $component,
+        string $filearea,
+        string $filepath,
+        int $itemid = 0
+    ): void {
         $meta = $provider->get_drive_file($fileid);
         if (!$meta->success) {
-            trace_router::trace('importfileerror', 'danger',
-                ['name' => $fileid, 'error' => $meta->error->to_string()]);
+            trace_router::trace(
+                'importfileerror',
+                'danger',
+                ['name' => $fileid, 'error' => $meta->error->to_string()]
+            );
             return;
         }
         self::store($provider, $meta->data, $contextid, $userid, $component, $filearea, $filepath, $itemid);

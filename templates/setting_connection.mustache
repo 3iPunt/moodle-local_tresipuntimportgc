@@ -43,9 +43,10 @@
                 <span class="tipgc-badge tipgc-badge-error">{{# str }} conn_incomplete, local_tresipuntimportgc {{/ str }}</span>
             {{/ configured }}
         </div>
-        <label class="tipgc-label" for="tipgc-redirecturi">{{# str }} redirecturi, local_tresipuntimportgc {{/ str }}</label>
+        <span class="tipgc-label" id="tipgc-redirecturi-label">{{# str }} redirecturi, local_tresipuntimportgc {{/ str }}</span>
         <div class="d-flex tipgc-uri-row">
-            <code id="tipgc-redirecturi" class="tipgc-uri flex-grow-1">{{ redirecturi }}</code>
+            <code id="tipgc-redirecturi" class="tipgc-uri flex-grow-1"
+                  aria-labelledby="tipgc-redirecturi-label">{{ redirecturi }}</code>
             <button type="button" class="btn btn-outline-secondary btn-sm"
                     data-action="tipgc-copy-uri" data-uri="{{ redirecturi }}">
                 {{# str }} copyuri, local_tresipuntimportgc {{/ str }}
@@ -61,14 +62,14 @@
     </div>
 </div>
 {{#js}}
-require(['core/str', 'core/notification'], function(Str, Notification) {
+require(['jquery', 'core/str', 'core/notification'], function($, Str, Notification) {
     var button = document.querySelector('[data-action="tipgc-copy-uri"]');
     if (!button) {
         return;
     }
-    // navigator.clipboard solo existe en contextos seguros (certificado
-    // válido): en entornos locales con certificado autofirmado se usa el
-    // fallback clásico de selección + execCommand.
+    // El API navigator.clipboard solo existe en contextos seguros
+    // (certificado válido): en entornos locales con certificado autofirmado
+    // se usa el fallback clásico de selección + execCommand.
     var copy = function(text) {
         if (navigator.clipboard && window.isSecureContext) {
             return navigator.clipboard.writeText(text);
@@ -81,7 +82,9 @@ require(['core/str', 'core/notification'], function(Str, Notification) {
         area.select();
         document.execCommand('copy');
         document.body.removeChild(area);
-        return Promise.resolve();
+        // Deferred de jQuery en vez de Promise nativa: el eslint de Moodle no
+        // admite la nativa en el JS de plantillas.
+        return $.Deferred().resolve().promise();
     };
     button.addEventListener('click', function() {
         copy(button.getAttribute('data-uri')).then(function() {

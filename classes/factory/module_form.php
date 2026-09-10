@@ -44,14 +44,13 @@ require_once($CFG->dirroot . '/mod/quiz/lib.php');
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class module_form extends module {
-
     /** @var string Mod Name */
     protected $modname;
 
     /** @var mod_quiz_generator Generator */
     protected $generator;
 
-    /** array module */
+    /** @var array The Classroom module being mapped. */
     protected $module;
 
     /** @var google $provider */
@@ -71,19 +70,24 @@ class module_form extends module {
         $this->module = $module;
         $this->provider = $provider;
         $this->modname = 'quiz';
-        if ((isset($module['workType']) && $module['workType'] === 'SHORT_ANSWER_QUESTION') ||
-            (isset($module['workType']) && $module['workType'] === 'MULTIPLE_CHOICE_QUESTION')) {
+        if (
+            (isset($module['workType']) && $module['workType'] === 'SHORT_ANSWER_QUESTION') ||
+            (isset($module['workType']) && $module['workType'] === 'MULTIPLE_CHOICE_QUESTION')
+        ) {
             $this->modname = 'feedback';
         }
-        if (isset($module['materials'][0]) && count($module['materials']) === 1
-                && array_key_first($module['materials'][0]) === 'form') {
+        if (
+            isset($module['materials'][0]) && count($module['materials']) === 1
+                && array_key_first($module['materials'][0]) === 'form'
+        ) {
             $formurl = $module['materials'][0]['form']['formUrl'];
             // Only forms the connected account can edit are readable via API;
             // forms owned by another teacher will simply not be found.
             $resform = $this->provider->get_form_by_url($formurl);
             if ($resform->success && $resform->data !== null) {
                 $this->intro = $resform->data->description;
-                // TODO when isquiz, import questions once the Forms API mapping lands.
+                // Quiz questions are not imported yet: the Forms API mapping is in the
+                // plugin roadmap.
             }
         }
         // El modname va sin prefijo (para la traza); el generador necesita el
@@ -143,8 +147,10 @@ class module_form extends module {
             'overallfeedbackclosed'  => 1,
             'questionsperpage'       => 1,
             'shuffleanswers'         => 1,
-            'sumgrades'              => 10, // TODO Dinamyc from questions.
-            'grade'                  => 10, // TODO derive from the questions too.
+            // Fixed grade and sum: deriving them from the questions depends on the
+            // Forms API mapping, still pending.
+            'sumgrades'              => 10,
+            'grade'                  => 10,
             'timecreated'            => time(),
             'timemodified'           => time(),
             'timelimit'              => 0,
@@ -167,19 +173,23 @@ class module_form extends module {
                 $minute = $this->module['dueTime']['minutes'] ?? 0;
             }
             $duedate = $this->module['dueDate'];
-            $record['timeclose'] = mktime($hour, $minute, 0,
-                $duedate['month'], $duedate['day'], $duedate['year']);
+            $record['timeclose'] = mktime(
+                $hour,
+                $minute,
+                0,
+                $duedate['month'],
+                $duedate['day'],
+                $duedate['year']
+            );
         }
         $options = ['section' => $this->get_section($courseid), 'visible' => $this->visible, 'showdescription' => false];
         $res = $this->generator->create_instance($record, $options);
         if (isset($res)) {
-            // TODO add the questions to the question bank and link them to this
-            // quiz. The builder also needs the extra configuration that comes
-            // with them: grading, multiple answers, and so on.
+            // The questions are neither added to the question bank nor linked to
+            // this quiz, and their configuration (grading, multiple answers) is
+            // missing too: it depends on the Forms API mapping.
             return new response_module(true, $this, null);
         }
         return new response_module(false, null, new error('13000', 'MODULE_NOT_CREATED'));
     }
-
-
 }

@@ -17,6 +17,7 @@
 #page-local-tresipuntimportgc-import #region-main,
 #page-local-tresipuntimportgc-progress #region-main,
 #page-local-tresipuntimportgc-panel #region-main {
+    /* stylelint-disable-next-line declaration-no-important -- unica forma de vencer al !important del tema. */
     background-color: transparent !important;
 }
 
@@ -100,6 +101,7 @@
     color: #6f6f73;
     font-size: 1rem;
 }
+
 @media (max-width: 600px) {
     .local-tipgc .tipgc-logo-full {
         display: none;
@@ -131,14 +133,32 @@
     border-top-color: transparent;
     animation: tipgc-spin 1s linear infinite;
 }
+
 @keyframes tipgc-spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
-.local-tipgc .tipgc-badge-pending { background: #ececed; color: #545457; }
-.local-tipgc .tipgc-badge-running { background: #e8f1fe; color: #2d7ff9; }
-.local-tipgc .tipgc-badge-success { background: #e7f6ee; color: #1f9d57; }
-.local-tipgc .tipgc-badge-warning { background: #fcf3df; color: #9a6b08; }
-.local-tipgc .tipgc-badge-error { background: #fceae8; color: #e23b2e; }
+.local-tipgc .tipgc-badge-pending {
+    background: #ececed;
+    color: #545457;
+}
+.local-tipgc .tipgc-badge-running {
+    background: #e8f1fe;
+    color: #2d7ff9;
+}
+.local-tipgc .tipgc-badge-success {
+    background: #e7f6ee;
+    color: #1f9d57;
+}
+.local-tipgc .tipgc-badge-warning {
+    background: #fcf3df;
+    color: #9a6b08;
+}
+.local-tipgc .tipgc-badge-error {
+    background: #fceae8;
+    color: #e23b2e;
+}
 
 /* Cards y filas de curso (C4). */
 .local-tipgc .tipgc-card {
@@ -413,10 +433,18 @@
 .local-tipgc .tipgc-progressbar-seg {
     transition: width 0.4s ease;
 }
-.local-tipgc .tipgc-seg-success { background: #1f9d57; }
-.local-tipgc .tipgc-seg-error { background: #e23b2e; }
-.local-tipgc .tipgc-seg-running { background: #2d7ff9; }
-.local-tipgc .tipgc-seg-pending { background: #c6c6c9; }
+.local-tipgc .tipgc-seg-success {
+    background: #1f9d57;
+}
+.local-tipgc .tipgc-seg-error {
+    background: #e23b2e;
+}
+.local-tipgc .tipgc-seg-running {
+    background: #2d7ff9;
+}
+.local-tipgc .tipgc-seg-pending {
+    background: #c6c6c9;
+}
 .local-tipgc .tipgc-counters {
     gap: 16px;
     font-size: 0.8rem;
@@ -512,8 +540,12 @@
     font-size: 1.5rem;
     line-height: 1;
 }
-.local-tipgc .tipgc-stat-success { color: #1f9d57; }
-.local-tipgc .tipgc-stat-error { color: #e23b2e; }
+.local-tipgc .tipgc-stat-success {
+    color: #1f9d57;
+}
+.local-tipgc .tipgc-stat-error {
+    color: #e23b2e;
+}
 .local-tipgc .tipgc-stat-l {
     font-size: 0.8rem;
     color: #6f6f73;
@@ -555,8 +587,13 @@
     color: #9a9a9e;
     flex: none;
 }
-.local-tipgc .tipgc-log-warning .tipgc-log-msg { color: #9a6b08; }
-.local-tipgc .tipgc-log-error .tipgc-log-msg { color: #e23b2e; font-weight: 500; }
+.local-tipgc .tipgc-log-warning .tipgc-log-msg {
+    color: #9a6b08;
+}
+.local-tipgc .tipgc-log-error .tipgc-log-msg {
+    color: #e23b2e;
+    font-weight: 500;
+}
 
 /* C10 - bloque de conexion en la pagina de ajustes. */
 .local-tipgc .tipgc-uri-row {
@@ -585,23 +622,45 @@
    descuadra el centrado ni el apilado en móvil (norma de la skill
    tresipunt-moodle-responsive).
    ============================================================ */
-.local-tipgc .tipgc-titlerow { gap: 8px; }
-.local-tipgc .tipgc-runhead-title { gap: 8px; }
-.local-tipgc .tipgc-runhead-actions { gap: 8px; }
+.local-tipgc .tipgc-titlerow {
+    gap: 8px;
+}
+.local-tipgc .tipgc-runhead-title {
+    gap: 8px;
+}
+.local-tipgc .tipgc-runhead-actions {
+    gap: 8px;
+}
 .local-tipgc .tipgc-course-head {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 8px;
 }
-.local-tipgc .tipgc-course-selrow { gap: 10px; }
-.local-tipgc .tipgc-course-tags { gap: 6px 8px; }
-.local-tipgc .tipgc-toolbar { gap: 8px; }
-.local-tipgc .tipgc-searchrow { gap: 8px; }
-.local-tipgc .tipgc-minibar-cell { gap: 8px; }
-.local-tipgc .tipgc-account-chip { gap: 10px; }
-.local-tipgc .tipgc-uri-row { gap: 8px; }
-.local-tipgc .tipgc-testrow { gap: 8px; }
+.local-tipgc .tipgc-course-selrow {
+    gap: 10px;
+}
+.local-tipgc .tipgc-course-tags {
+    gap: 6px 8px;
+}
+.local-tipgc .tipgc-toolbar {
+    gap: 8px;
+}
+.local-tipgc .tipgc-searchrow {
+    gap: 8px;
+}
+.local-tipgc .tipgc-minibar-cell {
+    gap: 8px;
+}
+.local-tipgc .tipgc-account-chip {
+    gap: 10px;
+}
+.local-tipgc .tipgc-uri-row {
+    gap: 8px;
+}
+.local-tipgc .tipgc-testrow {
+    gap: 8px;
+}
 
 /* ============================================================
    Responsive: tablet y móvil. Mobile-first, apilar en vertical
