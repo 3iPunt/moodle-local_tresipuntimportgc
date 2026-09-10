@@ -50,7 +50,7 @@
 
     {{#header}}{{> local_tresipuntimportgc/components/page_header }}{{/header}}
 
-    {{! ===== Estado: sin conectar ===== }}
+    {{! ===== State: not connected ===== }}
     {{# isconnect }}
         <div class="d-flex justify-content-center py-4">
             <div class="tipgc-card tipgc-connect-card p-4">
@@ -76,7 +76,7 @@
         </div>
     {{/ isconnect }}
 
-    {{! ===== Estado: conectado ===== }}
+    {{! ===== State: connected ===== }}
     {{# islist }}
         <div class="tipgc-account-row d-flex align-items-center justify-content-between flex-wrap mt-3 mb-3">
             {{> local_tresipuntimportgc/components/account_chip }}

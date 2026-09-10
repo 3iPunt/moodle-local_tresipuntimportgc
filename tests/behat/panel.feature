@@ -12,16 +12,16 @@ Feature: Panel de importaciones
       | user     | role    | contextlevel | reference |
       | manager1 | manager | System       |           |
 
-  # Antes de la primera importación el panel muestra el estado vacío
-  # inicial, no una tabla sin filas.
+  # Before the first import the panel shows the initial empty state, not a
+  # table with no rows.
   Scenario: Estado vacío antes de cualquier importación
     Given I log in as "manager1"
     When I visit "/local/tresipuntimportgc/panel.php"
     Then I should see "No import has been run yet"
 
-  # Con datos sembrados por el generator (un run con un curso completado y
-  # otro con error), el histórico lista la importación con quién la lanzó,
-  # el estado derivado "con incidencias" y el enlace al detalle.
+  # With data seeded by the generator (a run with one completed course and
+  # another with an error), the history lists the import with who launched
+  # it, the derived "with issues" status and the link to the detail.
   Scenario: El histórico lista las importaciones sembradas con estado y detalle
     Given the following "local_tresipuntimportgc > imports" exist:
       | user     | googleaccount       |
@@ -36,12 +36,12 @@ Feature: Panel de importaciones
     And I should see "Manager One"
     And I should see "With issues"
     And I should see "View detail"
-    # Privacidad: un manager que no es administrador del sitio no ve la
-    # cuenta de Google de quien lanzó la importación.
+    # Privacy: a manager who is not a site administrator does not see the
+    # Google account of whoever launched the import.
     And I should not see "teacher@example.com"
 
-  # El filtro de estado se aplica en servidor vía parámetro GET: si ningún
-  # run coincide, se muestra el estado "sin resultados" (distinto del vacío).
+  # The status filter is applied server side through a GET parameter: if no
+  # run matches, the "no results" state is shown (different from empty).
   Scenario: Filtrar por un estado sin coincidencias muestra el aviso de sin resultados
     Given the following "local_tresipuntimportgc > imports" exist:
       | user     |
@@ -53,8 +53,8 @@ Feature: Panel de importaciones
     When I visit "/local/tresipuntimportgc/panel.php?status=error"
     Then I should see "No import matches the filters"
 
-  # La búsqueda por texto filtra por quién lanzó la importación: con un
-  # texto que no coincide se ve el aviso; con el nombre del usuario, la fila.
+  # The text search filters by who launched the import: with text that does
+  # not match you see the warning; with the user name, the row.
   Scenario: La búsqueda por usuario filtra el histórico
     Given the following "local_tresipuntimportgc > imports" exist:
       | user     | googleaccount       |

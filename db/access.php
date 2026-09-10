@@ -26,7 +26,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// Este fichero define $capabilities (estado global), así que sí necesita el guard.
+// This file defines $capabilities (global state), so it does need the guard.
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [

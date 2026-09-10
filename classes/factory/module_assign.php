@@ -90,11 +90,11 @@ class module_assign extends module {
             'introeditor' => $this->intro_editor(),
             'files' => file_get_unused_draft_itemid(),
         ];
-        // Nota máxima del trabajo → calificación por puntos de la tarea (E10.4).
+        // Coursework max points to the point grade of the assignment (E10.4).
         if (isset($this->module['maxPoints']) && (int) $this->module['maxPoints'] > 0) {
             $record['grade'] = (int) $this->module['maxPoints'];
         }
-        // Fecha de publicación programada → restricción de acceso (E10.5).
+        // Scheduled publication date to an access restriction (E10.5).
         if ($availability = self::scheduled_availability($this->module)) {
             $record['availability'] = $availability;
         }

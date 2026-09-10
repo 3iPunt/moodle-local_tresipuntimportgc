@@ -1,29 +1,29 @@
-/* local_tresipuntimportgc — estilos propios, siempre acotados a .local-tipgc
-   o al id de body de las páginas del plugin. */
+/* local_tresipuntimportgc — own styles, always scoped to .local-tipgc or to
+   the body id of the plugin pages. */
 
-/* Boost capa el contenedor central (.main-inner) muy por debajo de nuestro
-   ancho de trabajo: lo ampliamos solo en las páginas del plugin. */
+/* Boost caps the central container (.main-inner) well below our working
+   width: we widen it only on the plugin pages. */
 #page-local-tresipuntimportgc-import .main-inner,
 #page-local-tresipuntimportgc-progress .main-inner,
 #page-local-tresipuntimportgc-panel .main-inner {
-    max-width: 1102px; /* 1038px de contenido + padding lateral del tema. */
+    max-width: 1102px; /* 1038px of content plus the side padding of the theme. */
 }
 
-/* Algunos temas (p. ej. theme_fresk vía su SCSS de ajustes) pintan #region-main
-   como tarjeta blanca con !important. Nuestras pantallas ya traen la suya
-   (.local-tipgc), así que quedarían dos tarjetas anidadas y el fondo de página
-   dejaría de contrastar: lo neutralizamos solo aquí. Doble id + !important para
-   ganar al !important del tema. */
+/* Some themes (theme_fresk through its settings SCSS, for one) paint
+   #region-main as a white card with !important. Our screens already bring their
+   own (.local-tipgc), so there would be two nested cards and the page background
+   would stop contrasting: we neutralise it only here. Double id plus !important
+   to beat the !important of the theme. */
 #page-local-tresipuntimportgc-import #region-main,
 #page-local-tresipuntimportgc-progress #region-main,
 #page-local-tresipuntimportgc-panel #region-main {
-    /* stylelint-disable-next-line declaration-no-important -- unica forma de vencer al !important del tema. */
+    /* stylelint-disable-next-line declaration-no-important -- only way to beat the theme !important. */
     background-color: transparent !important;
 }
 
 .local-tipgc {
     font-size: 0.95rem;
-    /* Ancho de trabajo del plugin en todas las pantallas. */
+    /* Working width of the plugin on every screen. */
     max-width: 1038px;
     margin: 0 auto;
     box-shadow: rgba(100, 100, 111, 0.2) 0 7px 29px 0;
@@ -32,7 +32,7 @@
     background-color: white;
 }
 
-/* Norma: icono + texto siempre centrados en altura (flex, sin baselines). */
+/* Rule: icon and text always centred vertically (flex, no baselines). */
 .local-tipgc .btn {
     display: inline-flex;
     align-items: center;
@@ -46,7 +46,7 @@
     line-height: 1;
 }
 
-/* Norma: icono de enlace externo tras el texto — gris, separado y centrado. */
+/* Rule: external link icon after the text — grey, spaced and centred. */
 .local-tipgc a .icon:last-child {
     margin: 3px 0 0 7px;
     font-size: 0.7em;
@@ -54,14 +54,14 @@
     line-height: 1;
     vertical-align: middle;
 }
-/* En botones manda el flex+gap del propio botón (sin margen extra). */
+/* On buttons the flex and gap of the button itself win (no extra margin). */
 .local-tipgc .btn .icon:last-child {
     margin: 0;
     font-size: 0.8em;
     color: inherit;
 }
 
-/* Botones de texto (btn-link): sin subrayado, hover con fondo suave. */
+/* Text buttons (btn-link): no underline, hover with a soft background. */
 .local-tipgc .btn-link {
     text-decoration: none;
     color: #545457;
@@ -74,7 +74,7 @@
     color: #1e1e1f;
 }
 
-/* C11 — cabecera co-brandada. */
+/* C11 — co-branded header. */
 .local-tipgc .tipgc-header {
     gap: 26px;
     padding-bottom: 20px;
@@ -111,7 +111,7 @@
     }
 }
 
-/* C1 — badges de estado (icono lo aporta el texto; nunca solo color). */
+/* C1 — status badges (the text carries the icon; never colour alone). */
 .local-tipgc .tipgc-badge {
     display: inline-flex;
     align-items: center;
@@ -123,7 +123,7 @@
     line-height: 1.4;
     white-space: nowrap;
 }
-/* Arco de recarga girando dentro de la pastilla mientras el run está vivo. */
+/* Refresh arc spinning inside the pill while the run is alive. */
 .local-tipgc .tipgc-badge-spin {
     width: 11px;
     height: 11px;
@@ -160,7 +160,7 @@
     color: #e23b2e;
 }
 
-/* Cards y filas de curso (C4). */
+/* Course cards and rows (C4). */
 .local-tipgc .tipgc-card {
     background: #fff;
     border: 1px solid rgba(0, 0, 0, 0.125);
@@ -291,13 +291,13 @@
     margin-bottom: 4px;
 }
 
-/* Toolbar: buscador + chips. */
+/* Toolbar: search box and chips. */
 .local-tipgc .tipgc-toolbar {
     gap: 10px;
     padding: 20px 0;
 }
 .local-tipgc .tipgc-search {
-    /* El buscador estira todo el ancho disponible junto a los chips. */
+    /* The search box stretches to all the width available next to the chips. */
     flex: 1 1 auto;
     min-width: 200px;
     width: auto;
@@ -325,7 +325,7 @@
     box-shadow: 0 1px 2px rgba(30, 30, 31, 0.06);
 }
 
-/* C5 — barra fija inferior: flota con claridad sobre el contenido. */
+/* C5 — fixed bottom bar: it floats clearly above the content. */
 .local-tipgc .tipgc-footer {
     position: sticky;
     bottom: 12px;
@@ -338,7 +338,7 @@
     z-index: 10;
 }
 
-/* Estado sin conectar. */
+/* Not connected state. */
 .local-tipgc .tipgc-connect-card {
     max-width: 560px;
     width: 100%;
@@ -387,7 +387,7 @@
     text-decoration: none;
 }
 
-/* Cuenta conectada (chip reutilizable). */
+/* Connected account (reusable chip). */
 .local-tipgc .tipgc-account-chip {
     background: #fff;
     border: 1px solid rgba(0, 0, 0, 0.125);
@@ -422,7 +422,7 @@
     line-height: 1.2;
 }
 
-/* C2 — barra de progreso segmentada. */
+/* C2 — segmented progress bar. */
 .local-tipgc .tipgc-progressbar {
     display: flex;
     height: 12px;
@@ -472,13 +472,13 @@
     gap: 6px;
 }
 
-/* Subtítulo de la ejecución (progreso). */
+/* Run subtitle (progress). */
 .local-tipgc .tipgc-run-title {
     font-weight: 700;
     font-size: 1.15rem;
 }
 
-/* Panel: tabla de importaciones. */
+/* Panel: imports table. */
 .local-tipgc .tipgc-table-wrap {
     overflow-x: auto;
 }
@@ -526,7 +526,7 @@
     border-top: 1px solid rgba(0, 0, 0, 0.125);
 }
 
-/* Resumen final. */
+/* Final summary. */
 .local-tipgc .tipgc-summary-title {
     font-weight: 700;
     font-size: 1.1rem;
@@ -564,7 +564,7 @@
     color: inherit;
 }
 
-/* Trazas (C3, versión mínima). */
+/* Traces (C3, minimal version). */
 .local-tipgc .tipgc-mono {
     font-family: SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 0.8rem;
@@ -595,7 +595,7 @@
     font-weight: 500;
 }
 
-/* C10 - bloque de conexion en la pagina de ajustes. */
+/* C10 - connection block on the settings page. */
 .local-tipgc .tipgc-uri-row {
     gap: 8px;
 }
@@ -617,10 +617,10 @@
 }
 
 /* ============================================================
-   Separación entre ítems: SIEMPRE con `gap` en el contenedor flex,
-   nunca con utilidades de margen (ml-2/ms-2) en los hijos. El gap no
-   descuadra el centrado ni el apilado en móvil (norma de la skill
-   tresipunt-moodle-responsive).
+   Spacing between items: ALWAYS with `gap` on the flex container, never
+   with margin utilities (ml-2/ms-2) on the children. The gap breaks
+   neither the centring nor the stacking on mobile (rule of the
+   tresipunt-moodle-responsive skill).
    ============================================================ */
 .local-tipgc .tipgc-titlerow {
     gap: 8px;
@@ -663,19 +663,19 @@
 }
 
 /* ============================================================
-   Responsive: tablet y móvil. Mobile-first, apilar en vertical
-   (skill tresipunt-moodle-responsive). Breakpoint principal 767.98px
-   (incluye tablet en vertical, 768px).
+   Responsive: tablet and mobile. Mobile-first, stack vertically
+   (tresipunt-moodle-responsive skill). Main breakpoint 767.98px
+   (it covers portrait tablet, 768px).
    ============================================================ */
 @media (max-width: 767.98px) {
-    /* Aire global: menos padding lateral que el escritorio. */
+    /* Global breathing room: less side padding than on desktop. */
     .local-tipgc {
         padding: 20px 14px;
         border-radius: 12px;
     }
 
-    /* C11 — cabecera co-brandada: apilar y centrar (logos arriba, título
-       debajo), todo en vertical y centrado. */
+    /* C11 — co-branded header: stack and centre (logos on top, title
+       below), everything vertical and centred. */
     .local-tipgc .tipgc-header {
         flex-direction: column;
         align-items: center;
@@ -691,16 +691,16 @@
         text-align: center;
         width: 100%;
     }
-    /* Fila título + badge: centrada (la separación la da el gap base). */
+    /* Title and badge row: centred (the base gap provides the spacing). */
     .local-tipgc .tipgc-header-text > .tipgc-titlerow {
         justify-content: center;
     }
-    /* Separar la descripción del título para que no queden pegados. */
+    /* Separate the description from the title so they do not touch. */
     .local-tipgc .tipgc-header-desc {
         margin-top: 8px;
     }
 
-    /* Acciones superiores del importador: apiladas a ancho completo. */
+    /* Top actions of the importer: stacked at full width. */
     .local-tipgc .tipgc-topactions {
         flex-direction: column;
         align-items: stretch;
@@ -709,7 +709,7 @@
         width: 100%;
     }
 
-    /* Cabecera de la importación: todo centrado en móvil. */
+    /* Import header: everything centred on mobile. */
     .local-tipgc .tipgc-runhead {
         justify-content: center;
         text-align: center;
@@ -720,7 +720,7 @@
     .local-tipgc .tipgc-runhead-title {
         justify-content: center;
     }
-    /* Acciones de cabecera: apiladas en vertical, a ancho completo. */
+    /* Header actions: stacked vertically, at full width. */
     .local-tipgc .tipgc-runhead-actions {
         flex-direction: column;
         align-items: stretch;
@@ -731,7 +731,7 @@
         width: 100%;
     }
 
-    /* Botón inferior del panel: a ancho completo, no pegado a la derecha. */
+    /* Bottom button of the panel: full width, not stuck to the right. */
     .local-tipgc .tipgc-panel-actions {
         justify-content: stretch;
     }
@@ -739,14 +739,14 @@
         width: 100%;
     }
 
-    /* Fila de cada curso: en columna y centrada (nombre, badge, errores e
-       "Ir al curso" apilados; las acciones debajo). */
+    /* Row of each course: in a column and centred (name, badge, errors and
+       "go to course" stacked; the actions below). */
     .local-tipgc .tipgc-course-row {
         flex-direction: column;
         align-items: stretch;
         text-align: center;
     }
-    /* En móvil la fila de curso pasa a columna centrada (el gap base sigue). */
+    /* On mobile the course row becomes a centred column (base gap still applies). */
     .local-tipgc .tipgc-course-head {
         flex-direction: column;
         gap: 6px;
@@ -756,8 +756,8 @@
         margin-top: 10px;
     }
 
-    /* Chips (estado del panel y filtros de logs): scroll horizontal, no se
-       aplastan, y centrados (se anula el ml-auto/ms-auto que los empuja). */
+    /* Chips (panel status and log filters): horizontal scroll, they do not
+       squash, and centred (the ml-auto/ms-auto that pushes them is cancelled). */
     .local-tipgc .tipgc-chips {
         max-width: 100%;
         overflow-x: auto;
@@ -769,7 +769,7 @@
         flex: none;
     }
 
-    /* Buscador del panel: input a ancho completo, botones debajo centrados. */
+    /* Panel search box: full width input, buttons centred below. */
     .local-tipgc .tipgc-searchrow {
         flex-wrap: wrap;
         justify-content: center;
@@ -779,8 +779,8 @@
         min-width: 0;
     }
 
-    /* Tabla del panel: reflow a tarjetas (ocultar cabecera, filas apiladas y
-       centradas), en vez de una tabla que desborda a la derecha. */
+    /* Panel table: reflow into cards (hide the header, stack and centre the
+       rows) instead of a table that overflows to the right. */
     .local-tipgc .tipgc-table-wrap {
         overflow-x: visible;
     }
@@ -820,7 +820,7 @@
         gap: 8px;
     }
 
-    /* Bloque de conexión (C10): URI y botón apilados (gap base); URI que parta. */
+    /* Connection block (C10): URI and button stacked (base gap); URI may wrap. */
     .local-tipgc .tipgc-uri-row {
         flex-direction: column;
         align-items: stretch;
@@ -830,12 +830,12 @@
         white-space: normal;
     }
 
-    /* Correo de la cuenta conectada: que parta si es largo. */
+    /* Email of the connected account: it may wrap if long. */
     .local-tipgc .tipgc-account-email {
         overflow-wrap: anywhere;
     }
 
-    /* Importador — fila de cuenta: cuenta arriba, acciones debajo, centrado. */
+    /* Importer — account row: account on top, actions below, centred. */
     .local-tipgc .tipgc-account-row {
         flex-direction: column;
         align-items: center;
@@ -843,7 +843,7 @@
         gap: 10px;
     }
 
-    /* Importador — barra de búsqueda + chips: apiladas (gap base) y centradas. */
+    /* Importer — search bar and chips: stacked (base gap) and centred. */
     .local-tipgc .tipgc-toolbar {
         flex-direction: column;
         align-items: stretch;
@@ -852,7 +852,7 @@
         width: 100%;
     }
 
-    /* Importador — fila "seleccionar todo" + contador: centrada. */
+    /* Importer — "select all" row and counter: centred. */
     .local-tipgc .tipgc-selectrow {
         flex-direction: column;
         align-items: center;
@@ -860,7 +860,7 @@
         gap: 6px;
     }
 
-    /* Barra inferior fija: pegada al borde, apilada y centrada en móvil. */
+    /* Fixed bottom bar: flush to the edge, stacked and centred on mobile. */
     .local-tipgc .tipgc-footer {
         bottom: 0;
         flex-direction: column;

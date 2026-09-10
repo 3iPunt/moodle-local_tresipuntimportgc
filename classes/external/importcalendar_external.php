@@ -115,14 +115,14 @@ class importcalendar_external extends external_api {
         } else {
             trace_router::trace('eventsfound', 'warning', count($events));
             foreach ($events as $googleevent) {
-                // El resumen del evento se compone concatenando HTML en vez de con
-                // una plantilla Mustache (IGC-020).
-                // La descripción de Google es texto plano: mismo tratamiento que
-                // en los módulos y el resumen del curso (escapa, respeta saltos
-                // y enlaza URLs).
+                // The event summary is built by concatenating HTML instead of using
+                // a Mustache template (IGC-020).
+                // The Google description is plain text: same treatment as in the
+                // modules and the course summary (escapes, keeps line breaks and
+                // links URLs).
                 $summary = text_to_html((string) $googleevent->description, false, false, true);
-                // El enlace de videoconferencia se deja como enlace; convertirlo en una
-                // actividad (BigBlueButton, Zoom) está en el roadmap del plugin.
+                // The conference link is kept as a link; turning it into an activity
+                // (BigBlueButton, Zoom) is in the plugin roadmap.
                 foreach ($googleevent->conferencelinks as $link) {
                     $summary .= '<hr>';
                     $summary .= html_writer::link(
@@ -138,9 +138,9 @@ class importcalendar_external extends external_api {
                     $summary .= '<br>';
                 }
 
-                // La llamada a calendar_event::create() usa su $checkcapability
-                // por defecto (true), así que la capacidad de crear eventos SÍ
-                // se comprueba: no hay ninguna propiedad que lo desactive.
+                // The calendar_event::create() call uses its default $checkcapability
+                // (true), so the capability to create events IS checked: there is no
+                // property that disables it.
                 $event = new stdClass();
                 $event->eventtype = 'course';
                 $event->type = CALENDAR_EVENT_COURSE;
@@ -157,9 +157,9 @@ class importcalendar_external extends external_api {
                 $event->timeduration = $googleevent->timeduration;
                 $ev = calendar_event::create($event);
 
-                // Adjuntos → ficheros de Moodle en el área del evento (E10.10):
-                // los de Drive se descargan y se referencian con @@PLUGINFILE@@;
-                // los que no son de Drive quedan como enlace externo.
+                // Attachments to Moodle files in the event file area (E10.10): the
+                // Drive ones are downloaded and referenced with @@PLUGINFILE@@; the
+                // non-Drive ones are kept as an external link.
                 if ($ev && !empty($googleevent->attachments)) {
                     $coursecontext = context_course::instance($courseid);
                     $links = [];

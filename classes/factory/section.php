@@ -30,8 +30,8 @@ use local_tresipuntimportgc\responses\response_section;
 use moodle_exception;
 use stdClass;
 
-// El guard va ANTES del cambio de estado global: este fichero tiene efectos
-// secundarios (require_once), así que sí lo necesita.
+// The guard goes BEFORE the global state change: this file has side
+// effects (require_once), so it does need it.
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -52,14 +52,14 @@ class section {
     protected $providerid;
 
     /**
-     * @var array<string,int> Correspondencia topicId → número de sección de la
-     * importación en curso. Evita usar el `summary` visible como clave (§6.3).
-     * Se reinicia por curso con reset_map().
+     * @var array<string,int> Map of topicId to section number of the running
+     * import. Avoids using the visible `summary` as a key (§6.3). Reset per
+     * course with reset_map().
      */
     private static $sectionmap = [];
 
     /**
-     * Reinicia la correspondencia topicId↔sección. Llamar al empezar un curso.
+     * Resets the topicId to section map. Call it when a course starts.
      *
      * @return void
      */
@@ -110,8 +110,8 @@ class section {
     public function create(int $courseid): response_section {
         try {
             $newsection = course_create_section($courseid, 1000);
-            // El nombre del tema va en el name; el topicId ya NO se guarda en el
-            // summary visible (§6.3): la correspondencia vive en $sectionmap.
+            // The topic name goes in the name; the topicId is NO longer stored in the
+            // visible summary (§6.3): the map lives in $sectionmap.
             course_update_section($courseid, $newsection, ['name' => $this->name]);
             self::$sectionmap[$this->providerid] = (int) $newsection->section;
             return new response_section(true, $this, null);

@@ -111,8 +111,8 @@ class module_label extends module {
             get_string('form', 'local_tresipuntimportgc'),
             ['class' => 'card-subtitle mb-2 text-muted']
         );
-        // Sin contenido ni frameborder/margin*: obsoletos en HTML5. El borde va
-        // por estilo, que este HTML se guarda en el curso y debe valerse solo.
+        // No content and no frameborder/margin*: obsolete in HTML5. The border
+        // goes inline, as this HTML is stored in the course and must stand alone.
         $res['intro'] .= html_writer::tag('iframe', '', [
             'src' => $this->material['form']['formUrl'],
             'title' => $this->title,

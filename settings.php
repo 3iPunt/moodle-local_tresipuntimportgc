@@ -32,14 +32,14 @@ $ADMIN->add('courses', new admin_externalpage(
     ['local/tresipuntimportgc:import']
 ));
 
-// Categoría del plugin en Extensiones. Se registra siempre para que el panel
-// aparezca por su capacidad (no solo para administradores del sitio).
+// Plugin category under Plugins. Always registered so that the panel shows
+// up by capability (not only for site administrators).
 $ADMIN->add('modules', new admin_category(
     'local_tresipuntimportgc_category',
     new lang_string('pluginname', 'local_tresipuntimportgc')
 ));
 
-// Acceso a importar también desde la categoría del plugin (además de Cursos).
+// Access to the importer from the plugin category too (besides Courses).
 $ADMIN->add('local_tresipuntimportgc_category', new admin_externalpage(
     'local_tresipuntimportgc_import_menu',
     new lang_string('import_page', 'local_tresipuntimportgc'),
@@ -47,7 +47,7 @@ $ADMIN->add('local_tresipuntimportgc_category', new admin_externalpage(
     ['local/tresipuntimportgc:import']
 ));
 
-// El panel de importaciones: visible para quien tenga la capacidad de consulta.
+// The imports panel: visible to anyone holding the reports capability.
 $ADMIN->add('local_tresipuntimportgc_category', new admin_externalpage(
     'local_tresipuntimportgc_panel',
     new lang_string('panel_title', 'local_tresipuntimportgc'),
@@ -55,7 +55,7 @@ $ADMIN->add('local_tresipuntimportgc_category', new admin_externalpage(
     ['local/tresipuntimportgc:viewreports']
 ));
 
-// Los ajustes del plugin son configuración de sitio: solo administradores.
+// The plugin settings are site configuration: administrators only.
 if ($hassiteconfig) {
     $settingspage = new admin_settingpage(
         'local_tresipuntimportgc_config',
@@ -64,7 +64,7 @@ if ($hassiteconfig) {
     $ADMIN->add('local_tresipuntimportgc_category', $settingspage);
 
     if ($ADMIN->fulltree) {
-        // Bloque A: conexión con Google.
+        // Block A: connection with Google.
         $settingspage->add(
             new admin_setting_heading(
                 'local_tresipuntimportgc_gc',
@@ -73,7 +73,7 @@ if ($hassiteconfig) {
             )
         );
 
-        // Estado de la conexión + URI de redirección copiable + probar.
+        // Connection status, copiable redirect URI and test link.
         $settingspage->add(new \local_tresipuntimportgc\adminsetting\connection());
 
         $settingspage->add(new admin_setting_configtext(
@@ -91,7 +91,7 @@ if ($hassiteconfig) {
             ''
         ));
 
-        // Bloque B: opciones de importación por defecto.
+        // Block B: default import options.
         $settingspage->add(
             new admin_setting_heading(
                 'local_tresipuntimportgc_config_import',
@@ -109,7 +109,7 @@ if ($hassiteconfig) {
             )
         );
 
-        // Formularios de Google: solo opciones implementadas.
+        // Google Forms: implemented options only.
         $options = [
             0 => get_string('formsiframegenerate', 'local_tresipuntimportgc'),
             2 => get_string('notimport', 'local_tresipuntimportgc'),
@@ -124,7 +124,7 @@ if ($hassiteconfig) {
             )
         );
 
-        // Ficheros de Google Drive: solo opciones implementadas.
+        // Google Drive files: implemented options only.
         $options = [
             0 => get_string('generategdlink', 'local_tresipuntimportgc'),
             1 => get_string('importtoprivatearea', 'local_tresipuntimportgc'),
@@ -140,7 +140,7 @@ if ($hassiteconfig) {
             )
         );
 
-        // Calendario del curso: solo opciones implementadas.
+        // Course calendar: implemented options only.
         $options = [
             1 => get_string('calendarimport', 'local_tresipuntimportgc'),
             2 => get_string('notimport', 'local_tresipuntimportgc'),
