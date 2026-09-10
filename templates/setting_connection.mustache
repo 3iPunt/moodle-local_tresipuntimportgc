@@ -62,14 +62,14 @@
     </div>
 </div>
 {{#js}}
-require(['core/str', 'core/notification'], function(Str, Notification) {
+require(['jquery', 'core/str', 'core/notification'], function($, Str, Notification) {
     var button = document.querySelector('[data-action="tipgc-copy-uri"]');
     if (!button) {
         return;
     }
-    // navigator.clipboard solo existe en contextos seguros (certificado
-    // válido): en entornos locales con certificado autofirmado se usa el
-    // fallback clásico de selección + execCommand.
+    // El API navigator.clipboard solo existe en contextos seguros
+    // (certificado válido): en entornos locales con certificado autofirmado
+    // se usa el fallback clásico de selección + execCommand.
     var copy = function(text) {
         if (navigator.clipboard && window.isSecureContext) {
             return navigator.clipboard.writeText(text);
@@ -82,7 +82,9 @@ require(['core/str', 'core/notification'], function(Str, Notification) {
         area.select();
         document.execCommand('copy');
         document.body.removeChild(area);
-        return Promise.resolve();
+        // Deferred de jQuery en vez de Promise nativa: el eslint de Moodle no
+        // admite la nativa en el JS de plantillas.
+        return $.Deferred().resolve().promise();
     };
     button.addEventListener('click', function() {
         copy(button.getAttribute('data-uri')).then(function() {
