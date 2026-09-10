@@ -52,8 +52,6 @@ Compatible with Moodle 4.5 LTS and 5.1 (`requires` 4.5, `supported [405, 501]`).
 - Vendored dependencies pruned to what Moodle core does not already ship and
   autoload (`.extlib` down from 6.0 MB to 2.6 MB). Versions are pinned to what
   Moodle 4.5 provides, the oldest supported release.
-- The diagnostic dev tool was removed; the settings page already reports
-  connection status and can run a real test connection.
 - Clearing the section summaries of an imported course now runs as a single
   statement and touches the course cache once, instead of rebuilding the whole
   course cache once per section.
@@ -100,10 +98,6 @@ Compatible with Moodle 4.5 LTS and 5.1 (`requires` 4.5, `supported [405, 501]`).
   stopped a site administrator from granting the capability to a role with those
   archetypes; anything not granted is denied by default anyway.
 
-### Removed
-
-- The unused `pix/importgc_login.png` image and the empty `db/uninstall.php`
-  (Moodle already drops the tables and settings on uninstall).
 - Fatal error on successful imports (`error` dereferenced on null).
 - TLS host verification is no longer disabled on Google API calls.
 - Import start is protected with `sesskey`; browser cookies are no longer
@@ -127,6 +121,11 @@ Compatible with Moodle 4.5 LTS and 5.1 (`requires` 4.5, `supported [405, 501]`).
   outputs and AMD module.
 - Orphan settings and language strings (NextCloud option, teacher folder
   setting, credentials JSON).
+- The unused `pix/importgc_login.png` image and the empty `db/uninstall.php`
+  (Moodle already drops the tables and settings on uninstall).
+- The diagnostic dev tool (`devtools/`), which forced `display_errors` and
+  printed stack traces; the settings page already reports connection status and
+  can run a real test connection.
 
 ## 1.0
 
