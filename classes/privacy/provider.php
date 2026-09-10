@@ -49,9 +49,8 @@ use core_privacy\local\request\writer;
  */
 class provider implements
     \core_privacy\local\metadata\provider,
-    \core_privacy\local\request\plugin\provider,
-    \core_privacy\local\request\core_userlist_provider {
-
+    \core_privacy\local\request\core_userlist_provider,
+    \core_privacy\local\request\plugin\provider {
     /**
      * Declares the personal data handled by the plugin.
      *
@@ -123,8 +122,11 @@ class provider implements
         if (!$userlist->get_context() instanceof context_system) {
             return;
         }
-        $userlist->add_from_sql('userid',
-            'SELECT userid FROM {local_tresipuntimportgc_import}', []);
+        $userlist->add_from_sql(
+            'userid',
+            'SELECT userid FROM {local_tresipuntimportgc_import}',
+            []
+        );
     }
 
     /**
@@ -148,15 +150,28 @@ class provider implements
         $userid = (int) $contextlist->get_user()->id;
         $subcontext = [get_string('privacy:exportpath', 'local_tresipuntimportgc')];
 
-        $imports = $DB->get_records('local_tresipuntimportgc_import',
-            ['userid' => $userid], 'timecreated ASC');
+        $imports = $DB->get_records(
+            'local_tresipuntimportgc_import',
+            ['userid' => $userid],
+            'timecreated ASC'
+        );
         foreach ($imports as $import) {
             $courses = [];
-            foreach ($DB->get_records('local_tresipuntimportgc_course',
-                    ['importid' => $import->id], 'id ASC') as $course) {
+            foreach (
+                $DB->get_records(
+                    'local_tresipuntimportgc_course',
+                    ['importid' => $import->id],
+                    'id ASC'
+                ) as $course
+            ) {
                 $logs = [];
-                foreach ($DB->get_records('local_tresipuntimportgc_log',
-                        ['importcourseid' => $course->id], 'id ASC') as $log) {
+                foreach (
+                    $DB->get_records(
+                        'local_tresipuntimportgc_log',
+                        ['importcourseid' => $course->id],
+                        'id ASC'
+                    ) as $log
+                ) {
                     $logs[] = (object) [
                         'time' => transform::datetime($log->timecreated),
                         'level' => $log->level,
@@ -238,18 +253,29 @@ class provider implements
     private static function delete_user_history(int $userid): void {
         global $DB;
 
-        $imports = $DB->get_fieldset_select('local_tresipuntimportgc_import', 'id',
-            'userid = :userid', ['userid' => $userid]);
+        $imports = $DB->get_fieldset_select(
+            'local_tresipuntimportgc_import',
+            'id',
+            'userid = :userid',
+            ['userid' => $userid]
+        );
         if ($imports === []) {
             return;
         }
         [$insql, $params] = $DB->get_in_or_equal($imports, SQL_PARAMS_NAMED);
-        $courses = $DB->get_fieldset_select('local_tresipuntimportgc_course', 'id',
-            "importid $insql", $params);
+        $courses = $DB->get_fieldset_select(
+            'local_tresipuntimportgc_course',
+            'id',
+            "importid $insql",
+            $params
+        );
         if ($courses !== []) {
             [$coursesql, $courseparams] = $DB->get_in_or_equal($courses, SQL_PARAMS_NAMED);
-            $DB->delete_records_select('local_tresipuntimportgc_log',
-                "importcourseid $coursesql", $courseparams);
+            $DB->delete_records_select(
+                'local_tresipuntimportgc_log',
+                "importcourseid $coursesql",
+                $courseparams
+            );
         }
         $DB->delete_records_select('local_tresipuntimportgc_course', "importid $insql", $params);
         $DB->delete_records_select('local_tresipuntimportgc_import', "id $insql", $params);

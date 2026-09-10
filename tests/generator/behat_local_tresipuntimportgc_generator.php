@@ -28,7 +28,7 @@
  * Example:
  *   And the following "local_tresipuntimportgc > imports" exist:
  *     | user  | googleaccount        |
- *     | admin | teacher@example.com  |
+ *     | admin | teacher@school.test  |
  *   And the following "local_tresipuntimportgc > import courses" exist:
  *     | user  | fullname | shortname | status  |
  *     | admin | Bio 1    | bio1      | success |
@@ -38,7 +38,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_local_tresipuntimportgc_generator extends behat_generator_base {
-
     /**
      * Entities this generator can create.
      *

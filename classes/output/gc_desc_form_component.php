@@ -41,7 +41,6 @@ global $CFG;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class gc_desc_form_component implements renderable, templatable {
-
     /** @var string Thumbnail Url */
     protected $thumbnailurl;
 

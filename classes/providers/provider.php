@@ -46,7 +46,6 @@ use local_tresipuntimportgc\responses\response_sections;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class provider {
-
     // Connection and authentication.
 
     /**

@@ -27,7 +27,6 @@ use local_tresipuntimportgc\task\cleanup_task;
  * @covers     \local_tresipuntimportgc\task\cleanup_task
  */
 final class cleanup_task_test extends \advanced_testcase {
-
     /**
      * Seeds an import (with course and trace) created $days days ago.
      *
@@ -41,10 +40,15 @@ final class cleanup_task_test extends \advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('local_tresipuntimportgc');
         $import = $generator->create_import(['userid' => $userid]);
         $course = $generator->create_import_course(
-            ['importid' => $import->get('id'), 'status' => 'success']);
+            ['importid' => $import->get('id'), 'status' => 'success']
+        );
         $generator->create_log(['importcourseid' => $course->get('id')]);
-        $DB->set_field('local_tresipuntimportgc_import', 'timecreated',
-            time() - $days * DAYSECS, ['id' => $import->get('id')]);
+        $DB->set_field(
+            'local_tresipuntimportgc_import',
+            'timecreated',
+            time() - $days * DAYSECS,
+            ['id' => $import->get('id')]
+        );
         return (int) $import->get('id');
     }
 

@@ -27,7 +27,6 @@ use local_tresipuntimportgc\local\helper;
  * @covers     \local_tresipuntimportgc\local\helper
  */
 final class helper_test extends \advanced_testcase {
-
     /**
      * Shortname slug cases.
      *
