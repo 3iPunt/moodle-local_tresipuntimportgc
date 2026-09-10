@@ -151,6 +151,23 @@ Google Classroom** (también bajo la categoría del plugin en *Extensiones*).
 Requiere la capacidad `local/tresipuntimportgc:import` (por defecto, gestores y
 creadores de cursos).
 
+## 🔒 Privacidad
+
+El plugin implementa la privacy API de Moodle (`classes/privacy/provider.php`).
+
+**Se envía a Google**: la cuenta con la que se conecta, para poder leer en su
+nombre las APIs de Classroom, Drive, Calendar y Forms. Todos los scopes que pide
+son de **solo lectura**: el plugin nunca escribe nada en Google.
+
+**Se almacena en Moodle**: el historial de importaciones (quién lanzó cada una,
+con qué cuenta de Google, qué clases se importaron, su estado y sus fechas) y las
+trazas por curso. El refresh token de OAuth se guarda **cifrado y solo mientras la
+importación está en curso**, y se destruye al terminar.
+
+La exportación y el borrado de ese historial están soportados por las peticiones
+de privacidad de Moodle. El ajuste de retención purga el historial antiguo
+automáticamente. Al desinstalar se eliminan las tablas y los ajustes del plugin;
+los cursos ya importados no se ven afectados.
 ## 🗑️ Desinstalación
 
 Al desinstalar se eliminan las tablas del plugin (historial de importaciones y
