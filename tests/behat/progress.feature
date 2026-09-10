@@ -23,10 +23,10 @@ Feature: Pantalla de progreso en modo histórico
       | bio1      | info  | Course created without issues  |
       | phy2      | error | The short name is already used |
 
-  # Importación sembrada con un curso completado y otro con error: al abrir
-  # el detalle desde el panel se ve la cabecera estática, el estado derivado
-  # "con incidencias", ambos cursos, sus trazas, el resumen final y el botón
-  # de reintentar en el curso fallido (sin @javascript: solo presencia).
+  # Import seeded with one completed course and another with an error: opening
+  # the detail from the panel shows the static header, the derived "with
+  # issues" status, both courses, their traces, the final summary and the
+  # retry button on the failed course (without @javascript: presence only).
   Scenario: Una importación terminada muestra resumen, pastillas, trazas y la acción de reintentar
     Given I log in as "manager1"
     When I visit "/local/tresipuntimportgc/panel.php"
@@ -41,8 +41,8 @@ Feature: Pantalla de progreso en modo histórico
     And "button[data-action='retry']" "css_element" should exist
     And I should see "teacher@example.com"
 
-  # Con un curso aún pendiente la importación no está terminada: no hay
-  # resumen final y el curso pendiente ofrece la acción de descartar.
+  # With a course still pending the import is not finished: there is no final
+  # summary and the pending course offers the discard action.
   Scenario: Una importación con cursos pendientes ofrece descartar y no muestra resumen
     Given the following "local_tresipuntimportgc > import courses" exist:
       | user     | fullname    | shortname | status  |

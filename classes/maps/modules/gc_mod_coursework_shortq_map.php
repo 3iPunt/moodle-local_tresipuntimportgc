@@ -42,7 +42,7 @@ class gc_mod_coursework_shortq_map extends gc_mod_map {
         $section = $module['topicId'] ?? '';
         $mats = $module['materials'] ?? [];
         $desc = self::get_desc_rich($module['description'] ?? '', $mats);
-        // Pregunta de respuesta corta → Retroalimentación con el enunciado (E10.1).
+        // Short-answer question to a Feedback activity with the wording (E10.1).
         return new module_feedback(
             $section,
             $module,

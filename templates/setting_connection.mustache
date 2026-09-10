@@ -67,9 +67,9 @@ require(['jquery', 'core/str', 'core/notification'], function($, Str, Notificati
     if (!button) {
         return;
     }
-    // El API navigator.clipboard solo existe en contextos seguros
-    // (certificado válido): en entornos locales con certificado autofirmado
-    // se usa el fallback clásico de selección + execCommand.
+    // The navigator.clipboard API only exists in secure contexts (a valid
+    // certificate): on local environments with a self-signed certificate the
+    // classic selection plus execCommand fallback is used.
     var copy = function(text) {
         if (navigator.clipboard && window.isSecureContext) {
             return navigator.clipboard.writeText(text);

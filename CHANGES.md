@@ -26,6 +26,11 @@ pipeline (Code Checker, PHPDoc Checker, Mustache Lint and Grunt) across the full
 - A unit test depended on execution order: it used the Google library before anything
   had registered the vendored autoloader, so it passed in the full suite and failed on
   its own.
+- The Classroom module map included a file from the plugin's own `classes/` directory
+  with `require_once`, even though Moodle autoloads plugin classes. The include also
+  hardcoded the plugin path, so renaming the directory would have broken it. Removing
+  it left the file with no side effects, so its `MOODLE_INTERNAL` guard went too
+  (reported as issue #1).
 
 ### Changed
 
@@ -38,6 +43,9 @@ pipeline (Code Checker, PHPDoc Checker, Mustache Lint and Grunt) across the full
   (the four `gc/` components shared a copy-pasted docblock).
 - Docblocks of the response DTOs and of the Classroom maps: parameter types that were
   missing, and constructor summaries naming the wrong class.
+- Every comment is now in English, as the Moodle coding style requires: 152 comment
+  blocks across PHP, `styles.css`, the AMD modules, the templates and the Behat
+  feature files (reported as issue #2).
 ## 2.0.0 (2026-07-24)
 
 Full refactor of the import flow plus an extended Classroom → Moodle mapping.

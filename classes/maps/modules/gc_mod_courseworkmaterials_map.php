@@ -61,8 +61,8 @@ class gc_mod_courseworkmaterials_map extends gc_mod_map {
             );
         }
         if ($firstkey === 'form' && count($module['materials']) === 1) {
-            // Formulario adjunto → embed en etiqueta (E10.2); nunca un quiz vacío.
-            // La conversión a cuestionario con preguntas es futura (Forms API).
+            // Attached form to an embed in a label (E10.2); never an empty quiz.
+            // Converting it into a quiz with questions is future work (Forms API).
             return new module_label(
                 $section,
                 $module['title'],
@@ -81,8 +81,8 @@ class gc_mod_courseworkmaterials_map extends gc_mod_map {
             );
         }
         if (isset($module['materials']) && count($module['materials']) > 1) {
-            // Materiales combinados → un recurso por material (E10.11): los
-            // ficheros a Moodle, los enlaces/vídeos como URL, el formulario embebido.
+            // Combined materials to one resource per material (E10.11): files to
+            // Moodle, links and videos as URL, the form embedded.
             $mods = [];
             foreach ($module['materials'] as $material) {
                 $key = array_key_first($material);
@@ -105,7 +105,7 @@ class gc_mod_courseworkmaterials_map extends gc_mod_map {
                     $mods[] = new module_label($section, $module['title'], $desc, $visible, $material);
                 }
             }
-            // Si nada encajó, cae a etiqueta con el conjunto (comportamiento previo).
+            // If nothing matched, fall back to a label with the whole set (previous behaviour).
             return $mods !== [] ? $mods
                 : new module_label($section, $module['title'], $desc, $visible, $module['materials']);
         }

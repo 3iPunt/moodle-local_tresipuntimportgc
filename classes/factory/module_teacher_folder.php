@@ -84,8 +84,8 @@ class module_teacher_folder extends module {
         $record = [
             'course' => $course,
             'name' => $this->title,
-            // Descripción propia: además evita que el generador inyecte su
-            // valor de test ("Test folder N") cuando el intro va vacío.
+            // Own description: it also stops the generator from injecting its test
+            // value ("Test folder N") when the intro is left empty.
             'intro' => get_string('teacher_folder_intro', 'local_tresipuntimportgc'),
             'introformat' => FORMAT_HTML,
             'files' => file_get_unused_draft_itemid(),

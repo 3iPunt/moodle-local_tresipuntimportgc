@@ -90,8 +90,8 @@ class module_form extends module {
                 // plugin roadmap.
             }
         }
-        // El modname va sin prefijo (para la traza); el generador necesita el
-        // componente con prefijo.
+        // The modname goes without prefix (for the trace); the generator needs
+        // the prefixed component.
         parent::__construct('mod_' . $this->modname, $providersection, $module['title'], $intro, $visible);
     }
 

@@ -90,14 +90,14 @@ class factory {
                 // the generic Classroom one is in the plugin roadmap.
                 // Create Teacher Resource if config.
                 if ($importfiles === 0) {
-                    // Descargar la carpeta del profesor a una carpeta del curso,
-                    // oculta para estudiantes (E10.8): los ficheros viven en Moodle.
+                    // Download the teacher folder into a course folder, hidden from
+                    // students (E10.8): the files live in Moodle.
                     $restf = $this->provider->get_teacher_folder($providerid);
                     if ($restf->success) {
                         $resfiles = $this->provider->list_drive_folder($restf->data->get_providerid());
                         $files = $resfiles->success ? $resfiles->data : [];
-                        // Nombre traducido al idioma del usuario que lanza la
-                        // importación (no el nombre interno que trae Google).
+                        // Name translated to the language of the user launching the import
+                        // (not the internal name Google reports).
                         $folder = new module_teacher_folder(
                             get_string('teacher_folder', 'local_tresipuntimportgc'),
                             $files,

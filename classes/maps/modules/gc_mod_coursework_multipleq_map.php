@@ -42,7 +42,7 @@ class gc_mod_coursework_multipleq_map extends gc_mod_map {
         $mats = $module['materials'] ?? [];
         $desc = $module['description'] ?? '';
         $desc = self::get_desc_rich($desc, $mats);
-        // Pregunta de opción múltiple → actividad de Elección con sus opciones (E10.1).
+        // Multiple-choice question to a Choice activity with its options (E10.1).
         return new module_choice(
             $section,
             $module,
