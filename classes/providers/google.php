@@ -58,7 +58,6 @@ require_once(__DIR__ . '/../../.extlib/vendor/autoload.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class google extends provider {
-
     /** @var string Session property holding the OAuth token array. */
     private const SESSION_TOKEN = 'local_tresipuntimportgc_token';
 
@@ -174,16 +173,22 @@ class google extends provider {
         $expected = (string) ($SESSION->{self::SESSION_STATE} ?? '');
         unset($SESSION->{self::SESSION_STATE});
         if ($expected === '' || $state === '' || !hash_equals($expected, $state)) {
-            return new response_data(false, null,
-                new error('02002', get_string('error_oauthstate', 'local_tresipuntimportgc')));
+            return new response_data(
+                false,
+                null,
+                new error('02002', get_string('error_oauthstate', 'local_tresipuntimportgc'))
+            );
         }
 
         try {
             $client = $this->get_client();
             $token = $client->fetchAccessTokenWithAuthCode($code);
             if (!empty($token['error'])) {
-                return new response_data(false, null,
-                    new error('02000', $token['error'] . ': ' . ($token['error_description'] ?? '')));
+                return new response_data(
+                    false,
+                    null,
+                    new error('02000', $token['error'] . ': ' . ($token['error_description'] ?? ''))
+                );
             }
             $SESSION->{self::SESSION_TOKEN} = $client->getAccessToken();
             $oauth2 = new Oauth2($client);
@@ -245,8 +250,11 @@ class google extends provider {
             $client = $this->get_client();
             $token = $client->fetchAccessTokenWithRefreshToken($refreshtoken);
             if (!empty($token['error'])) {
-                return new response_data(false, null,
-                    new error('02002', $token['error'] . ': ' . ($token['error_description'] ?? '')));
+                return new response_data(
+                    false,
+                    null,
+                    new error('02002', $token['error'] . ': ' . ($token['error_description'] ?? ''))
+                );
             }
             // Share the token with every other provider instance of this run
             // (in cron the session is ephemeral and belongs to the task).
@@ -499,8 +507,14 @@ class google extends provider {
         $filerecord['filename'] = $filename;
         $filerecord['itemid'] = $filerecord['itemid'] ?? 0;
 
-        $existing = $fs->get_file($filerecord['contextid'], $filerecord['component'], $filerecord['filearea'],
-            $filerecord['itemid'], $filerecord['filepath'], $filename);
+        $existing = $fs->get_file(
+            $filerecord['contextid'],
+            $filerecord['component'],
+            $filerecord['filearea'],
+            $filerecord['itemid'],
+            $filerecord['filepath'],
+            $filename
+        );
         if ($existing !== false) {
             return new response_data(true, (object) ['status' => 'exists', 'filename' => $filename]);
         }

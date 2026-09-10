@@ -39,15 +39,18 @@ use moodle_url;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class connection extends admin_setting {
-
     /**
      * Constructor.
      * @throws coding_exception
      */
     public function __construct() {
         $this->nosave = true;
-        parent::__construct('local_tresipuntimportgc/connectionstatus',
-            get_string('connectionstatus', 'local_tresipuntimportgc'), '', '');
+        parent::__construct(
+            'local_tresipuntimportgc/connectionstatus',
+            get_string('connectionstatus', 'local_tresipuntimportgc'),
+            '',
+            ''
+        );
     }
 
     /**

@@ -29,7 +29,6 @@ use local_tresipuntimportgc\local\trace_router;
  * @covers     \local_tresipuntimportgc\local\logger
  */
 final class trace_router_test extends \advanced_testcase {
-
     /**
      * Traces are persisted with the legacy types collapsed into three levels.
      */

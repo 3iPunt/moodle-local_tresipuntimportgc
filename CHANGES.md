@@ -1,5 +1,43 @@
 # Changelog
 
+## 2.0.1 (2026-09-10)
+
+Compatibility and code style release: the plugin passes the whole moodle-plugin-ci
+pipeline (Code Checker, PHPDoc Checker, Mustache Lint and Grunt) across the full matrix
+— Moodle 4.5 and 5.1, PHP 8.1 to 8.4, PostgreSQL and MariaDB. No functional change.
+
+### Fixed
+
+- PHP 8.4: explicit nullable types on the 13 parameters that relied on the implicit
+  nullable of a `null` default, deprecated in 8.4.
+- Nested promises in `progress.js` and `selection.js`: the modal chain is now flat and
+  the nesting callbacks live in their own functions.
+- Template JS: `setting_connection.mustache` used a native `Promise`, which the Moodle
+  eslint configuration does not allow outside `amd/src`. It now uses a jQuery Deferred.
+- Obsolete markup in the embedded Google Form and YouTube frames (`frameborder`,
+  `marginheight`, `marginwidth`, `width="100%"` and text inside the `iframe`), both in
+  the template and in the label generator, whose HTML is stored in the imported course.
+  Both frames now carry a `title`.
+- Settings connection block: the redirect URI caption was a `<label for>` pointing at a
+  `<code>` element, which is not a form control. It is now a caption associated with
+  `aria-labelledby`.
+- `thirdpartylibs.xml` did not cover `.extlib/vendor/autoload.php`, so the vendored
+  Composer autoloader was being analysed as plugin code.
+- A unit test depended on execution order: it used the Google library before anything
+  had registered the vendored autoloader, so it passed in the full suite and failed on
+  its own.
+
+### Changed
+
+- Language files in alphabetical order and without section comments, as the code checker
+  requires; three unused strings removed. 202 strings per language, with no gaps between
+  `en`, `es` and `ca`.
+- `TODO` markers replaced with descriptive comments, keeping the information; the debt
+  they recorded is tracked in the plugin documentation.
+- Template docblocks: real context variables and example contexts that render valid HTML
+  (the four `gc/` components shared a copy-pasted docblock).
+- Docblocks of the response DTOs and of the Classroom maps: parameter types that were
+  missing, and constructor summaries naming the wrong class.
 ## 2.0.0 (2026-07-24)
 
 Full refactor of the import flow plus an extended Classroom → Moodle mapping.

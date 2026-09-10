@@ -43,7 +43,6 @@ use mod_folder_generator;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class module_teacher_folder extends module {
-
     /** @var string Mod Name */
     protected $modname = 'folder';
 
@@ -98,8 +97,15 @@ class module_teacher_folder extends module {
         }
         $context = context_module::instance($res->cmid);
         foreach ($this->files as $filemeta) {
-            drive_files::store($this->provider, $filemeta, $context->id,
-                (int) $USER->id, 'mod_folder', 'content', '/');
+            drive_files::store(
+                $this->provider,
+                $filemeta,
+                $context->id,
+                (int) $USER->id,
+                'mod_folder',
+                'content',
+                '/'
+            );
         }
         return new response_module(true, $this, null);
     }

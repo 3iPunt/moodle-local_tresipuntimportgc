@@ -163,15 +163,15 @@ define([
                 body: langstrings[1],
                 buttons: {save: langstrings[2]},
                 show: true
-            }).then(function(modal) {
-                modal.getRoot().on(ModalEvents.save, function() {
-                    var form = root.querySelector('[data-region="import-form"]');
-                    form.querySelector('[data-region="courses-payload"]').value =
-                        JSON.stringify(collectConfigs());
-                    form.submit();
-                });
-                return modal;
             });
+        }).then(function(modal) {
+            modal.getRoot().on(ModalEvents.save, function() {
+                var form = root.querySelector('[data-region="import-form"]');
+                form.querySelector('[data-region="courses-payload"]').value =
+                    JSON.stringify(collectConfigs());
+                form.submit();
+            });
+            return modal;
         }).catch(Notification.exception);
     };
 
@@ -239,15 +239,28 @@ define([
     };
 
     /**
+     * Turns one category select into a server-searched autocomplete.
+     *
+     * Kept out of the string callback so the promise chains stay flat.
+     *
+     * @param {Element} select The select element to enhance.
+     * @param {String} placeholder Placeholder text.
+     * @return {Promise} Resolved once the autocomplete replaced the select.
+     */
+    var enhanceCategory = function(select, placeholder) {
+        return FormAutocomplete.enhance('#' + select.id, false,
+            'local_tresipuntimportgc/categories_datasource', placeholder,
+            false, true, '').catch(Notification.exception);
+    };
+
+    /**
      * Turns each category select into a server-searched autocomplete, so the
      * selector scales with any number of categories.
      */
     var enhanceCategories = function() {
         Str.get_string('select_category', 'local_tresipuntimportgc').then(function(placeholder) {
             root.querySelectorAll('[data-autocomplete-categories]').forEach(function(select) {
-                FormAutocomplete.enhance('#' + select.id, false,
-                    'local_tresipuntimportgc/categories_datasource', placeholder,
-                    false, true, '').catch(Notification.exception);
+                enhanceCategory(select, placeholder);
             });
             return placeholder;
         }).catch(Notification.exception);
