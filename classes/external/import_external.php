@@ -304,7 +304,7 @@ class import_external extends external_api {
         self::validate_context($context);
         require_capability('local/tresipuntimportgc:import', $context);
 
-        // Búsqueda en BD con límite: escala con cualquier número de categorías.
+        // Limited database search: it scales with any number of categories.
         $search = trim($params['query']);
         $select = 'visible = 1';
         $sqlparams = [];

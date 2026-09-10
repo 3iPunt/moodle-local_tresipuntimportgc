@@ -39,8 +39,8 @@ require_login();
 require_capability('local/tresipuntimportgc:import', context_system::instance());
 
 $import = new import($importid);
-// Solo la propia ejecución, salvo que se tenga la capacidad de consulta: una
-// ejecución lleva la cuenta de Google de quien la lanzó.
+// Only your own run, unless you hold the reports capability: a run carries
+// the Google account of whoever launched it.
 $import->require_can_access();
 
 // Page setup.
@@ -118,8 +118,8 @@ $pct = static function (int $n) use ($total): float {
 };
 
 $launcher = $DB->get_record('user', ['id' => $import->get('userid')]);
-// La cuenta de Google solo se muestra si es la propia o si se administra el
-// sitio (mismo criterio que la columna de cuenta del panel).
+// The Google account is only shown if it is your own or if you administer
+// the site (same criterion as the account column of the panel).
 $showaccount = $import->is_owned_by()
     || has_capability('moodle/site:config', context_system::instance());
 $run = (object) [

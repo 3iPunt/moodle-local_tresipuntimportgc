@@ -4,9 +4,9 @@ Feature: Página de ajustes del plugin
   como administrador
   necesito ver los tres bloques de ajustes y la URI de redirección.
 
-  # Comprueba que la página de ajustes carga con sus tres bloques (conexión,
-  # opciones por defecto y registro) y que el bloque de conexión muestra la
-  # URI de redirección y el estado "incompleta" cuando no hay credenciales.
+  # Checks that the settings page loads with its three blocks (connection,
+  # default options and log) and that the connection block shows the redirect
+  # URI and the "incomplete" status when there are no credentials.
   Scenario: El administrador ve los bloques de conexión, opciones y registro
     Given I log in as "admin"
     When I navigate to "Plugins > Tresipunt Import Google Classroom > Tresipunt Import Google Classroom settings" in site administration
@@ -21,8 +21,8 @@ Feature: Página de ajustes del plugin
     And the field "Import history retention (days)" matches value "365"
     And the field "Imports per page in the panel" matches value "25"
 
-  # Con ID de cliente y secreto guardados, la pastilla de estado pasa a
-  # "credenciales configuradas" y aparece el enlace de probar la conexión.
+  # With client id and secret saved, the status pill turns into "credentials
+  # configured" and the test connection link shows up.
   Scenario: Con credenciales configuradas el bloque de conexión lo refleja
     Given the following config values are set as admin:
       | clientid  | test-client-id.apps.googleusercontent.com | local_tresipuntimportgc |

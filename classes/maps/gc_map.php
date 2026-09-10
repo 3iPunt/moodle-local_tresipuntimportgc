@@ -111,15 +111,15 @@ class gc_map extends map {
      * @return module|module[]|null
      */
     public static function module(array $module, provider $provider, string $type = '') {
-        // Contenidos dirigidos a estudiantes concretos (E10.9, §6.9): por
-        // defecto no se importan; con el ajuste activo se importan ocultos y con
-        // una nota para el profesor. Aplica a los tres tipos.
+        // Content aimed at specific students (E10.9, §6.9): not imported by
+        // default; with the setting on they are imported hidden and with a note
+        // for the teacher. It applies to the three types.
         $individual = isset($module['assigneeMode']) && $module['assigneeMode'] !== 'ALL_STUDENTS';
         if ($individual) {
             if ((int) run_config::get('importindividual', 0) !== 1) {
                 return null;
             }
-            $module['state'] = 'DRAFT'; // Oculto para los estudiantes.
+            $module['state'] = 'DRAFT'; // Hidden from students.
             $note = get_string('individual_note', 'local_tresipuntimportgc');
             $module['description'] = $note . (isset($module['description']) && $module['description'] !== ''
                 ? "\n\n" . $module['description'] : '');
@@ -132,8 +132,8 @@ class gc_map extends map {
                     $modmap = new $class();
                     return $modmap->get_mod($module, $provider);
                 } catch (Throwable $e) {
-                    // Robustez (§6.5): un Error en la transformación de un
-                    // módulo no debe tumbar la importación del resto.
+                    // Robustness (§6.5): an Error while transforming one module must not
+                    // bring down the import of the rest.
                     mtrace('    -- ERROR: GET_MODULE: ' . $module['id'] . ' - ' . $e->getMessage());
                     return null;
                 }
@@ -153,16 +153,16 @@ class gc_map extends map {
      * @return module[]
      */
     public static function modules(array $modules, provider $provider, string $type = ''): array {
-        // Orden estable por fecha de creación (§6.8): la API los devuelve sin
-        // orden garantizado. Se ordena dentro de cada tipo; los tipos se
-        // agrupan luego al concatenarse en el proveedor.
+        // Stable order by creation date (§6.8): the API returns them with no
+        // guaranteed order. Sorted within each type; the types are grouped
+        // later when the provider concatenates them.
         usort($modules, static function ($a, $b) {
             return strcmp($a['creationTime'] ?? '', $b['creationTime'] ?? '');
         });
         $data = [];
         foreach ($modules as $module) {
             $m = self::module($module, $provider, $type);
-            // Un ítem puede mapear a varios módulos (materiales combinados, E10.11).
+            // One item can map to several modules (combined materials, E10.11).
             if (is_array($m)) {
                 foreach ($m as $sub) {
                     $data[] = $sub;

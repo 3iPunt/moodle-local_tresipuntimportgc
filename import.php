@@ -148,13 +148,13 @@ if (!$provider->is_configured()) {
             'archived' => ($d->courseState ?? '') === 'ARCHIVED',
             'link' => $d->alternateLink ?? '',
             'defaultshortname' => $slug,
-            // Aviso previo: el nombre corto propuesto ya está en uso (evita que
-            // el curso falle luego en la importación por duplicado).
+            // Early warning: the proposed short name is already taken (it stops the
+            // course from failing later in the import as a duplicate).
             'shortnameexists' => $slug !== '' && $DB->record_exists('course', ['shortname' => $slug]),
         ];
     }
-    // Las categorías se buscan por AJAX en el importador (autocompletado), no
-    // se precargan todas aquí: el selector escala con cualquier volumen.
+    // Categories are searched over AJAX in the importer (autocomplete), they
+    // are not all preloaded here: the selector scales with any volume.
     $categories = [];
     $allowconfig = (bool) get_config('local_tresipuntimportgc', 'allowconfig');
     $filesdefault = (int) get_config('local_tresipuntimportgc', 'importfiles');
@@ -173,8 +173,8 @@ if (!$provider->is_configured()) {
         ['value' => 2, 'text' => get_string('notimport', 'local_tresipuntimportgc'),
             'selected' => $calendardefault !== 1 ? 'selected' : ''],
     ];
-    // Categoría preseleccionada por defecto (la del sitio): así el importador
-    // nunca queda sin categoría y el usuario ve dónde irán los cursos.
+    // Default preselected category (the site one): this way the importer is
+    // never left without a category and the user sees where courses will go.
     $defaultcat = core_course_category::get_default();
     $defaultcategory = ['id' => (int) $defaultcat->id, 'name' => $defaultcat->get_nested_name(false)];
     $view = new import_view(

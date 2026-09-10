@@ -54,8 +54,8 @@ class importfiles_external extends external_api {
             [
                 'providerid' => new external_value(PARAM_TEXT, 'Course ID Provider', VALUE_REQUIRED),
                 'courseid' => new external_value(PARAM_INT, 'Course id for import files', VALUE_REQUIRED),
-                // PARAM_SAFEPATH: se usa como nombre de carpeta en el área de
-                // ficheros, así que no puede traer separadores de ruta.
+                // PARAM_SAFEPATH: it is used as a folder name in the file area, so it
+                // cannot carry path separators.
                 'shortname' => new external_value(PARAM_SAFEPATH, 'Short name of course', VALUE_REQUIRED),
             ]
         );

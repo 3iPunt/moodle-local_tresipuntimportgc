@@ -21,11 +21,6 @@ use local_tresipuntimportgc\factory\module;
 use local_tresipuntimportgc\maps\materials\gc_mat_map;
 use local_tresipuntimportgc\providers\provider;
 
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->dirroot . '/local/tresipuntimportgc/classes/maps/materials/gc_mat_map.php');
-
 /**
  * Class gc_mod_map
  *
@@ -54,9 +49,9 @@ abstract class gc_mod_map {
      * @return string
      */
     public static function get_desc_rich(string $desc = '', array $materials = []): string {
-        // La descripción de Classroom es texto plano (la API no da HTML): se
-        // convierte de forma segura (escapa HTML, saltos de línea a <br> y
-        // enlaza URLs) antes de concatenar el HTML de los materiales.
+        // The Classroom description is plain text (the API gives no HTML): it is
+        // converted safely (escapes HTML, line breaks to <br> and links URLs)
+        // before concatenating the HTML of the materials.
         $html = $desc === '' ? '' : text_to_html($desc, false, false, true);
         // Materials are still rendered as links to Google. Importing their content
         // into Moodle, so the Classroom account and its Drive files can be deleted

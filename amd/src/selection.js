@@ -206,7 +206,7 @@ define([
                 refreshFooter();
             }
         });
-        // Al editar el nombre corto, ocultar el aviso de "ya en uso" de esa fila.
+        // When the short name is edited, hide the "already taken" warning of that row.
         root.addEventListener('input', function(e) {
             if (e.target.matches('[data-field="shortname"]')) {
                 var row = e.target.closest('[data-course]');

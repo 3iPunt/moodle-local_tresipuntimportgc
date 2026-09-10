@@ -63,8 +63,8 @@ class drive_files {
         int $itemid = 0
     ): void {
         if ($filemeta->mimetype === 'application/vnd.google-apps.form') {
-            // Un Google Form no tiene binario descargable: se omite (no es un
-            // error, los formularios se tratan aparte según formsimport).
+            // A Google Form has no downloadable binary: it is skipped (not an error,
+            // forms are handled separately according to formsimport).
             trace_router::trace('importfileerrorcontent', 'warning', $filemeta->name);
             return;
         }

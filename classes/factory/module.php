@@ -31,8 +31,8 @@ use moodle_exception;
 use phpunit_util;
 use testing_data_generator;
 
-// El guard va ANTES del cambio de estado global: este fichero tiene efectos
-// secundarios (require_once), así que sí lo necesita.
+// The guard goes BEFORE the global state change: this file has side
+// effects (require_once), so it does need it.
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
