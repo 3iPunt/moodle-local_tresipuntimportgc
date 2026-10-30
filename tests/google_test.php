@@ -35,6 +35,9 @@ final class google_test extends \advanced_testcase {
     /** @var string Session key holding the account email. */
     private const SESSION_EMAIL = 'local_tresipuntimportgc_email';
 
+    /** @var string Session key holding the pending OAuth state. */
+    private const SESSION_STATE = 'local_tresipuntimportgc_oauthstate';
+
     /**
      * Loads the provider before each test.
      *
@@ -187,5 +190,84 @@ final class google_test extends \advanced_testcase {
         $this->assertFalse($result->success);
         $this->assertSame([], $result->data);
         $this->assertNotNull($result->error);
+    }
+
+    /**
+     * A successful OAuth callback stores the new token and the email of its account.
+     */
+    public function test_authenticate_with_code_stores_token_and_email(): void {
+        global $SESSION;
+        $this->resetAfterTest();
+
+        $provider = $this->provider_with_responses([
+            $this->token_response('new-access'),
+            new \GuzzleHttp\Psr7\Response(200, ['Content-Type' => 'application/json'], '{"email": "new@example.com"}'),
+        ]);
+        $SESSION->{self::SESSION_STATE} = 'state-1';
+
+        $result = $provider->authenticate_with_code('code-1', 'state-1');
+
+        $this->assertTrue($result->success);
+        $this->assertSame('new-access', $SESSION->{self::SESSION_TOKEN}['access_token']);
+        $this->assertSame('new@example.com', $provider->get_account_email());
+    }
+
+    /**
+     * When the profile of the new account cannot be read, the session keeps the
+     * previous account whole: its token and its email stay paired.
+     */
+    public function test_authenticate_with_code_keeps_previous_account_on_profile_failure(): void {
+        global $SESSION;
+        $this->resetAfterTest();
+
+        $provider = $this->provider_with_responses([
+            $this->token_response('new-access'),
+            new \GuzzleHttp\Psr7\Response(
+                500,
+                ['Content-Type' => 'application/json'],
+                '{"error": {"code": 500, "message": "Backend error"}}'
+            ),
+        ]);
+        $SESSION->{self::SESSION_TOKEN} = ['access_token' => 'old-access'];
+        $SESSION->{self::SESSION_EMAIL} = 'old@example.com';
+        $SESSION->{self::SESSION_STATE} = 'state-1';
+
+        $result = $provider->authenticate_with_code('code-1', 'state-1');
+
+        $this->assertFalse($result->success);
+        $this->assertSame('old-access', $SESSION->{self::SESSION_TOKEN}['access_token']);
+        $this->assertSame('old@example.com', $provider->get_account_email());
+    }
+
+    /**
+     * Builds a configured provider whose Google client answers with canned HTTP
+     * responses, in order, so no call ever reaches Google.
+     *
+     * @param array $responses Guzzle responses, one per HTTP call.
+     * @return google
+     */
+    private function provider_with_responses(array $responses): google {
+        set_config('clientid', 'abc.apps.googleusercontent.com', 'local_tresipuntimportgc');
+        set_config('secretkey', 'shh', 'local_tresipuntimportgc');
+        $provider = new google();
+        $client = (new \ReflectionMethod($provider, 'get_client'))->invoke($provider);
+        $stack = \GuzzleHttp\HandlerStack::create(new \GuzzleHttp\Handler\MockHandler($responses));
+        $client->setHttpClient(new \GuzzleHttp\Client(['handler' => $stack]));
+        return $provider;
+    }
+
+    /**
+     * Response of the Google token endpoint to an authorisation code.
+     *
+     * @param string $accesstoken Access token to hand out.
+     * @return \GuzzleHttp\Psr7\Response
+     */
+    private function token_response(string $accesstoken): \GuzzleHttp\Psr7\Response {
+        return new \GuzzleHttp\Psr7\Response(200, ['Content-Type' => 'application/json'], json_encode([
+            'access_token' => $accesstoken,
+            'expires_in' => 3599,
+            'refresh_token' => '1//refresh',
+            'token_type' => 'Bearer',
+        ]));
     }
 }

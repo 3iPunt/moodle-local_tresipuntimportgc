@@ -8,7 +8,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/version-2.0.0-informational" alt="Version">
-  <a href="https://moodle.org"><img src="https://img.shields.io/badge/Moodle-4.5%20%7C%205.1-orange?logo=moodle" alt="Moodle"></a>
+  <a href="https://moodle.org"><img src="https://img.shields.io/badge/Moodle-4.5%20%7C%205.1%20%7C%205.3-orange?logo=moodle" alt="Moodle"></a>
   <img src="https://img.shields.io/badge/PHP-8.1%2B-777BB4?logo=php&logoColor=white" alt="PHP">
   <img src="https://img.shields.io/badge/License-GPL--3.0-green" alt="License">
   <a href="https://tresipunt.com"><img src="https://img.shields.io/badge/made%20by-Tresipunt-F84015" alt="Made by Tresipunt"></a>
@@ -87,7 +87,7 @@ Moodle ni el tema.
 
 | Requisito | Versión |
 |---|---|
-| Moodle | 4.5 LTS o 5.1 |
+| Moodle | 4.5 LTS, 5.1 o 5.3 LTS |
 | PHP | 8.1 o superior |
 | Otros plugins | No requiere |
 | Cron de Moodle | Necesario — las importaciones corren como tareas en segundo plano |
