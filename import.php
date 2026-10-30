@@ -114,8 +114,11 @@ if ($autherror !== '') {
     );
 }
 
-// OAuth callback: exchange the code and clean the URL.
-if ($code !== '' && !$provider->has_token()) {
+// OAuth callback: exchange the code and clean the URL. It is handled even when
+// a token is already there, because "Change account" comes back this way; the
+// one-time state check in authenticate_with_code() rejects a replayed or foreign
+// code, and the current token is only replaced when the exchange succeeds.
+if ($code !== '') {
     $res = $provider->authenticate_with_code($code, $oauthstate);
     if (!$res->success) {
         redirect(
