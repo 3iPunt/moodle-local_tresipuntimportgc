@@ -190,11 +190,17 @@ class google extends provider {
                     new error('02000', $token['error'] . ': ' . ($token['error_description'] ?? ''))
                 );
             }
+            // Read the account email before touching the session: token and email
+            // are stored together, so a failure here leaves the session with the
+            // previous account whole instead of a new token under an old email.
+            $email = (new Oauth2($client))->userinfo->get()->getEmail();
             $SESSION->{self::SESSION_TOKEN} = $client->getAccessToken();
-            $oauth2 = new Oauth2($client);
-            $SESSION->{self::SESSION_EMAIL} = $oauth2->userinfo->get()->getEmail();
+            $SESSION->{self::SESSION_EMAIL} = $email;
             return new response_data(true);
         } catch (Throwable $e) {
+            // The cached client may already hold the new token: drop it, so any
+            // later call of this request starts again from the session.
+            $this->client = null;
             return new response_data(false, null, new error('02001', $e->getMessage()));
         }
     }

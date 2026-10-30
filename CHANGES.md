@@ -10,6 +10,10 @@ same code, and its screens follow the dark colour mode that Boost brings in 5.3.
 - "Change account" on the import page kept the account already connected: the
   OAuth callback was ignored while the session held a token, so the only way to
   switch accounts was to log out of Moodle.
+- Connecting a Google account stored the new token before reading the account
+  email. If that read failed, the session kept the new token under the previous
+  email, and an import started then recorded the wrong account. Both are now
+  stored together, only once the email is known.
 - Dark colour mode of Boost (Moodle 5.3, experimental): the plugin screens kept
   their white cards and fixed greys on the dark page, and text that inherits the
   theme colour became hard to read. Every colour now goes through `--igc-*` custom
