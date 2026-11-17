@@ -14,3 +14,10 @@ composer.json   export-ignore
 composer.lock   export-ignore
 .gitignore      export-ignore
 .gitattributes  export-ignore
+bitbucket-pipelines.yml export-ignore
+# The Marketplace rejects packages that carry CI files.
+.github         export-ignore
+
+# The repository stores LF. Without this, a Windows checkout with
+# core.autocrlf turns every file into CRLF and phpcs reports each line.
+* text=auto eol=lf

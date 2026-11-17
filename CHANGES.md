@@ -1,5 +1,41 @@
 # Changelog
 
+## 2.0.2 (2026-10-30)
+
+Moodle 5.3 LTS support. The plugin now supports Moodle 4.5, 5.1 and 5.3 from the
+same code, and its screens follow the dark colour mode that Boost brings in 5.3.
+
+### Fixed
+
+- "Change account" on the import page kept the account already connected: the
+  OAuth callback was ignored while the session held a token, so the only way to
+  switch accounts was to log out of Moodle.
+- Connecting a Google account stored the new token before reading the account
+  email. If that read failed, the session kept the new token under the previous
+  email, and an import started then recorded the wrong account. Both are now
+  stored together, only once the email is known.
+- Dark colour mode of Boost (Moodle 5.3, experimental): the plugin screens kept
+  their white cards and fixed greys on the dark page, and text that inherits the
+  theme colour became hard to read. Every colour now goes through `--igc-*` custom
+  properties, which keep their previous values in light mode and follow the theme
+  greys and status colours in dark mode. The Tresipunt logo switches to its white
+  variant.
+- Moodle 5.2 and later: the course factory included `lib/phpunit/classes/util.php`,
+  which those versions deprecate, and every import logged a debugging notice. The
+  include now only runs where the class is not autoloaded (4.5 and 5.1), and the
+  section factory, which did not use it, no longer includes it.
+- A unit test read the import courses by position. Since Moodle 5.2,
+  `persistent::get_records()` keys them by record id, so the test failed there. The
+  plugin code iterates over them and was not affected.
+
+### Changed
+
+- `$plugin->supported` is now `[405, 503]`.
+- The GitHub Actions matrix adds Moodle 5.3 (PHP 8.3 with PostgreSQL, PHP 8.4 with
+  MariaDB).
+- Bitbucket Pipelines validates pull requests with moodle-plugin-ci.
+- `.gitattributes` keeps LF line endings on every checkout.
+
 ## 2.0.1 (2026-09-10)
 
 Compatibility and code style release: the plugin passes the whole moodle-plugin-ci

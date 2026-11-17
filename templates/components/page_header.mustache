@@ -23,6 +23,7 @@
 
   Context variables required for this template:
   * logotresipunt - URL of the Tresipunt horizontal logo (pix)
+  * logotresipuntdark - URL of its white variant, shown in dark colour mode (pix)
   * logotresipunticon - URL of the Tresipunt square icon (pix)
   * logoclassroom - URL of the Classroom isotype (pix)
   * title - page title
@@ -33,7 +34,7 @@
 
   Example context (json):
   {
-    "logotresipunt": "#", "logotresipunticon": "#", "logoclassroom": "#",
+    "logotresipunt": "#", "logotresipuntdark": "#", "logotresipunticon": "#", "logoclassroom": "#",
     "title": "Importar cursos de Google Classroom",
     "description": "Elige las clases y su configuración.",
     "hasstatus": false, "statuslabel": "", "statusclass": ""
@@ -41,7 +42,8 @@
 }}
 <div class="tipgc-header d-flex flex-wrap align-items-stretch">
     <div class="tipgc-header-brands d-flex align-items-center">
-        <img src="{{ logotresipunt }}" alt="Tresipunt" class="tipgc-logo-full" height="42">
+        <img src="{{ logotresipunt }}" alt="Tresipunt" class="tipgc-logo-full tipgc-logo-full-light" height="42">
+        <img src="{{ logotresipuntdark }}" alt="Tresipunt" class="tipgc-logo-full tipgc-logo-full-dark" height="42">
         <img src="{{ logotresipunticon }}" alt="Tresipunt" class="tipgc-logo-mark" height="42">
         <span class="tipgc-header-divider" aria-hidden="true"></span>
         <img src="{{ logoclassroom }}" alt="Google Classroom" height="42">
