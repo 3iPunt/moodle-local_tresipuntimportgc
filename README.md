@@ -7,7 +7,7 @@
 <h1 align="center">Import courses from Google Classroom</h1>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.0.0-informational" alt="Version">
+  <img src="https://img.shields.io/badge/version-2.0.2-informational" alt="Version">
   <a href="https://moodle.org"><img src="https://img.shields.io/badge/Moodle-4.5%20%7C%205.1%20%7C%205.3-orange?logo=moodle" alt="Moodle"></a>
   <img src="https://img.shields.io/badge/PHP-8.1%2B-777BB4?logo=php&logoColor=white" alt="PHP">
   <img src="https://img.shields.io/badge/License-GPL--3.0-green" alt="License">
@@ -86,7 +86,7 @@ a history panel. It does not modify Moodle core or the theme.
 | Requirement | Version |
 |---|---|
 | Moodle | 4.5 LTS, 5.1 or 5.3 LTS |
-| PHP | 8.1 or later |
+| PHP | 8.1 or later (8.3 or later on Moodle 5.3) |
 | Other plugins | None |
 | Moodle cron | Required — imports run as background tasks |
 | Google services | A Google Cloud project with the Classroom, Drive, Calendar and Forms APIs enabled, and an OAuth 2.0 *web application* client |
