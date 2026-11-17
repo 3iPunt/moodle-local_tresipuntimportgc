@@ -36,7 +36,11 @@ use testing_data_generator;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/lib/phpunit/classes/util.php');
+// Moodle 5.2 and later autoload phpunit_util and deprecate including this
+// file; 4.5 and 5.1 only get the class through it.
+if (!class_exists(phpunit_util::class)) {
+    require_once($CFG->dirroot . '/lib/phpunit/classes/util.php');
+}
 
 /**
  * Class module

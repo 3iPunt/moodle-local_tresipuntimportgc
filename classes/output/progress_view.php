@@ -102,6 +102,7 @@ class progress_view implements renderable, templatable {
         $data = new stdClass();
         $data->header = [
             'logotresipunt' => $output->image_url('tresipunt_logo', 'local_tresipuntimportgc')->out(false),
+            'logotresipuntdark' => $output->image_url('tresipunt_logo_white', 'local_tresipuntimportgc')->out(false),
             'logotresipunticon' => $output->image_url('tresipunt_icon', 'local_tresipuntimportgc')->out(false),
             'logoclassroom' => $output->image_url('icon', 'local_tresipuntimportgc')->out(false),
             'title' => get_string('progress_header', 'local_tresipuntimportgc'),

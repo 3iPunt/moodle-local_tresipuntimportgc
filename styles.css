@@ -29,7 +29,93 @@
     box-shadow: rgba(100, 100, 111, 0.2) 0 7px 29px 0;
     padding: 50px;
     border-radius: 20px;
-    background-color: white;
+    background-color: var(--igc-surface);
+}
+
+/* Palette. Every colour that has to follow the light or dark colour mode goes
+   through these properties. The values below are the light ones, the same on
+   every supported Moodle version. Solid fills that carry their own white text
+   (avatar, progress segments) read the same in both modes and stay literal. */
+.local-tipgc {
+    --igc-surface: #fff;
+    --igc-surface-float: rgba(255, 255, 255, 0.92);
+    --igc-surface-sunken: #fafafa;
+    --igc-surface-hover: #f4f4f5;
+    --igc-fill: #ececed;
+    --igc-fill-strong: #dddddf;
+    --igc-fill-muted: #c6c6c9;
+    /* Text, from the strongest to the faintest. */
+    --igc-text-1: #1e1e1f;
+    --igc-text-2: #3a3a3e;
+    --igc-text-3: #424244;
+    --igc-text-4: #545457;
+    --igc-text-5: #6f6f73;
+    --igc-text-6: #9a9a9e;
+    --igc-border: rgba(0, 0, 0, 0.125);
+    --igc-border-hover: rgba(0, 0, 0, 0.22);
+    --igc-border-float: rgba(0, 0, 0, 0.16);
+    --igc-divider: rgba(0, 0, 0, 0.2);
+    --igc-rule-strong: rgba(0, 0, 0, 0.1);
+    --igc-rule: rgba(0, 0, 0, 0.08);
+    --igc-rule-soft: rgba(0, 0, 0, 0.06);
+    --igc-info: #2d7ff9;
+    --igc-info-bg: #e8f1fe;
+    --igc-info-bg-subtle: #f5f9ff;
+    --igc-info-bg-strong: #dbe9fc;
+    --igc-success: #1f9d57;
+    --igc-success-bg: #e7f6ee;
+    --igc-warning: #9a6b08;
+    --igc-warning-bg: #fcf3df;
+    --igc-danger: #e23b2e;
+    --igc-danger-bg: #fceae8;
+}
+
+/* Dark colour mode of Boost (Moodle 5.3 and later, experimental): Boost sets
+   data-bs-theme="dark" on <html> and re-points its own greys, so the palette
+   follows them instead of carrying a second set of values. The grey ramp is
+   inverted in dark mode: gray-100 is the page, white the raised surface and
+   gray-900 the strongest text. Moodle 4.5 and 5.1 never set the attribute. */
+[data-bs-theme="dark"] .local-tipgc {
+    --igc-surface: var(--bs-white);
+    --igc-surface-float: var(--bs-white);
+    --igc-surface-sunken: var(--bs-gray-100);
+    --igc-surface-hover: var(--bs-gray-200);
+    --igc-fill: var(--bs-gray-200);
+    --igc-fill-strong: var(--bs-gray-300);
+    --igc-fill-muted: var(--bs-gray-400);
+    --igc-text-1: var(--bs-gray-900);
+    --igc-text-2: var(--bs-gray-800);
+    --igc-text-3: var(--bs-gray-800);
+    --igc-text-4: var(--bs-gray-700);
+    --igc-text-5: var(--bs-gray-600);
+    --igc-text-6: var(--bs-gray-500);
+    --igc-border: var(--bs-gray-300);
+    --igc-border-hover: var(--bs-gray-400);
+    --igc-border-float: var(--bs-gray-300);
+    --igc-divider: var(--bs-gray-300);
+    --igc-rule-strong: rgba(255, 255, 255, 0.1);
+    --igc-rule: rgba(255, 255, 255, 0.08);
+    --igc-rule-soft: rgba(255, 255, 255, 0.06);
+    --igc-info: var(--bs-primary-text-emphasis);
+    --igc-info-bg: var(--mds-bg-feedback-primary-light, var(--bs-primary-bg-subtle));
+    --igc-info-bg-subtle: var(--mds-bg-feedback-primary-light, var(--bs-primary-bg-subtle));
+    --igc-info-bg-strong: var(--mds-bg-feedback-primary-subtle, var(--bs-primary-bg-subtle));
+    --igc-success: var(--bs-success-text-emphasis);
+    --igc-success-bg: var(--mds-bg-feedback-success-light, var(--bs-success-bg-subtle));
+    --igc-warning: var(--bs-warning-text-emphasis);
+    --igc-warning-bg: var(--mds-bg-feedback-warning-light, var(--bs-warning-bg-subtle));
+    --igc-danger: var(--bs-danger-text-emphasis);
+    --igc-danger-bg: var(--mds-bg-feedback-danger-light, var(--bs-danger-bg-subtle));
+}
+
+/* The horizontal Tresipunt logo has dark grey lettering: dark mode swaps it for
+   the white variant. */
+.local-tipgc .tipgc-logo-full-dark,
+[data-bs-theme="dark"] .local-tipgc .tipgc-logo-full-light {
+    display: none;
+}
+[data-bs-theme="dark"] .local-tipgc .tipgc-logo-full-dark {
+    display: block;
 }
 
 /* Rule: icon and text always centred vertically (flex, no baselines). */
@@ -50,7 +136,7 @@
 .local-tipgc a .icon:last-child {
     margin: 3px 0 0 7px;
     font-size: 0.7em;
-    color: #9a9a9e;
+    color: var(--igc-text-6);
     line-height: 1;
     vertical-align: middle;
 }
@@ -64,21 +150,21 @@
 /* Text buttons (btn-link): no underline, hover with a soft background. */
 .local-tipgc .btn-link {
     text-decoration: none;
-    color: #545457;
+    color: var(--igc-text-4);
     font-weight: 500;
     border-radius: 8px;
 }
 .local-tipgc .btn-link:hover {
     text-decoration: none;
-    background: #f4f4f5;
-    color: #1e1e1f;
+    background: var(--igc-surface-hover);
+    color: var(--igc-text-1);
 }
 
 /* C11 — co-branded header. */
 .local-tipgc .tipgc-header {
     gap: 26px;
     padding-bottom: 20px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    border-bottom: 1px solid var(--igc-border);
 }
 .local-tipgc .tipgc-header-brands {
     gap: 16px;
@@ -87,7 +173,7 @@
 .local-tipgc .tipgc-header-divider {
     width: 1px;
     height: 36px;
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--igc-divider);
 }
 .local-tipgc .tipgc-logo-mark {
     display: none;
@@ -98,7 +184,7 @@
     letter-spacing: -0.02em;
 }
 .local-tipgc .tipgc-header-desc {
-    color: #6f6f73;
+    color: var(--igc-text-5);
     font-size: 1rem;
 }
 
@@ -108,6 +194,9 @@
     }
     .local-tipgc .tipgc-logo-mark {
         display: block;
+    }
+    [data-bs-theme="dark"] .local-tipgc .tipgc-logo-full-dark {
+        display: none;
     }
 }
 
@@ -140,30 +229,30 @@
     }
 }
 .local-tipgc .tipgc-badge-pending {
-    background: #ececed;
-    color: #545457;
+    background: var(--igc-fill);
+    color: var(--igc-text-4);
 }
 .local-tipgc .tipgc-badge-running {
-    background: #e8f1fe;
-    color: #2d7ff9;
+    background: var(--igc-info-bg);
+    color: var(--igc-info);
 }
 .local-tipgc .tipgc-badge-success {
-    background: #e7f6ee;
-    color: #1f9d57;
+    background: var(--igc-success-bg);
+    color: var(--igc-success);
 }
 .local-tipgc .tipgc-badge-warning {
-    background: #fcf3df;
-    color: #9a6b08;
+    background: var(--igc-warning-bg);
+    color: var(--igc-warning);
 }
 .local-tipgc .tipgc-badge-error {
-    background: #fceae8;
-    color: #e23b2e;
+    background: var(--igc-danger-bg);
+    color: var(--igc-danger);
 }
 
 /* Course cards and rows (C4). */
 .local-tipgc .tipgc-card {
-    background: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.125);
+    background: var(--igc-surface);
+    border: 1px solid var(--igc-border);
     border-radius: 12px;
 }
 .local-tipgc a {
@@ -176,7 +265,7 @@
     transition: border-color 0.12s ease, box-shadow 0.2s ease, transform 0.12s ease;
 }
 .local-tipgc .tipgc-course:hover {
-    border-color: rgba(0, 0, 0, 0.22);
+    border-color: var(--igc-border-hover);
     box-shadow: 0 6px 18px rgba(30, 30, 31, 0.08);
     transform: translateY(-1px);
 }
@@ -189,16 +278,16 @@
     align-items: center;
     gap: 6px;
     font-weight: 700;
-    color: #1e1e1f;
+    color: var(--igc-text-1);
     transition: color 0.12s ease;
 }
 .local-tipgc .tipgc-course-name:hover {
-    color: #2d7ff9;
+    color: var(--igc-info);
     text-decoration: none;
 }
 .local-tipgc .tipgc-course-name:hover .icon,
 .local-tipgc .tipgc-created-chip:hover .icon {
-    color: #9a9a9e;
+    color: var(--igc-text-6);
     text-decoration: none;
 }
 .local-tipgc .tipgc-course-check {
@@ -210,7 +299,7 @@
     align-items: center;
     gap: 9px;
     font-weight: 500;
-    color: #424244;
+    color: var(--igc-text-3);
     cursor: pointer;
     user-select: none;
     padding: 6px 10px;
@@ -218,7 +307,7 @@
     transition: background-color 0.12s ease;
 }
 .local-tipgc .tipgc-selectall:hover {
-    background: #f4f4f5;
+    background: var(--igc-surface-hover);
 }
 .local-tipgc .tipgc-selectall input[type="checkbox"],
 .local-tipgc .tipgc-course-check {
@@ -233,8 +322,8 @@
     height: 34px;
     flex: none;
     border-radius: 9px;
-    background: #ececed;
-    color: #545457;
+    background: var(--igc-fill);
+    color: var(--igc-text-4);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -243,42 +332,42 @@
     margin: 0;
 }
 .local-tipgc .tipgc-card.tipgc-course.tipgc-selected {
-    border-color: #2d7ff9;
-    background-color: #e8f1fe;
+    border-color: var(--igc-info);
+    background-color: var(--igc-info-bg);
 }
 .local-tipgc .tipgc-course.tipgc-selected .tipgc-course-edit {
-    background: #f5f9ff;
+    background: var(--igc-info-bg-subtle);
 }
 .local-tipgc .tipgc-course.tipgc-selected .tipgc-class-icon {
-    background: #dbe9fc;
-    color: #545457;
+    background: var(--igc-info-bg-strong);
+    color: var(--igc-text-4);
 }
 .local-tipgc .tipgc-course-edit {
-    border-top: 1px dashed rgba(0, 0, 0, 0.125);
-    background: #fafafa;
+    border-top: 1px dashed var(--igc-border);
+    background: var(--igc-surface-sunken);
 }
 .local-tipgc .tipgc-advanced {
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    border-top: 1px solid var(--igc-rule);
 }
 .local-tipgc .tipgc-tag {
-    background: #ececed;
-    color: #545457;
+    background: var(--igc-fill);
+    color: var(--igc-text-4);
     border-radius: 6px;
     padding: 2px 8px;
     font-size: 0.72rem;
     font-weight: 500;
 }
 .local-tipgc .tipgc-tag-archived {
-    background: #dddddf;
+    background: var(--igc-fill-strong);
     font-weight: 600;
 }
 .local-tipgc .tipgc-tag-warning {
-    background: #fcf3df;
-    color: #9a6b08;
+    background: var(--igc-warning-bg);
+    color: var(--igc-warning);
     font-weight: 600;
 }
 .local-tipgc .tipgc-btn-edit {
-    border: 1px solid rgba(0, 0, 0, 0.125);
+    border: 1px solid var(--igc-border);
     border-radius: 8px;
 }
 .local-tipgc .tipgc-label {
@@ -287,7 +376,7 @@
     font-weight: 600;
     letter-spacing: 0.03em;
     text-transform: uppercase;
-    color: #6f6f73;
+    color: var(--igc-text-5);
     margin-bottom: 4px;
 }
 
@@ -305,7 +394,7 @@
 .local-tipgc .tipgc-chips {
     display: inline-flex;
     gap: 3px;
-    background: #ececed;
+    background: var(--igc-fill);
     border-radius: 9px;
     padding: 3px;
 }
@@ -313,15 +402,15 @@
     border: 0;
     border-radius: 7px;
     background: transparent;
-    color: #6f6f73;
+    color: var(--igc-text-5);
     padding: 4px 13px;
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
 }
 .local-tipgc .tipgc-chip.active {
-    background: #fff;
-    color: #1e1e1f;
+    background: var(--igc-surface);
+    color: var(--igc-text-1);
     box-shadow: 0 1px 2px rgba(30, 30, 31, 0.06);
 }
 
@@ -329,10 +418,10 @@
 .local-tipgc .tipgc-footer {
     position: sticky;
     bottom: 12px;
-    background: rgba(255, 255, 255, 0.92);
+    background: var(--igc-surface-float);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(0, 0, 0, 0.16);
+    border: 1px solid var(--igc-border-float);
     border-radius: 12px;
     box-shadow: 0 -4px 16px rgba(30, 30, 31, 0.10), 0 12px 36px rgba(30, 30, 31, 0.22);
     z-index: 10;
@@ -362,8 +451,8 @@
     width: 26px;
     height: 26px;
     border-radius: 50%;
-    background: #e8f1fe;
-    color: #2d7ff9;
+    background: var(--igc-info-bg);
+    color: var(--igc-info);
     font-weight: 700;
     font-size: 0.8rem;
     display: inline-flex;
@@ -389,21 +478,21 @@
 
 /* Connected account (reusable chip). */
 .local-tipgc .tipgc-account-chip {
-    background: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.125);
+    background: var(--igc-surface);
+    border: 1px solid var(--igc-border);
     border-radius: 12px;
     padding: 8px 16px 8px 10px;
     box-shadow: 0 1px 2px rgba(30, 30, 31, 0.06);
     transition: border-color 0.12s ease, box-shadow 0.2s ease;
 }
 .local-tipgc .tipgc-account-chip:hover {
-    border-color: rgba(0, 0, 0, 0.22);
+    border-color: var(--igc-border-hover);
     box-shadow: 0 2px 6px rgba(30, 30, 31, 0.07);
 }
 .local-tipgc .tipgc-account-change {
     font-size: 0.78rem;
     font-weight: 500;
-    color: #2d7ff9;
+    color: var(--igc-info);
 }
 .local-tipgc .tipgc-avatar {
     width: 34px;
@@ -428,7 +517,7 @@
     height: 12px;
     border-radius: 99px;
     overflow: hidden;
-    background: #dddddf;
+    background: var(--igc-fill-strong);
 }
 .local-tipgc .tipgc-progressbar-seg {
     transition: width 0.4s ease;
@@ -443,7 +532,7 @@
     background: #2d7ff9;
 }
 .local-tipgc .tipgc-seg-pending {
-    background: #c6c6c9;
+    background: var(--igc-fill-muted);
 }
 .local-tipgc .tipgc-counters {
     gap: 16px;
@@ -461,10 +550,10 @@
     display: inline-block;
 }
 .local-tipgc .tipgc-refresh-note {
-    color: #2d7ff9;
+    color: var(--igc-info);
 }
 .local-tipgc .tipgc-error-count {
-    color: #e23b2e;
+    color: var(--igc-danger);
     font-size: 0.8rem;
     font-weight: 600;
 }
@@ -489,24 +578,24 @@
 .local-tipgc .tipgc-table th {
     text-align: left;
     padding: 11px 16px;
-    color: #6f6f73;
+    color: var(--igc-text-5);
     font-weight: 600;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    border-bottom: 1px solid var(--igc-border);
 }
 .local-tipgc .tipgc-table td {
     padding: 12px 16px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid var(--igc-rule-soft);
     vertical-align: middle;
 }
 .local-tipgc .tipgc-table tbody tr:last-child td {
     border-bottom: 0;
 }
 .local-tipgc .tipgc-table tbody tr:hover {
-    background: #fafafa;
+    background: var(--igc-surface-sunken);
 }
 .local-tipgc .tipgc-row-active {
-    border-left: 3px solid #2d7ff9;
-    background: #f5f9ff;
+    border-left: 3px solid var(--igc-info);
+    background: var(--igc-info-bg-subtle);
 }
 .local-tipgc .tipgc-minibar {
     width: 96px;
@@ -515,15 +604,15 @@
 }
 .local-tipgc .tipgc-account-cell {
     font-size: 0.75rem;
-    color: #6f6f73;
+    color: var(--igc-text-5);
     max-width: 220px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 .local-tipgc .tipgc-table-foot {
-    background: #fafafa;
-    border-top: 1px solid rgba(0, 0, 0, 0.125);
+    background: var(--igc-surface-sunken);
+    border-top: 1px solid var(--igc-border);
 }
 
 /* Final summary. */
@@ -541,14 +630,14 @@
     line-height: 1;
 }
 .local-tipgc .tipgc-stat-success {
-    color: #1f9d57;
+    color: var(--igc-success);
 }
 .local-tipgc .tipgc-stat-error {
-    color: #e23b2e;
+    color: var(--igc-danger);
 }
 .local-tipgc .tipgc-stat-l {
     font-size: 0.8rem;
-    color: #6f6f73;
+    color: var(--igc-text-5);
 }
 .local-tipgc .tipgc-created {
     gap: 8px;
@@ -556,8 +645,8 @@
 .local-tipgc .tipgc-created-chip {
     display: inline-flex;
     align-items: center;
-    background: #fafafa;
-    border: 1px solid rgba(0, 0, 0, 0.125);
+    background: var(--igc-surface-sunken);
+    border: 1px solid var(--igc-border);
     border-radius: 8px;
     padding: 6px 12px;
     font-size: 0.85rem;
@@ -572,7 +661,7 @@
 .local-tipgc .tipgc-log-lines {
     max-height: 240px;
     overflow: auto;
-    background: #fafafa;
+    background: var(--igc-surface-sunken);
     border-radius: 8px;
     padding: 8px 0;
 }
@@ -584,14 +673,14 @@
     line-height: 1.5;
 }
 .local-tipgc .tipgc-log-time {
-    color: #9a9a9e;
+    color: var(--igc-text-6);
     flex: none;
 }
 .local-tipgc .tipgc-log-warning .tipgc-log-msg {
-    color: #9a6b08;
+    color: var(--igc-warning);
 }
 .local-tipgc .tipgc-log-error .tipgc-log-msg {
-    color: #e23b2e;
+    color: var(--igc-danger);
     font-weight: 500;
 }
 
@@ -602,9 +691,9 @@
 .local-tipgc .tipgc-uri {
     min-width: 0;
     font-size: 0.82rem;
-    color: #3a3a3e;
-    background: #fafafa;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: var(--igc-text-2);
+    background: var(--igc-surface-sunken);
+    border: 1px solid var(--igc-rule);
     border-radius: 8px;
     padding: 10px 12px;
     overflow: hidden;
@@ -612,7 +701,7 @@
     white-space: nowrap;
 }
 .local-tipgc .tipgc-copy-feedback {
-    color: #1f9d57;
+    color: var(--igc-success);
     min-height: 15px;
 }
 
@@ -795,7 +884,7 @@
         display: none;
     }
     .local-tipgc .tipgc-table tr {
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        border-bottom: 1px solid var(--igc-rule-strong);
         padding: 12px 0;
         text-align: center;
     }

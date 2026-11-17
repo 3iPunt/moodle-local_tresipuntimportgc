@@ -82,7 +82,8 @@ final class importer_test extends \advanced_testcase {
         $this->assertSame('1//refresh-token', $import->get_refresh_token());
         $this->assertSame(import::STATUS_QUEUED, $import->get_status());
 
-        $courses = $import->get_courses();
+        // Moodle 5.2+ keys persistent records by id; index them by position.
+        $courses = array_values($import->get_courses());
         $this->assertCount(2, $courses);
         $this->assertSame('bio1', $courses[0]->get('shortname'));
         $this->assertSame(1, (int) $courses[0]->get('importfiles'));
