@@ -7,7 +7,7 @@
 <h1 align="center">Importación de cursos desde Google Classroom</h1>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.0.0-informational" alt="Version">
+  <img src="https://img.shields.io/badge/version-2.0.2-informational" alt="Version">
   <a href="https://moodle.org"><img src="https://img.shields.io/badge/Moodle-4.5%20%7C%205.1%20%7C%205.3-orange?logo=moodle" alt="Moodle"></a>
   <img src="https://img.shields.io/badge/PHP-8.1%2B-777BB4?logo=php&logoColor=white" alt="PHP">
   <img src="https://img.shields.io/badge/License-GPL--3.0-green" alt="License">
@@ -88,7 +88,7 @@ Moodle ni el tema.
 | Requisito | Versión |
 |---|---|
 | Moodle | 4.5 LTS, 5.1 o 5.3 LTS |
-| PHP | 8.1 o superior |
+| PHP | 8.1 o superior (8.3 o superior en Moodle 5.3) |
 | Otros plugins | No requiere |
 | Cron de Moodle | Necesario — las importaciones corren como tareas en segundo plano |
 | Servicios Google | Proyecto de Google Cloud con las APIs de Classroom, Drive, Calendar y Forms, y un cliente OAuth 2.0 de tipo *aplicación web* |
